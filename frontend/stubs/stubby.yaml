@@ -1,0 +1,52 @@
+- request:
+    url: /settings/debug
+    method: GET
+  response:
+    - status: 200
+      file: responses/settings_debug.json
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: /settings/ap
+    method: [GET, POST]
+  response:
+    - status: 200
+      file: responses/settings_ap.json
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: /flags
+    method: GET
+  response:
+    - status: 200
+      file: responses/flags.json
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: /settings/location
+    method: [GET, POST]
+  response:
+    - status: 200
+      file: responses/settings_location.json
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: /status/align
+    method: GET
+  response:
+    - status: 200
+      file: responses/status_align.json
+      headers:
+        Content-Type: application/json
+# -  request:
+#       url: ^/settings/ap$
+#       method: OPTIONS
+#    response:
+#       status: 204
+#       headers:
+#          content-type: application/json
+#          Allow: OPTIONS, GET, POST
