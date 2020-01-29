@@ -11,26 +11,58 @@ import (
 type FlagStruct struct {
 	NeedsAPSettings       bool
 	NeedsLocationSettings bool
-	PreviousTime          time.Time
+}
+
+type appContext struct {
+	Flags        *FlagStruct
+	PreviousTime *time.Time
+}
+
+type appHandler struct {
+	*appContext
+	H func(*appContext, http.ResponseWriter, *http.Request) (int, error)
+}
+
+func (ah appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	status, err := ah.H(ah.appContext, w, r)
+
+	if err != nil {
+		log.Printf("HTTP %d: %q", status, err)
+		switch status {
+		case http.StatusNotFound:
+			http.NotFound(w, r)
+			// And if we wanted a friendlier error page, we can
+			// now leverage our context instance - e.g.
+			// err := ah.renderTemplate(w, "http_404.tmpl", nil)
+		case http.StatusInternalServerError:
+			http.Error(w, http.StatusText(status), status)
+		default:
+			http.Error(w, http.StatusText(status), status)
+		}
+	}
+}
+
+func IndexHandler(a *appContext, w http.ResponseWriter, r *http.Request) (int, error) {
+	io.WriteString(w, fmt.Sprintf("%v", a.PreviousTime))
+	return 200, nil
 }
 
 func main() {
 	log.Println("hello world")
 	previousTime := time.Now()
 
-	updateChan := make(chan time.Time)
-
 	var flags = FlagStruct{
 		NeedsAPSettings:       false,
 		NeedsLocationSettings: false,
-		PreviousTime:          previousTime,
 	}
 
-	go func
-	http.HandleFunc("/flags", flags.flagHandler)
+	context := &appContext{
+		Flags:        &flags,
+		PreviousTime: &previousTime,
+	}
 
-	// log.Fatal(http.ListenAndServe(":8080", nil))
-	// go http.ListenAndServe(":8080", nil)
+	http.Handle("/", appHandler{context, IndexHandler})
+	go http.ListenAndServe(":8080", nil)
 
 	for true {
 		currentTime := time.Now()
@@ -39,21 +71,6 @@ func main() {
 		if diff.Seconds() >= 2.00 {
 			previousTime = currentTime
 			log.Println(previousTime)
-			flags.PreviousTime = previousTime
 		}
 	}
-}
-
-func (f FlagStruct) flagHandler(w http.ResponseWriter, _ *http.Request) {
-	io.WriteString(w, fmt.Sprintf("%v", f))
-}
-
-func (f FlagStruct) updateFlags(NeedsAPSettings bool, NeedsLocationSettings bool, PreviousTime time.Time) {
-	f.NeedsAPSettings = NeedsAPSettings
-	f.NeedsLocationSettings = NeedsLocationSettings
-	f.PreviousTime = PreviousTime
-}
-
-func (f FlagStruct) updateTime(time.Time) {
-	
 }
