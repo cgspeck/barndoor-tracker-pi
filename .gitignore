@@ -4,4 +4,4 @@ frontend/node_modules/
 frontend/build/
 .vscode/ipch
 .vscode/.browse.c_cpp.db
-backend/web
+backend/backend
