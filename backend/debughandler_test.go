@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bradleyjkemp/cupaloy"
+	"github.com/pyros2097/cupaloy"
 )
 
 func TestDebugHandler(t *testing.T) {

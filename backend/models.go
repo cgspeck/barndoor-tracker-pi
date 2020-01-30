@@ -6,6 +6,7 @@ import "time"
 type FlagStruct struct {
 	NeedsNetworkSettings  bool
 	NeedsLocationSettings bool
+	IsRoot                bool
 }
 
 // configuration
@@ -31,9 +32,10 @@ type WirelessStation struct {
 }
 
 type NetworkSettingsStruct struct {
-	AccessPointMode  bool
-	APSettings       *APSettingsStruct
-	WirelessStations []*WirelessStation
+	AccessPointMode   bool
+	APSettings        *APSettingsStruct
+	ManagementEnabled bool
+	WirelessStations  []*WirelessStation
 }
 
 // statuses

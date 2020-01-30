@@ -1,14 +1,19 @@
 package main
 
 import (
+	"os/user"
 	"time"
 )
 
 func CreateAppContext(previousTime time.Time) *AppContext {
 	// TODO: load settings from configuration, if it exists
+
+	user, _ := user.Current()
+
 	var flags = FlagStruct{
 		NeedsNetworkSettings:  true,
 		NeedsLocationSettings: true,
+		IsRoot:                user.Uid == "0",
 	}
 
 	var location = LocationStruct{
@@ -35,7 +40,8 @@ func CreateAppContext(previousTime time.Time) *AppContext {
 			Key:     "",
 			Channel: 11,
 		},
-		WirelessStations: []*WirelessStation{},
+		ManagementEnabled: flags.IsRoot,
+		WirelessStations:  []*WirelessStation{},
 	}
 	return &AppContext{
 		AlignStatus:           &alignStatus,

@@ -14,7 +14,8 @@
   },
   "Flags": {
     "NeedsNetworkSettings": true,
-    "NeedsLocationSettings": true
+    "NeedsLocationSettings": true,
+    "IsRoot": false
   },
   "Location": {
     "Latitude": -37.74,
@@ -33,6 +34,7 @@
       "Key": "",
       "Channel": 11
     },
+    "ManagementEnabled": false,
     "WirelessStations": []
   }
 }),
