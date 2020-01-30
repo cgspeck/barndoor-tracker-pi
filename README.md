@@ -7,3 +7,10 @@ If on Ubuntu 18.04 LTS, download and compile the latest [libarchive](https://www
 Follow directions [here](https://archlinuxarm.org/platforms/armv8/broadcom/raspberry-pi-3#installation) to prepare the new microSD card.
 
 Then run `./arch/bootstrap.sh` as root.
+
+## Updating snapshots
+
+```
+cd backend
+UPDATE_SNAPSHOTS=true go test . -v
+```

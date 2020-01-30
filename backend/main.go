@@ -9,12 +9,12 @@ import (
 	"time"
 )
 
-type appHandler struct {
+type AppHandler struct {
 	*AppContext
 	H func(*AppContext, http.ResponseWriter, *http.Request) (int, error)
 }
 
-func (ah appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (ah AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	status, err := ah.H(ah.AppContext, w, r)
 
 	if err != nil {
@@ -31,6 +31,7 @@ func (ah appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.StatusText(status), status)
 		}
 	}
+	w.Header().Set("Content-Type", "application/json")
 }
 
 func IndexHandler(a *AppContext, w http.ResponseWriter, r *http.Request) (int, error) {
@@ -39,11 +40,12 @@ func IndexHandler(a *AppContext, w http.ResponseWriter, r *http.Request) (int, e
 }
 
 func DebugHandler(a *AppContext, w http.ResponseWriter, r *http.Request) (int, error) {
-	b, err := json.Marshal(a)
+	b, err := json.MarshalIndent(a, "", "  ")
 	if err != nil {
 		return 500, err
 	}
 	io.WriteString(w, string(b))
+
 	return 200, nil
 }
 
@@ -51,50 +53,10 @@ func main() {
 	log.Println("hello world")
 	previousTime := time.Now()
 
-	// TODO: load settings from configuration, if it exists
+	context := CreateAppContext(previousTime)
 
-	var flags = FlagStruct{
-		NeedsNetworkSettings:  true,
-		NeedsLocationSettings: true,
-	}
-
-	var location = LocationStruct{
-		Latitude:       -37.74,
-		MagDeclination: 11.64,
-		AzError:        2.0,
-		AltError:       2.0,
-		XOffset:        0,
-		YOffset:        0,
-		ZOffset:        0,
-	}
-
-	var alignStatus = AlignStatusStruct{
-		AltAligned: true,
-		AzAligned:  true,
-		CurrentAz:  181.2,
-		CurrentAlt: -37.4,
-	}
-
-	var networkSettings = NetworkSettingsStruct{
-		AccessPointMode: true,
-		APSettings: &APSettingsStruct{
-			SSID:    "barndoor-tracker",
-			Key:     "",
-			Channel: 11,
-		},
-		WirelessStations: []*WirelessStation{},
-	}
-
-	context := &AppContext{
-		AlignStatus:           &alignStatus,
-		Flags:                 &flags,
-		Location:              &location,
-		PreviousTime:          &previousTime,
-		NetworkSettingsStruct: &networkSettings,
-	}
-
-	http.Handle("/", appHandler{context, IndexHandler})
-	http.Handle("/debug", appHandler{context, DebugHandler})
+	http.Handle("/", AppHandler{context, IndexHandler})
+	http.Handle("/debug", AppHandler{context, DebugHandler})
 	go http.ListenAndServe(":8080", nil)
 
 	for true {
