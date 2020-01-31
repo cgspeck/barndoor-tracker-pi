@@ -6,30 +6,61 @@ import (
 	"os/user"
 	"time"
 
-	"github.com/spf13/viper"
+	"github.com/zpatrick/go-config"
 )
 
-func CreateAppContext(previousTime time.Time) *AppContext {
-	viper.SetConfigName("config.json")
-	viper.AddConfigPath(".")
-	viper.AddConfigPath("$HOME/.barndoor")
-	viper.AddConfigPath("/etc/barndoor/")
+const configFilename = "config.json"
 
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			// Config file not found; ignore error if desired
-			log.Println(err)
-			log.Printf("Loading defaults")
+type configSettings struct {
+	AccessPointMode       bool
+	APSettings            APSettingsStruct
+	LocationSettings      LocationStruct
+	NeedsNetworkSettings  bool
+	NeedsLocationSettings bool
+}
+
+func configBoolOrFatal(c *config.Config, key string, defaultValue bool) bool {
+	val, err := c.BoolOr(key, defaultValue)
+	if err != nil {
+		log.Fatalf("Unable to load %s from config: %s", key, err)
+	}
+	return val
+}
+
+func loadConfig() *configSettings {
+	jsonFile := config.NewJSONFile(configFilename)
+	c := config.NewConfig([]config.Provider{jsonFile})
+
+	if err := c.Load(); err != nil {
+		log.Println(err)
+		if err == err.(*os.PathError) {
+			log.Println("Creating empty config file")
+			fh, err := os.Create(configFilename)
+			if err != nil {
+				log.Fatalf("Unable to create new config file! %s\n", err)
+			}
+			fh.WriteString("{}\n")
+			fh.Close()
 		} else {
-			log.Println(err)
 			os.Exit(1)
 		}
 	}
+
+	return &configSettings{
+		AccessPointMode:       configBoolOrFatal(c, "AccessPointMode", true),
+		NeedsLocationSettings: configBoolOrFatal(c, "NeedsLocationSettings", true),
+		NeedsNetworkSettings:  configBoolOrFatal(c, "NeedsNetworkSettings", true),
+	}
+}
+
+func CreateAppContext(previousTime time.Time) *AppContext {
 	user, _ := user.Current()
 
+	configSettings := loadConfig()
+
 	var flags = FlagStruct{
-		NeedsNetworkSettings:  true,
-		NeedsLocationSettings: true,
+		NeedsNetworkSettings:  configSettings.NeedsNetworkSettings,
+		NeedsLocationSettings: configSettings.NeedsLocationSettings,
 		IsRoot:                user.Uid == "0",
 	}
 
@@ -51,7 +82,7 @@ func CreateAppContext(previousTime time.Time) *AppContext {
 	}
 
 	var networkSettings = NetworkSettingsStruct{
-		AccessPointMode: true,
+		AccessPointMode: configSettings.AccessPointMode,
 		APSettings: &APSettingsStruct{
 			SSID:    "barndoor-tracker",
 			Key:     "",
