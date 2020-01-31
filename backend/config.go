@@ -1,13 +1,30 @@
 package main
 
 import (
+	"log"
+	"os"
 	"os/user"
 	"time"
+
+	"github.com/spf13/viper"
 )
 
 func CreateAppContext(previousTime time.Time) *AppContext {
-	// TODO: load settings from configuration, if it exists
+	viper.SetConfigName("config.json")
+	viper.AddConfigPath(".")
+	viper.AddConfigPath("$HOME/.barndoor")
+	viper.AddConfigPath("/etc/barndoor/")
 
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			// Config file not found; ignore error if desired
+			log.Println(err)
+			log.Printf("Loading defaults")
+		} else {
+			log.Println(err)
+			os.Exit(1)
+		}
+	}
 	user, _ := user.Current()
 
 	var flags = FlagStruct{
