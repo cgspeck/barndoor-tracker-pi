@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 	"os/user"
 	"time"
 
@@ -10,6 +9,9 @@ import (
 )
 
 const configFilename = "config.json"
+const configKeyAccessPointMode = "accessPointMode"
+const configKeyNeedsNetworkSettings = "needsNetworkSettings"
+const configKeyNeedsLocationSettings = "needsLocationSettings"
 
 type configSettings struct {
 	AccessPointMode       bool
@@ -19,8 +21,8 @@ type configSettings struct {
 	NeedsLocationSettings bool
 }
 
-func configBoolOrFatal(c *config.Config, key string, defaultValue bool) bool {
-	val, err := c.BoolOr(key, defaultValue)
+func configBoolOrFatal(c *config.Config, key string) bool {
+	val, err := c.Bool(key)
 	if err != nil {
 		log.Fatalf("Unable to load %s from config: %s", key, err)
 	}
@@ -28,28 +30,25 @@ func configBoolOrFatal(c *config.Config, key string, defaultValue bool) bool {
 }
 
 func loadConfig() *configSettings {
+	mappings := map[string]string{
+		configKeyAccessPointMode:       "true",
+		configKeyNeedsLocationSettings: "true",
+		configKeyNeedsNetworkSettings:  "true",
+	}
+
+	defaults := config.NewStatic(mappings)
 	jsonFile := config.NewJSONFile(configFilename)
-	c := config.NewConfig([]config.Provider{jsonFile})
+	providers := []config.Provider{defaults, jsonFile}
+	c := config.NewConfig(providers)
 
 	if err := c.Load(); err != nil {
-		log.Println(err)
-		if err == err.(*os.PathError) {
-			log.Println("Creating empty config file")
-			fh, err := os.Create(configFilename)
-			if err != nil {
-				log.Fatalf("Unable to create new config file! %s\n", err)
-			}
-			fh.WriteString("{}\n")
-			fh.Close()
-		} else {
-			os.Exit(1)
-		}
+		log.Fatalf("Error loading configuration: %s", err)
 	}
 
 	return &configSettings{
-		AccessPointMode:       configBoolOrFatal(c, "AccessPointMode", true),
-		NeedsLocationSettings: configBoolOrFatal(c, "NeedsLocationSettings", true),
-		NeedsNetworkSettings:  configBoolOrFatal(c, "NeedsNetworkSettings", true),
+		AccessPointMode:       configBoolOrFatal(c, configKeyAccessPointMode),
+		NeedsLocationSettings: configBoolOrFatal(c, configKeyNeedsLocationSettings),
+		NeedsNetworkSettings:  configBoolOrFatal(c, configKeyNeedsNetworkSettings),
 	}
 }
 
