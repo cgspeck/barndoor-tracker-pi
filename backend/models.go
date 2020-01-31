@@ -21,14 +21,14 @@ type LocationStruct struct {
 }
 
 type APSettingsStruct struct {
-	SSID    string
-	Key     string
 	Channel int8
+	Key     string
+	SSID    string
 }
 
 type WirelessStation struct {
-	SSID string
 	Key  string
+	SSID string
 }
 
 type NetworkSettingsStruct struct {

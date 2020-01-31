@@ -9,14 +9,21 @@ import (
 )
 
 const configFilename = "config.json"
+
+// top level
 const configKeyAccessPointMode = "accessPointMode"
 const configKeyNeedsNetworkSettings = "needsNetworkSettings"
 const configKeyNeedsLocationSettings = "needsLocationSettings"
 
+// ap settings
+const configKeyAPChannel = "aPChannel"
+const configKeyAPKey = "aPKey"
+const configKeyAPSSID = "aPSSID"
+
 type configSettings struct {
 	AccessPointMode       bool
-	APSettings            APSettingsStruct
-	LocationSettings      LocationStruct
+	APSettings            *APSettingsStruct
+	LocationSettings      *LocationStruct
 	NeedsNetworkSettings  bool
 	NeedsLocationSettings bool
 }
@@ -29,11 +36,30 @@ func configBoolOrFatal(c *config.Config, key string) bool {
 	return val
 }
 
+func configStringOrFatal(c *config.Config, key string) string {
+	val, err := c.String(key)
+	if err != nil {
+		log.Fatalf("Unable to load %s from config: %s", key, err)
+	}
+	return val
+}
+
+func configInt8OrFatal(c *config.Config, key string) int8 {
+	val, err := c.Int(key)
+	if err != nil {
+		log.Fatalf("Unable to load %s from config: %s", key, err)
+	}
+	return int8(val)
+}
+
 func loadConfig() *configSettings {
 	mappings := map[string]string{
 		configKeyAccessPointMode:       "true",
 		configKeyNeedsLocationSettings: "true",
 		configKeyNeedsNetworkSettings:  "true",
+		configKeyAPChannel:             "11",
+		configKeyAPSSID:                "barndoor-tracker",
+		configKeyAPKey:                 "",
 	}
 
 	defaults := config.NewStatic(mappings)
@@ -46,7 +72,12 @@ func loadConfig() *configSettings {
 	}
 
 	return &configSettings{
-		AccessPointMode:       configBoolOrFatal(c, configKeyAccessPointMode),
+		AccessPointMode: configBoolOrFatal(c, configKeyAccessPointMode),
+		APSettings: &APSettingsStruct{
+			Channel: configInt8OrFatal(c, configKeyAPChannel),
+			Key:     configStringOrFatal(c, configKeyAPKey),
+			SSID:    configStringOrFatal(c, configKeyAPSSID),
+		},
 		NeedsLocationSettings: configBoolOrFatal(c, configKeyNeedsLocationSettings),
 		NeedsNetworkSettings:  configBoolOrFatal(c, configKeyNeedsNetworkSettings),
 	}
