@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os/user"
 	"time"
@@ -20,6 +21,8 @@ const configKeyAPChannel = "aPChannel"
 const configKeyAPKey = "aPKey"
 const configKeyAPSSID = "aPSSID"
 
+// location settings
+
 type configSettings struct {
 	AccessPointMode       bool
 	APSettings            *APSettingsStruct
@@ -36,20 +39,24 @@ func configBoolOrFatal(c *config.Config, key string) bool {
 	return val
 }
 
-func configStringOrFatal(c *config.Config, key string) string {
+func configStringOrFatal(c *config.Config, key string, allowEmpty bool) string {
 	val, err := c.String(key)
 	if err != nil {
+		if err.Error() == fmt.Sprintf("Required setting '%s' not set", key) && allowEmpty {
+			log.Printf("Empty value for %q", key)
+			return ""
+		}
 		log.Fatalf("Unable to load %s from config: %s", key, err)
 	}
 	return val
 }
 
-func configInt8OrFatal(c *config.Config, key string) int8 {
+func configIntOrFatal(c *config.Config, key string) int {
 	val, err := c.Int(key)
 	if err != nil {
 		log.Fatalf("Unable to load %s from config: %s", key, err)
 	}
-	return int8(val)
+	return val
 }
 
 func loadConfig() *configSettings {
@@ -74,9 +81,9 @@ func loadConfig() *configSettings {
 	return &configSettings{
 		AccessPointMode: configBoolOrFatal(c, configKeyAccessPointMode),
 		APSettings: &APSettingsStruct{
-			Channel: configInt8OrFatal(c, configKeyAPChannel),
-			Key:     configStringOrFatal(c, configKeyAPKey),
-			SSID:    configStringOrFatal(c, configKeyAPSSID),
+			Channel: configIntOrFatal(c, configKeyAPChannel),
+			Key:     configStringOrFatal(c, configKeyAPKey, true),
+			SSID:    configStringOrFatal(c, configKeyAPSSID, false),
 		},
 		NeedsLocationSettings: configBoolOrFatal(c, configKeyNeedsLocationSettings),
 		NeedsNetworkSettings:  configBoolOrFatal(c, configKeyNeedsNetworkSettings),

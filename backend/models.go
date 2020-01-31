@@ -15,13 +15,13 @@ type LocationStruct struct {
 	MagDeclination float32
 	AzError        float32
 	AltError       float32
-	XOffset        int16
-	YOffset        int16
-	ZOffset        int16
+	XOffset        int
+	YOffset        int
+	ZOffset        int
 }
 
 type APSettingsStruct struct {
-	Channel int8
+	Channel int
 	Key     string
 	SSID    string
 }
