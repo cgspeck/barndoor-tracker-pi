@@ -91,7 +91,14 @@ func EnableAP(interfaceName string, apSettings *models.APSettingsStruct) error {
 		fmt.Sprintf("ip link set %v up", interfaceName),
 		"systemctl enable hostapd",
 		"systemctl start hostapd",
-		fmt.Sprintf("ip addr add 192.168.0.1/24 dev %s", interfaceName),
+	}
+	err, _, _ = process.RunCommands(commands)
+	if err != nil {
+		return err
+	}
+	// don't really mind if the next line fails
+	_, _, _ = process.ShellOut(fmt.Sprintf("ip addr add 192.168.0.1/24 dev %s", interfaceName))
+	commands = []string{
 		"systemctl enable dnsmasq",
 		"systemctl start dnsmasq",
 	}
@@ -110,6 +117,16 @@ func disableAP(interfaceName string) error {
 		"systemctl stop dnsmasq",
 	}
 	err, _, _ := process.RunCommands(commands)
+	if err != nil {
+		return err
+	}
+	// intentionally ignore errors on next call
+	_, _, _ = process.ShellOut(fmt.Sprintf("ip addr del 192.168.0.1/24 dev %s", interfaceName))
+	commands = []string{
+		"systemctl disable dnsmasq",
+		"systemctl stop dnsmasq",
+	}
+	err, _, _ = process.RunCommands(commands)
 	return err
 }
 
