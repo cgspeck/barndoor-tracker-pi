@@ -129,9 +129,6 @@ func loadConfig() *configSettings {
 		NeedsLocationSettings: configBoolOrFatal(c, configKeyNeedsLocationSettings),
 		NeedsNetworkSettings:  configBoolOrFatal(c, configKeyNeedsNetworkSettings),
 	}
-	// Persist config
-	// Apply startup flags
-
 	return &cs
 }
 
@@ -162,10 +159,15 @@ func getWirelessInterface() (string, error) {
 	return builder.String(), nil
 }
 
-func CreateAppContext(previousTime time.Time) (*models.AppContext, error) {
+func CreateAppContext(previousTime time.Time, cmdFlags models.CmdFlags) (*models.AppContext, error) {
 	user, _ := user.Current()
 
 	configSettings := loadConfig()
+
+	if cmdFlags.DisableAP {
+		log.Println("Disabling Access Point per start-up options")
+		configSettings.AccessPointMode = false
+	}
 
 	gotRoot := user.Uid == "0"
 

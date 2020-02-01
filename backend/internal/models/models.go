@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 // global config flags for frontend
 type FlagStruct struct {
@@ -60,6 +62,11 @@ type AlignStatusStruct struct {
 // 	IntervolmeterEnable bool
 // 	DewControlEnable    bool
 // }
+
+// startup flags
+type CmdFlags struct {
+	DisableAP bool
+}
 
 // the app context!
 type AppContext struct {

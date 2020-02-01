@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -55,9 +56,15 @@ func DebugHandler(a *models.AppContext, w http.ResponseWriter, r *http.Request) 
 
 func main() {
 	log.Println("Barndoor Tracker Startup")
+
+	var cmdFlags = models.CmdFlags{}
+
+	flag.BoolVar(&cmdFlags.DisableAP, "disable-ap", false, "Disables Access Point mode")
+	flag.Parse()
+
 	previousTime := time.Now()
 
-	context, err := CreateAppContext(previousTime)
+	context, err := CreateAppContext(previousTime, cmdFlags)
 	if err != nil {
 		log.Fatalf("Unable to create application context!")
 	}
