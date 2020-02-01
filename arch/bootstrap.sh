@@ -12,5 +12,5 @@ locale-gen
 echo "LANG=en_AU.UTF-8" > /etc/locale.conf
 
 pacman -Sy
-pacman -S --needed - < pkglist.txt
+pacman -S -y --needed - < pkglist.txt
 pacman -Su

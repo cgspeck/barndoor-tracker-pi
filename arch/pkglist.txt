@@ -4,3 +4,4 @@ npm
 neovim
 sudo
 tmux
+wireless_tools

@@ -1,15 +1,14 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"log"
-	"os/exec"
 	"os/user"
 	"strings"
 	"time"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
+	"github.com/cgspeck/barndoor-tracker-pi/internal/process"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/wireless"
 
 	"github.com/zpatrick/go-config"
@@ -127,27 +126,8 @@ func loadConfig() *configSettings {
 	}
 }
 
-func ShellOut(command string) (error, string, string) {
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-	cmd := exec.Command("bash", "-c", command)
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	err := cmd.Run()
-	if err != nil {
-		log.Printf(
-			"Exit status %s executing %q:\nCaptured StdOut:%v\nCaptured StdErr%v\n",
-			err,
-			command,
-			stdout,
-			stderr,
-		)
-	}
-	return err, stdout.String(), stderr.String()
-}
-
 func getWirelessInterface() (string, error) {
-	err, stdOut, _ := ShellOut("ip link | grep wl")
+	err, stdOut, _ := process.ShellOut("ip link | grep wl")
 
 	if err != nil {
 		return "", err
@@ -205,9 +185,16 @@ func CreateAppContext(previousTime time.Time) (*models.AppContext, error) {
 	log.Printf("Wireless interface is %q", wirelessInterface)
 
 	if gotRoot {
+		wireless.Setup(wirelessInterface)
 		wirelessProfiles, err = wireless.ReadProfiles(wirelessInterface)
 		if err != nil {
 			log.Print("Unable to load profiles")
+			return nil, err
+		}
+
+		avaliableNetworks, err = wireless.ScanAvailableNetworks(wirelessInterface)
+		if err != nil {
+			log.Print("Unable to scan networks")
 			return nil, err
 		}
 	}

@@ -32,8 +32,10 @@ type WirelessProfile struct {
 }
 
 type AvailableNetwork struct {
-	SSID string
-	Rsi  int
+	Channel     int
+	Frequency   string
+	SSID        string
+	SignalLevel int
 }
 
 type NetworkSettingsStruct struct {
