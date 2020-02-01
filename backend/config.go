@@ -209,10 +209,10 @@ func CreateAppContext(previousTime time.Time) (*models.AppContext, error) {
 	}
 
 	return &models.AppContext{
-		AlignStatus:           &alignStatus,
-		Flags:                 &flags,
-		Location:              configSettings.LocationSettings,
-		PreviousTime:          &previousTime,
-		NetworkSettingsStruct: &networkSettings,
+		AlignStatus:     &alignStatus,
+		Flags:           &flags,
+		Location:        configSettings.LocationSettings,
+		PreviousTime:    &previousTime,
+		NetworkSettings: &networkSettings,
 	}, nil
 }

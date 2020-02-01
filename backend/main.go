@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/cgspeck/barndoor-tracker-pi/internal/wireless"
+
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 )
 
@@ -58,6 +60,11 @@ func main() {
 	context, err := CreateAppContext(previousTime)
 	if err != nil {
 		log.Fatalf("Unable to create application context!")
+	}
+
+	err = wireless.ApplyDesiredConfiguration(context.NetworkSettings)
+	if err != nil {
+		log.Fatalf("Unable to apply desired network settings!\n\n%+v\n", err, context.NetworkSettings)
 	}
 
 	http.Handle("/", AppHandler{context, IndexHandler})

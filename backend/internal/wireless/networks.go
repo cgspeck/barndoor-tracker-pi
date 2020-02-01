@@ -18,7 +18,7 @@ func ScanAvailableNetworks(interfaceName string) (networks []*models.AvailableNe
 	if err != nil {
 		if err.Error() == "exit status 255" {
 			fmt.Println("Retry scan in 5 seconds")
-			time.Sleep(5)
+			time.Sleep(5000)
 			err, stdOut, _ = process.ShellOut(fmt.Sprintf("iwlist %s scan", interfaceName))
 
 			if err != nil {

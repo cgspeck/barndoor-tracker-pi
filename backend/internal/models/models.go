@@ -63,9 +63,9 @@ type AlignStatusStruct struct {
 
 // the app context!
 type AppContext struct {
-	AlignStatus           *AlignStatusStruct
-	Flags                 *FlagStruct
-	Location              *LocationStruct
-	PreviousTime          *time.Time
-	NetworkSettingsStruct *NetworkSettingsStruct
+	AlignStatus     *AlignStatusStruct
+	Flags           *FlagStruct
+	Location        *LocationStruct
+	PreviousTime    *time.Time
+	NetworkSettings *NetworkSettingsStruct
 }
