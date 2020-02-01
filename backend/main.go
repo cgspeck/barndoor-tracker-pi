@@ -90,6 +90,7 @@ func main() {
 
 		if diff.Seconds() >= 10.00 {
 			previousTime = currentTime
+			context.PreviousTime = &previousTime
 			log.Println(previousTime)
 		}
 	}
