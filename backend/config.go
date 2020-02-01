@@ -126,10 +126,12 @@ func CreateAppContext(previousTime time.Time) *AppContext {
 
 	configSettings := loadConfig()
 
+	gotRoot := user.Uid == "0"
+
 	var flags = FlagStruct{
 		NeedsNetworkSettings:  configSettings.NeedsNetworkSettings,
 		NeedsLocationSettings: configSettings.NeedsLocationSettings,
-		IsRoot:                user.Uid == "0",
+		RunningAsRoot:         gotRoot,
 	}
 
 	var alignStatus = AlignStatusStruct{
@@ -142,7 +144,7 @@ func CreateAppContext(previousTime time.Time) *AppContext {
 	var networkSettings = NetworkSettingsStruct{
 		AccessPointMode:   configSettings.AccessPointMode,
 		APSettings:        configSettings.APSettings,
-		ManagementEnabled: flags.IsRoot,
+		ManagementEnabled: flags.RunningAsRoot,
 		WirelessStations:  []*WirelessStation{},
 	}
 

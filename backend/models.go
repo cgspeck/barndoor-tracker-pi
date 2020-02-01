@@ -6,7 +6,7 @@ import "time"
 type FlagStruct struct {
 	NeedsNetworkSettings  bool
 	NeedsLocationSettings bool
-	IsRoot                bool
+	RunningAsRoot         bool
 }
 
 // configuration

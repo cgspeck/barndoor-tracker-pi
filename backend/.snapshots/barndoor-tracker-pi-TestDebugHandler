@@ -15,7 +15,7 @@
   "Flags": {
     "NeedsNetworkSettings": true,
     "NeedsLocationSettings": true,
-    "IsRoot": false
+    "RunningAsRoot": false
   },
   "Location": {
     "Latitude": -37.74,
