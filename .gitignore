@@ -5,3 +5,5 @@ frontend/build/
 .vscode/ipch
 .vscode/.browse.c_cpp.db
 backend/backend
+pocs/ghoami/ghoami
+backend/barndoor-tracker-pi

@@ -60,10 +60,17 @@ func applyHostAPDConfig(interfaceName string, apSettings *models.APSettingsStruc
 		Key:       apSettings.Key,
 		SSID:      apSettings.SSID,
 	}
-	tmpl, err := template.New("idk").Parse(hostAPDConfigTemplate)
+	templateStr := hostAPDConfigTemplate
+
+	if apVars.Key == "" {
+		templateStr = hostAPDConfigOpenTemplate
+	}
+
+	tmpl, err := template.New("idk").Parse(templateStr)
 	if err != nil {
 		return err
 	}
+
 	fh, err := os.Create(hostAPDFn)
 	if err != nil {
 		return err
