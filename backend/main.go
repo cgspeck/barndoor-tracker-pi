@@ -71,7 +71,7 @@ func main() {
 
 	err = wireless.ApplyDesiredConfiguration(context.NetworkSettings)
 	if err != nil {
-		log.Fatalf("Unable to apply desired network settings!\n\n%+v\n", err, context.NetworkSettings)
+		log.Fatalf("Unable to apply desired network settings: %v\n\n%+v\n", err, context.NetworkSettings)
 	}
 
 	http.Handle("/", AppHandler{context, IndexHandler})

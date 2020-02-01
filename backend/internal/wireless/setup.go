@@ -2,7 +2,9 @@ package wireless
 
 import (
 	"fmt"
+	"html/template"
 	"log"
+	"os"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/process"
@@ -19,7 +21,7 @@ func ApplyDesiredConfiguration(networkSettings *models.NetworkSettingsStruct) er
 		interfaceName := networkSettings.WirelessInterface
 		if networkSettings.AccessPointMode {
 			disableWirelessClient(interfaceName)
-			EnableAP(interfaceName)
+			EnableAP(interfaceName, networkSettings.APSettings)
 		} else {
 			disableAP(interfaceName)
 			EnableWirelessClient(interfaceName)
@@ -30,10 +32,41 @@ func ApplyDesiredConfiguration(networkSettings *models.NetworkSettingsStruct) er
 	return nil
 }
 
-func EnableAP(interfaceName string) error {
+func applyHostAPDConfig(interfaceName string, apSettings *models.APSettingsStruct) error {
+	// 	sweaters := Inventory{"wool", 17}
+	// tmpl, err := template.New("test").Parse("{{.Count}} items are made of {{.Material}}")
+	// if err != nil { panic(err) }
+	// err = tmpl.Execute(os.Stdout, sweaters)
+	// if err != nil { panic(err) }
+	apVars := hostAPDConfigVars{
+		Channel:   apSettings.Channel,
+		Interface: interfaceName,
+		Key:       apSettings.Key,
+		SSID:      apSettings.SSID,
+	}
+	tmpl, err := template.New("idk").Parse(hostAPDConfigTemplate)
+	if err != nil {
+		return err
+	}
+	fh, err := os.Create(hostAPDFn)
+	if err != nil {
+		return err
+	}
+	defer fh.Close()
+	err = tmpl.Execute(fh, apVars)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Wrote %v\n", hostAPDFn)
+	return nil
+}
+
+func EnableAP(interfaceName string, apSettings *models.APSettingsStruct) error {
 	log.Printf("Enabling Access Point on %v\n", interfaceName)
 	commands := []string{
 		fmt.Sprintf("ip link set %v up", interfaceName),
+		fmt.Sprintf("systemctl enable hostapd"),
+		fmt.Sprintf("systemctl start hostapd"),
 	}
 	err, _, _ := process.RunCommands(commands)
 	return err

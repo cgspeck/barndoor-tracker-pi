@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
+
 	"github.com/pyros2097/cupaloy"
 )
 
@@ -17,8 +19,9 @@ func TestDebugHandler(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	cmdFlags := models.CmdFlags{}
 
-	appContext, err := CreateAppContext(time.Time{})
+	appContext, err := CreateAppContext(time.Time{}, cmdFlags)
 	if err != nil {
 		t.Fatal(err)
 	}
