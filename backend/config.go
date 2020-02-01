@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"os/user"
 	"strings"
 	"time"
@@ -97,15 +98,19 @@ func loadConfig() *configSettings {
 	}
 
 	defaults := config.NewStatic(mappings)
-	jsonFile := config.NewJSONFile(configFilename)
-	providers := []config.Provider{defaults, jsonFile}
+	providers := []config.Provider{defaults}
+
+	if _, err := os.Stat(configFilename); err == nil {
+		providers = append(providers, config.NewJSONFile(configFilename))
+	}
+
 	c := config.NewConfig(providers)
 
 	if err := c.Load(); err != nil {
 		log.Fatalf("Error loading configuration: %s", err)
 	}
 
-	return &configSettings{
+	cs := configSettings{
 		AccessPointMode: configBoolOrFatal(c, configKeyAccessPointMode),
 		APSettings: &models.APSettingsStruct{
 			Channel: configIntOrFatal(c, configKeyAPChannel),
@@ -124,6 +129,10 @@ func loadConfig() *configSettings {
 		NeedsLocationSettings: configBoolOrFatal(c, configKeyNeedsLocationSettings),
 		NeedsNetworkSettings:  configBoolOrFatal(c, configKeyNeedsNetworkSettings),
 	}
+	// Persist config
+	// Apply startup flags
+
+	return &cs
 }
 
 func getWirelessInterface() (string, error) {
