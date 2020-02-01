@@ -60,13 +60,19 @@ func main() {
 
 	http.Handle("/", AppHandler{context, IndexHandler})
 	http.Handle("/debug", AppHandler{context, DebugHandler})
-	go http.ListenAndServe(":8080", nil)
+
+	port := 5000
+	if context.Flags.RunningAsRoot {
+		port = 80
+	}
+	log.Printf("Start server on port %v", port)
+	go http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
 
 	for true {
 		currentTime := time.Now()
 		diff := currentTime.Sub(previousTime)
 
-		if diff.Seconds() >= 2.00 {
+		if diff.Seconds() >= 10.00 {
 			previousTime = currentTime
 			log.Println(previousTime)
 		}
