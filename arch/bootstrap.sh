@@ -15,4 +15,10 @@ pacman -Sy
 pacman -S -noconfirm --needed - < pkglist.txt
 pacman -Su
 
-cp /etc/hostapd/hostapd.conf /etc/hostapd/hostapd.conf.bak
+if [ ! -f /etc/hostapd/hostapd.conf.bak ]; then
+    cp /etc/hostapd/hostapd.conf /etc/hostapd/hostapd.conf.bak
+fi
+
+if [ ! -f /etc/dnsmasq.conf.bak ]; then
+    cp /etc/dnsmasq.conf /etc/dnsmasq.conf.bak
+fi

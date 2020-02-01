@@ -32,12 +32,28 @@ func ApplyDesiredConfiguration(networkSettings *models.NetworkSettingsStruct) er
 	return nil
 }
 
+func applyDnsmasqConfig(interfaceName string) error {
+	d := dnsmasqVars{
+		Interface: interfaceName,
+	}
+	tmpl, err := template.New("idk").Parse(dnsmasqTemplate)
+	if err != nil {
+		return err
+	}
+	fh, err := os.Create(dnsmasqConfFn)
+	if err != nil {
+		return err
+	}
+	defer fh.Close()
+	err = tmpl.Execute(fh, d)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Wrote %v\n", dnsmasqConfFn)
+	return nil
+}
+
 func applyHostAPDConfig(interfaceName string, apSettings *models.APSettingsStruct) error {
-	// 	sweaters := Inventory{"wool", 17}
-	// tmpl, err := template.New("test").Parse("{{.Count}} items are made of {{.Material}}")
-	// if err != nil { panic(err) }
-	// err = tmpl.Execute(os.Stdout, sweaters)
-	// if err != nil { panic(err) }
 	apVars := hostAPDConfigVars{
 		Channel:   apSettings.Channel,
 		Interface: interfaceName,
@@ -63,12 +79,23 @@ func applyHostAPDConfig(interfaceName string, apSettings *models.APSettingsStruc
 
 func EnableAP(interfaceName string, apSettings *models.APSettingsStruct) error {
 	log.Printf("Enabling Access Point on %v\n", interfaceName)
+	err := applyHostAPDConfig(interfaceName, apSettings)
+	if err != nil {
+		return err
+	}
+	err = applyDnsmasqConfig(interfaceName)
+	if err != nil {
+		return err
+	}
 	commands := []string{
 		fmt.Sprintf("ip link set %v up", interfaceName),
-		fmt.Sprintf("systemctl enable hostapd"),
-		fmt.Sprintf("systemctl start hostapd"),
+		"systemctl enable hostapd",
+		"systemctl start hostapd",
+		fmt.Sprintf("ip addr add 192.168.0.1/24 dev %s", interfaceName),
+		"systemctl enable dnsmasq",
+		"systemctl start dnsmasq",
 	}
-	err, _, _ := process.RunCommands(commands)
+	err, _, _ = process.RunCommands(commands)
 	return err
 }
 
@@ -76,6 +103,11 @@ func disableAP(interfaceName string) error {
 	log.Printf("Disabling Access Point on %v\n", interfaceName)
 	commands := []string{
 		fmt.Sprintf("ip link set %v down", interfaceName),
+		"systemctl disable hostapd",
+		"systemctl stop hostapd",
+		fmt.Sprintf("ip addr del 192.168.0.1/24 dev %s", interfaceName),
+		"systemctl disable dnsmasq",
+		"systemctl stop dnsmasq",
 	}
 	err, _, _ := process.RunCommands(commands)
 	return err
