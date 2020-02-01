@@ -19,7 +19,7 @@ func ShellOut(command string) (error, string, string) {
 	if exitError, ok := err.(*exec.ExitError); ok {
 		log.Printf(
 			"Exit status %d executing %q:\nCaptured StdOut:%v\nCaptured StdErr%v\n",
-			exitError.ExitCode,
+			exitError.ExitCode(),
 			command,
 			stdout.String(),
 			stderr.String(),

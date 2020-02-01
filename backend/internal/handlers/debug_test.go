@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cgspeck/barndoor-tracker-pi/internal/config"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 
 	"github.com/pyros2097/cupaloy"
@@ -21,7 +22,7 @@ func TestDebugHandler(t *testing.T) {
 	}
 	cmdFlags := models.CmdFlags{}
 
-	appContext, err := CreateAppContext(time.Time{}, cmdFlags)
+	appContext, err := config.CreateAppContext(time.Time{}, cmdFlags)
 	if err != nil {
 		t.Fatal(err)
 	}
