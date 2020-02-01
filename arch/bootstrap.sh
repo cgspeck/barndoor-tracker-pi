@@ -12,5 +12,7 @@ locale-gen
 echo "LANG=en_AU.UTF-8" > /etc/locale.conf
 
 pacman -Sy
-pacman -S -y --needed - < pkglist.txt
+pacman -S -noconfirm --needed - < pkglist.txt
 pacman -Su
+
+cp /etc/hostapd/hostapd.conf /etc/hostapd/hostapd.conf.bak

@@ -1,5 +1,7 @@
+crda
 go
 go-tools
+hostapd
 npm
 neovim
 sudo
