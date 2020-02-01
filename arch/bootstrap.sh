@@ -22,3 +22,9 @@ fi
 if [ ! -f /etc/dnsmasq.conf.bak ]; then
     cp /etc/dnsmasq.conf /etc/dnsmasq.conf.bak
 fi
+
+if [ ! -f /etc/systemd/resolved.conf.bak ]; then
+    cp /etc/systemd/resolved.conf /etc/systemd/resolved.conf.bak
+fi
+
+systemctl restart systemd-resolved
