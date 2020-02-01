@@ -38,8 +38,8 @@ const configKeyLocationZOffset = "zOffset"
 
 type configSettings struct {
 	AccessPointMode       bool
-	APSettings            *models.APSettingsStruct
-	LocationSettings      *models.LocationStruct
+	APSettings            *models.APSettings
+	LocationSettings      *models.Location
 	NeedsNetworkSettings  bool
 	NeedsLocationSettings bool
 }
@@ -112,12 +112,12 @@ func loadConfig() *configSettings {
 
 	cs := configSettings{
 		AccessPointMode: configBoolOrFatal(c, configKeyAccessPointMode),
-		APSettings: &models.APSettingsStruct{
+		APSettings: &models.APSettings{
 			Channel: configIntOrFatal(c, configKeyAPChannel),
 			Key:     configStringOrFatal(c, configKeyAPKey, true),
 			SSID:    configStringOrFatal(c, configKeyAPSSID, false),
 		},
-		LocationSettings: &models.LocationStruct{
+		LocationSettings: &models.Location{
 			Latitude:       configFloatOrFatal(c, configKeyLocationLatitude),
 			MagDeclination: configFloatOrFatal(c, configKeyLocationMagDeclination),
 			AzError:        configFloatOrFatal(c, configKeyLocationAzError),
@@ -171,13 +171,13 @@ func CreateAppContext(previousTime time.Time, cmdFlags models.CmdFlags) (*models
 
 	gotRoot := user.Uid == "0"
 
-	var flags = models.FlagStruct{
+	var flags = models.Flags{
 		NeedsNetworkSettings:  configSettings.NeedsNetworkSettings,
 		NeedsLocationSettings: configSettings.NeedsLocationSettings,
 		RunningAsRoot:         gotRoot,
 	}
 
-	var alignStatus = models.AlignStatusStruct{
+	var alignStatus = models.AlignStatus{
 		AltAligned: true,
 		AzAligned:  true,
 		CurrentAz:  181.2,
@@ -213,7 +213,7 @@ func CreateAppContext(previousTime time.Time, cmdFlags models.CmdFlags) (*models
 		flags.NeedsNetworkSettings = false
 	}
 
-	var networkSettings = models.NetworkSettingsStruct{
+	var networkSettings = models.NetworkSettings{
 		AccessPointMode:   configSettings.AccessPointMode,
 		APSettings:        configSettings.APSettings,
 		AvailableNetworks: avaliableNetworks,
@@ -222,11 +222,13 @@ func CreateAppContext(previousTime time.Time, cmdFlags models.CmdFlags) (*models
 		WirelessInterface: wirelessInterface,
 	}
 
-	return &models.AppContext{
+	res := &models.AppContext{
 		AlignStatus:     &alignStatus,
 		Flags:           &flags,
 		Location:        configSettings.LocationSettings,
-		PreviousTime:    &previousTime,
+		Time:            &previousTime,
 		NetworkSettings: &networkSettings,
-	}, nil
+	}
+
+	return res, nil
 }

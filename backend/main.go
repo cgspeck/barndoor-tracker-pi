@@ -16,7 +16,7 @@ import (
 )
 
 func IndexHandler(a *models.AppContext, w http.ResponseWriter, r *http.Request) (int, error) {
-	io.WriteString(w, fmt.Sprintf("%v", a.PreviousTime))
+	io.WriteString(w, fmt.Sprintf("%v", a.Time))
 	return 200, nil
 }
 
@@ -56,7 +56,7 @@ func main() {
 
 		if diff.Seconds() >= 10.00 {
 			previousTime = currentTime
-			context.PreviousTime = &previousTime
+			context.Time = &previousTime
 			log.Println(previousTime)
 		}
 	}

@@ -5,14 +5,14 @@ import (
 )
 
 // global config flags for frontend
-type FlagStruct struct {
+type Flags struct {
 	NeedsNetworkSettings  bool
 	NeedsLocationSettings bool
 	RunningAsRoot         bool
 }
 
 // configuration
-type LocationStruct struct {
+type Location struct {
 	Latitude       float64
 	MagDeclination float64
 	AzError        float64
@@ -22,7 +22,7 @@ type LocationStruct struct {
 	ZOffset        int
 }
 
-type APSettingsStruct struct {
+type APSettings struct {
 	Channel int
 	Key     string
 	SSID    string
@@ -40,9 +40,9 @@ type AvailableNetwork struct {
 	SignalLevel int
 }
 
-type NetworkSettingsStruct struct {
-	AccessPointMode   bool
-	APSettings        *APSettingsStruct
+type NetworkSettings struct {
+	AccessPointMode bool
+	*APSettings
 	AvailableNetworks []*AvailableNetwork
 	ManagementEnabled bool
 	WirelessInterface string
@@ -50,7 +50,7 @@ type NetworkSettingsStruct struct {
 }
 
 // statuses
-type AlignStatusStruct struct {
+type AlignStatus struct {
 	AzAligned  bool
 	AltAligned bool
 	CurrentAz  float64
@@ -70,9 +70,9 @@ type CmdFlags struct {
 
 // the app context!
 type AppContext struct {
-	AlignStatus     *AlignStatusStruct
-	Flags           *FlagStruct
-	Location        *LocationStruct
-	PreviousTime    *time.Time
-	NetworkSettings *NetworkSettingsStruct
+	AlignStatus     *AlignStatus     `json:"alignStatus"`
+	Flags           *Flags           `json:"flags"`
+	Location        *Location        `json:"location"`
+	Time            *time.Time       `json:"time"`
+	NetworkSettings *NetworkSettings `json:"networkSettings"`
 }

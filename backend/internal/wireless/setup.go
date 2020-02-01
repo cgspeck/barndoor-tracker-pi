@@ -17,7 +17,7 @@ func Setup(interfaceName string) error {
 	return err
 }
 
-func fallbackApCheck(interfaceName string, networkSettings *models.NetworkSettingsStruct, timeout time.Duration) error {
+func fallbackApCheck(interfaceName string, networkSettings *models.NetworkSettings, timeout time.Duration) error {
 	// isConnected
 	log.Printf("Waiting %v for wireless connection to come online...", interfaceName)
 	start := time.Now()
@@ -43,7 +43,7 @@ func fallbackApCheck(interfaceName string, networkSettings *models.NetworkSettin
 	return nil
 }
 
-func ApplyDesiredConfiguration(networkSettings *models.NetworkSettingsStruct) error {
+func ApplyDesiredConfiguration(networkSettings *models.NetworkSettings) error {
 	if networkSettings.ManagementEnabled {
 		interfaceName := networkSettings.WirelessInterface
 		if networkSettings.AccessPointMode {
@@ -96,7 +96,7 @@ func applyDnsmasqConfig(interfaceName string) error {
 	return nil
 }
 
-func applyHostAPDConfig(interfaceName string, apSettings *models.APSettingsStruct) error {
+func applyHostAPDConfig(interfaceName string, apSettings *models.APSettings) error {
 	apVars := hostAPDConfigVars{
 		Channel:   apSettings.Channel,
 		Interface: interfaceName,
@@ -127,7 +127,7 @@ func applyHostAPDConfig(interfaceName string, apSettings *models.APSettingsStruc
 	return nil
 }
 
-func EnableAP(interfaceName string, apSettings *models.APSettingsStruct) error {
+func EnableAP(interfaceName string, apSettings *models.APSettings) error {
 	log.Printf("Enabling Access Point on %v\n", interfaceName)
 	err := applyHostAPDConfig(interfaceName, apSettings)
 	if err != nil {
