@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"os"
+	"time"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/process"
@@ -16,15 +17,57 @@ func Setup(interfaceName string) error {
 	return err
 }
 
+func fallbackApCheck(interfaceName string, networkSettings *models.NetworkSettingsStruct, timeout time.Duration) error {
+	// isConnected
+	log.Printf("Waiting %v for wireless connection to come online...", interfaceName)
+	start := time.Now()
+	for true {
+		log.Printf("Checking connectivity...")
+		res, err := isConnected(interfaceName)
+		if err != nil {
+			return err
+		}
+		if res {
+			log.Printf("Connected")
+			return nil
+		}
+		if time.Now().Sub(start) >= timeout {
+			break
+		}
+		time.Sleep(time.Second)
+	}
+	log.Println("Failed to connect to an access point, starting Access Point mode")
+	networkSettings.AccessPointMode = true
+	disableWirelessClient(interfaceName)
+	EnableAP(interfaceName, networkSettings.APSettings)
+	return nil
+}
+
 func ApplyDesiredConfiguration(networkSettings *models.NetworkSettingsStruct) error {
 	if networkSettings.ManagementEnabled {
 		interfaceName := networkSettings.WirelessInterface
 		if networkSettings.AccessPointMode {
-			disableWirelessClient(interfaceName)
-			EnableAP(interfaceName, networkSettings.APSettings)
+			err := disableWirelessClient(interfaceName)
+			if err != nil {
+				return err
+			}
+			err = EnableAP(interfaceName, networkSettings.APSettings)
+			if err != nil {
+				return err
+			}
 		} else {
-			disableAP(interfaceName)
-			EnableWirelessClient(interfaceName)
+			err := disableAP(interfaceName)
+			if err != nil {
+				return err
+			}
+			err = EnableWirelessClient(interfaceName)
+			if err != nil {
+				return err
+			}
+			err = fallbackApCheck(interfaceName, networkSettings, time.Second*10)
+			if err != nil {
+				return err
+			}
 		}
 	} else {
 		log.Println("Network management disabled")

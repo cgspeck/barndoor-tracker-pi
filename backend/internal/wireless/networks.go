@@ -96,3 +96,22 @@ func ScanAvailableNetworks(interfaceName string) (networks []*models.AvailableNe
 
 	return
 }
+
+func isConnected(interfaceName string) (bool, error) {
+	// test 1: AP is associated
+	err, stdOut, _ := process.ShellOut(fmt.Sprintf("iwconfig %v | grep 'Access Point'", interfaceName))
+	if err != nil {
+		return false, err
+	}
+	words := strings.Fields(stdOut)
+	finalWord := words[len(words)-1]
+	if finalWord == "Not-Associated" {
+		return false, nil
+	}
+	// test 2: has an IPv4 address
+	err, stdOut, _ = process.ShellOut(fmt.Sprintf("ifconfig -a %v | grep inet", interfaceName))
+	if err != nil {
+		return false, nil
+	}
+	return true, nil
+}
