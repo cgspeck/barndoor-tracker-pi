@@ -35,6 +35,7 @@
       "SSID": "barndoor-tracker"
     },
     "ManagementEnabled": false,
+    "WirelessInterface": "wlp2s0",
     "WirelessStations": []
   }
 }),

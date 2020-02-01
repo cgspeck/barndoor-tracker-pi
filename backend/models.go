@@ -35,6 +35,7 @@ type NetworkSettingsStruct struct {
 	AccessPointMode   bool
 	APSettings        *APSettingsStruct
 	ManagementEnabled bool
+	WirelessInterface string
 	WirelessStations  []*WirelessStation
 }
 

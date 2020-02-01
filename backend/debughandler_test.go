@@ -17,7 +17,12 @@ func TestDebugHandler(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	appContext := CreateAppContext(time.Time{})
+
+	appContext, err := CreateAppContext(time.Time{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	rr := httptest.NewRecorder()
 	handler := AppHandler{appContext, DebugHandler}
 

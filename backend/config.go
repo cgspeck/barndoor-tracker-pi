@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"log"
+	"os/exec"
 	"os/user"
+	"strings"
 	"time"
 
 	"github.com/zpatrick/go-config"
@@ -121,7 +124,63 @@ func loadConfig() *configSettings {
 	}
 }
 
-func CreateAppContext(previousTime time.Time) *AppContext {
+func ShellOut(command string) (error, string, string) {
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	cmd := exec.Command("bash", "-c", command)
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		log.Printf(
+			"Exit status %s executing %q:\nCaptured StdOut:%v\nCaptured StdErr%v\n",
+			err,
+			command,
+			stdout,
+			stderr,
+		)
+	}
+	return err, stdout.String(), stderr.String()
+}
+
+func getWirelessInterface() (string, error) {
+	// ip link | grep wl
+	// app := "/usr/bin/ip"
+	// arg0 := "link"
+	// arg1 := "|"
+	// arg2 := "grep"
+	// arg3 := "wl"
+
+	err, stdOut, _ := ShellOut("ip link | grep wl")
+
+	// cmd := exec.Command(app, arg0)
+	// stdout, err := cmd.Output()
+
+	if err != nil {
+		return "", err
+	}
+
+	var builder strings.Builder
+	capturingIfName := false
+
+	for _, runeValue := range stdOut {
+		if capturingIfName {
+			if runeValue == ':' {
+				break
+			}
+			builder.WriteRune(runeValue)
+		} else {
+			if runeValue == 'w' {
+				builder.WriteRune(runeValue)
+				capturingIfName = true
+			}
+		}
+	}
+
+	return builder.String(), nil
+}
+
+func CreateAppContext(previousTime time.Time) (*AppContext, error) {
 	user, _ := user.Current()
 
 	configSettings := loadConfig()
@@ -141,11 +200,26 @@ func CreateAppContext(previousTime time.Time) *AppContext {
 		CurrentAlt: -37.4,
 	}
 
+	var wirelessStations = []*WirelessStation{}
+
+	wirelessInterface, err := getWirelessInterface()
+	if err != nil {
+		log.Print("Unable to determine wireless interface")
+		return nil, err
+	}
+
+	log.Printf("Wireless interface is %q", wirelessInterface)
+
+	if gotRoot {
+
+	}
+
 	var networkSettings = NetworkSettingsStruct{
 		AccessPointMode:   configSettings.AccessPointMode,
 		APSettings:        configSettings.APSettings,
 		ManagementEnabled: flags.RunningAsRoot,
-		WirelessStations:  []*WirelessStation{},
+		WirelessStations:  wirelessStations,
+		WirelessInterface: wirelessInterface,
 	}
 
 	return &AppContext{
@@ -154,5 +228,5 @@ func CreateAppContext(previousTime time.Time) *AppContext {
 		Location:              configSettings.LocationSettings,
 		PreviousTime:          &previousTime,
 		NetworkSettingsStruct: &networkSettings,
-	}
+	}, nil
 }

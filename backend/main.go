@@ -53,7 +53,10 @@ func main() {
 	log.Println("Barndoor Tracker Startup")
 	previousTime := time.Now()
 
-	context := CreateAppContext(previousTime)
+	context, err := CreateAppContext(previousTime)
+	if err != nil {
+		log.Fatalf("Unable to create application context!")
+	}
 
 	http.Handle("/", AppHandler{context, IndexHandler})
 	http.Handle("/debug", AppHandler{context, DebugHandler})
