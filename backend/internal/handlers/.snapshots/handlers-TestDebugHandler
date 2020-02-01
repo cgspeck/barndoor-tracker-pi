@@ -6,34 +6,32 @@
     }
   },
   Body: (*bytes.Buffer)({
-  "AlignStatus": {
-    "AzAligned": true,
-    "AltAligned": true,
-    "CurrentAz": 181.2,
-    "CurrentAlt": -37.4
+  "alignStatus": {
+    "azAligned": true,
+    "altAligned": true,
+    "currentAz": 181.2,
+    "currentAlt": -37.4
   },
-  "Flags": {
-    "NeedsNetworkSettings": false,
-    "NeedsLocationSettings": true,
+  "flags": {
+    "needsAPSettings": false,
+    "needsLocationSettings": true,
     "RunningAsRoot": false
   },
-  "Location": {
-    "Latitude": -37.74,
-    "MagDeclination": 11.64,
-    "AzError": 2,
-    "AltError": 2,
-    "XOffset": 0,
-    "YOffset": 0,
-    "ZOffset": 0
+  "location": {
+    "latitude": -37.74,
+    "magDeclination": 11.64,
+    "azError": 2,
+    "altError": 2,
+    "xOffset": 0,
+    "yOffset": 0,
+    "zOffset": 0
   },
-  "PreviousTime": "0001-01-01T00:00:00Z",
-  "NetworkSettings": {
+  "time": "0001-01-01T00:00:00Z",
+  "networkSettings": {
     "AccessPointMode": true,
-    "APSettings": {
-      "Channel": 11,
-      "Key": "",
-      "SSID": "barndoor-tracker"
-    },
+    "Channel": 11,
+    "key": "",
+    "ssid": "barndoor-tracker",
     "AvailableNetworks": [],
     "ManagementEnabled": false,
     "WirelessInterface": "wlp2s0",

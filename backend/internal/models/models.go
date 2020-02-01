@@ -6,37 +6,37 @@ import (
 
 // global config flags for frontend
 type Flags struct {
-	NeedsNetworkSettings  bool
-	NeedsLocationSettings bool
+	NeedsNetworkSettings  bool `json:"needsAPSettings"`
+	NeedsLocationSettings bool `json:"needsLocationSettings"`
 	RunningAsRoot         bool
 }
 
 // configuration
 type Location struct {
-	Latitude       float64
-	MagDeclination float64
-	AzError        float64
-	AltError       float64
-	XOffset        int
-	YOffset        int
-	ZOffset        int
+	Latitude       float64 `json:"latitude"`
+	MagDeclination float64 `json:"magDeclination"`
+	AzError        float64 `json:"azError"`
+	AltError       float64 `json:"altError"`
+	XOffset        int     `json:"xOffset"`
+	YOffset        int     `json:"yOffset"`
+	ZOffset        int     `json:"zOffset"`
 }
 
 type APSettings struct {
 	Channel int
-	Key     string
-	SSID    string
+	Key     string `json:"key"`
+	SSID    string `json:"ssid"`
 }
 
 type WirelessProfile struct {
-	Key  string
-	SSID string
+	Key  string `json:"key"`
+	SSID string `json:"ssid"`
 }
 
 type AvailableNetwork struct {
 	Channel     int
 	Frequency   string
-	SSID        string
+	SSID        string `json:"ssid"`
 	SignalLevel int
 }
 
@@ -51,10 +51,10 @@ type NetworkSettings struct {
 
 // statuses
 type AlignStatus struct {
-	AzAligned  bool
-	AltAligned bool
-	CurrentAz  float64
-	CurrentAlt float64
+	AzAligned  bool    `json:"azAligned"`
+	AltAligned bool    `json:"altAligned"`
+	CurrentAz  float64 `json:"currentAz"`
+	CurrentAlt float64 `json:"currentAlt"`
 }
 
 // type TrackingStatus struct {
