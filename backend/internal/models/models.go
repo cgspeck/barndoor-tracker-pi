@@ -26,17 +26,23 @@ type APSettingsStruct struct {
 	SSID    string
 }
 
-type WirelessStation struct {
+type WirelessProfile struct {
 	Key  string
 	SSID string
+}
+
+type AvailableNetwork struct {
+	SSID string
+	Rsi  int
 }
 
 type NetworkSettingsStruct struct {
 	AccessPointMode   bool
 	APSettings        *APSettingsStruct
+	AvailableNetworks []*AvailableNetwork
 	ManagementEnabled bool
 	WirelessInterface string
-	WirelessStations  []*WirelessStation
+	WirelessProfiles  []*WirelessProfile
 }
 
 // statuses

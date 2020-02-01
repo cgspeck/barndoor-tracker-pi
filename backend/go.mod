@@ -12,6 +12,7 @@ require (
 	github.com/urfave/cli v1.22.2 // indirect
 	github.com/zpatrick/go-config v0.0.0-20191118215128-80ba6b3e54f6
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
+	gopkg.in/go-ini/ini.v1 v1.52.0
 	gopkg.in/ini.v1 v1.51.0 // indirect
 	gopkg.in/yaml.v2 v2.2.4 // indirect
 )

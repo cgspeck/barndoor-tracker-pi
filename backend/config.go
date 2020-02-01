@@ -193,7 +193,8 @@ func CreateAppContext(previousTime time.Time) (*models.AppContext, error) {
 		CurrentAlt: -37.4,
 	}
 
-	var wirelessStations = []*models.WirelessStation{}
+	var wirelessProfiles = []*models.WirelessProfile{}
+	var avaliableNetworks = []*models.AvailableNetwork{}
 
 	wirelessInterface, err := getWirelessInterface()
 	if err != nil {
@@ -204,14 +205,19 @@ func CreateAppContext(previousTime time.Time) (*models.AppContext, error) {
 	log.Printf("Wireless interface is %q", wirelessInterface)
 
 	if gotRoot {
-		log.Println(wireless.ReadProfiles())
+		wirelessProfiles, err = wireless.ReadProfiles(wirelessInterface)
+		if err != nil {
+			log.Print("Unable to load profiles")
+			return nil, err
+		}
 	}
 
 	var networkSettings = models.NetworkSettingsStruct{
 		AccessPointMode:   configSettings.AccessPointMode,
 		APSettings:        configSettings.APSettings,
+		AvailableNetworks: avaliableNetworks,
 		ManagementEnabled: flags.RunningAsRoot,
-		WirelessStations:  wirelessStations,
+		WirelessProfiles:  wirelessProfiles,
 		WirelessInterface: wirelessInterface,
 	}
 
