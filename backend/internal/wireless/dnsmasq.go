@@ -20,7 +20,8 @@ interface={{.Interface}}
 #except-interface=
 # Or which to listen on by address (remember to include 127.0.0.1 if
 # you use this.)
-listen-address=::1,127.0.0.1,192.168.0.1
+# listen-address=::1,127.0.0.1,192.168.0.1
+listen-address=192.168.0.1
 # If you want dnsmasq to provide only DNS service on an interface,
 # configure it as shown above, and then use the following line to
 # disable DHCP and TFTP on it.

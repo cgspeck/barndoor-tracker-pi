@@ -27,4 +27,6 @@ if [ ! -f /etc/systemd/resolved.conf.bak ]; then
     cp /etc/systemd/resolved.conf /etc/systemd/resolved.conf.bak
 fi
 
+cp etc/systemd/resolved.conf /etc/systemd/resolved.conf
+
 systemctl restart systemd-resolved
