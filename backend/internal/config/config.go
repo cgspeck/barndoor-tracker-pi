@@ -208,6 +208,9 @@ func CreateAppContext(previousTime time.Time, cmdFlags models.CmdFlags) (*models
 			log.Print("Unable to scan networks")
 			return nil, err
 		}
+	} else {
+		log.Println("Not running as root so not insisting on network configuration")
+		flags.NeedsNetworkSettings = false
 	}
 
 	var networkSettings = models.NetworkSettingsStruct{
