@@ -22,6 +22,13 @@ const configKeyAPKey = "aPKey"
 const configKeyAPSSID = "aPSSID"
 
 // location settings
+const configKeyLocationLatitude = "latitude"
+const configKeyLocationMagDeclination = "magDeclination"
+const configKeyLocationAzError = "azError"
+const configKeyLocationAltError = "altError"
+const configKeyLocationXOffset = "xOffset"
+const configKeyLocationYOffset = "yOffset"
+const configKeyLocationZOffset = "zOffset"
 
 type configSettings struct {
 	AccessPointMode       bool
@@ -59,14 +66,29 @@ func configIntOrFatal(c *config.Config, key string) int {
 	return val
 }
 
+func configFloatOrFatal(c *config.Config, key string) float64 {
+	val, err := c.Float(key)
+	if err != nil {
+		log.Fatalf("Unable to load %s from config: %s", key, err)
+	}
+	return val
+}
+
 func loadConfig() *configSettings {
 	mappings := map[string]string{
-		configKeyAccessPointMode:       "true",
-		configKeyNeedsLocationSettings: "true",
-		configKeyNeedsNetworkSettings:  "true",
-		configKeyAPChannel:             "11",
-		configKeyAPSSID:                "barndoor-tracker",
-		configKeyAPKey:                 "",
+		configKeyAccessPointMode:        "true",
+		configKeyNeedsLocationSettings:  "true",
+		configKeyNeedsNetworkSettings:   "true",
+		configKeyAPChannel:              "11",
+		configKeyAPSSID:                 "barndoor-tracker",
+		configKeyAPKey:                  "",
+		configKeyLocationLatitude:       "-37.74",
+		configKeyLocationMagDeclination: "11.64",
+		configKeyLocationAzError:        "2.0",
+		configKeyLocationAltError:       "2.0",
+		configKeyLocationXOffset:        "0",
+		configKeyLocationYOffset:        "0",
+		configKeyLocationZOffset:        "0",
 	}
 
 	defaults := config.NewStatic(mappings)
@@ -85,6 +107,15 @@ func loadConfig() *configSettings {
 			Key:     configStringOrFatal(c, configKeyAPKey, true),
 			SSID:    configStringOrFatal(c, configKeyAPSSID, false),
 		},
+		LocationSettings: &LocationStruct{
+			Latitude:       configFloatOrFatal(c, configKeyLocationLatitude),
+			MagDeclination: configFloatOrFatal(c, configKeyLocationMagDeclination),
+			AzError:        configFloatOrFatal(c, configKeyLocationAzError),
+			AltError:       configFloatOrFatal(c, configKeyLocationAltError),
+			XOffset:        configIntOrFatal(c, configKeyLocationXOffset),
+			YOffset:        configIntOrFatal(c, configKeyLocationYOffset),
+			ZOffset:        configIntOrFatal(c, configKeyLocationZOffset),
+		},
 		NeedsLocationSettings: configBoolOrFatal(c, configKeyNeedsLocationSettings),
 		NeedsNetworkSettings:  configBoolOrFatal(c, configKeyNeedsNetworkSettings),
 	}
@@ -101,16 +132,6 @@ func CreateAppContext(previousTime time.Time) *AppContext {
 		IsRoot:                user.Uid == "0",
 	}
 
-	var location = LocationStruct{
-		Latitude:       -37.74,
-		MagDeclination: 11.64,
-		AzError:        2.0,
-		AltError:       2.0,
-		XOffset:        0,
-		YOffset:        0,
-		ZOffset:        0,
-	}
-
 	var alignStatus = AlignStatusStruct{
 		AltAligned: true,
 		AzAligned:  true,
@@ -119,19 +140,16 @@ func CreateAppContext(previousTime time.Time) *AppContext {
 	}
 
 	var networkSettings = NetworkSettingsStruct{
-		AccessPointMode: configSettings.AccessPointMode,
-		APSettings: &APSettingsStruct{
-			SSID:    "barndoor-tracker",
-			Key:     "",
-			Channel: 11,
-		},
+		AccessPointMode:   configSettings.AccessPointMode,
+		APSettings:        configSettings.APSettings,
 		ManagementEnabled: flags.IsRoot,
 		WirelessStations:  []*WirelessStation{},
 	}
+
 	return &AppContext{
 		AlignStatus:           &alignStatus,
 		Flags:                 &flags,
-		Location:              &location,
+		Location:              configSettings.LocationSettings,
 		PreviousTime:          &previousTime,
 		NetworkSettingsStruct: &networkSettings,
 	}

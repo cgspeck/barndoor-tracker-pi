@@ -30,9 +30,9 @@
   "NetworkSettingsStruct": {
     "AccessPointMode": true,
     "APSettings": {
-      "SSID": "barndoor-tracker",
+      "Channel": 11,
       "Key": "",
-      "Channel": 11
+      "SSID": "barndoor-tracker"
     },
     "ManagementEnabled": false,
     "WirelessStations": []

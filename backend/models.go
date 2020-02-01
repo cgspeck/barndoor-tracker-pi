@@ -11,10 +11,10 @@ type FlagStruct struct {
 
 // configuration
 type LocationStruct struct {
-	Latitude       float32
-	MagDeclination float32
-	AzError        float32
-	AltError       float32
+	Latitude       float64
+	MagDeclination float64
+	AzError        float64
+	AltError       float64
 	XOffset        int
 	YOffset        int
 	ZOffset        int
@@ -43,7 +43,7 @@ type AlignStatusStruct struct {
 	AzAligned  bool
 	AltAligned bool
 	CurrentAz  float64
-	CurrentAlt float32
+	CurrentAlt float64
 }
 
 // type TrackingStatus struct {

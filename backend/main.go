@@ -50,7 +50,7 @@ func DebugHandler(a *AppContext, w http.ResponseWriter, r *http.Request) (int, e
 }
 
 func main() {
-	log.Println("hello world")
+	log.Println("Barndoor Tracker Startup")
 	previousTime := time.Now()
 
 	context := CreateAppContext(previousTime)
