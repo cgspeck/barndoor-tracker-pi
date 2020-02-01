@@ -9,6 +9,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
+	"github.com/cgspeck/barndoor-tracker-pi/internal/wireless"
+
 	"github.com/zpatrick/go-config"
 )
 
@@ -35,8 +38,8 @@ const configKeyLocationZOffset = "zOffset"
 
 type configSettings struct {
 	AccessPointMode       bool
-	APSettings            *APSettingsStruct
-	LocationSettings      *LocationStruct
+	APSettings            *models.APSettingsStruct
+	LocationSettings      *models.LocationStruct
 	NeedsNetworkSettings  bool
 	NeedsLocationSettings bool
 }
@@ -105,12 +108,12 @@ func loadConfig() *configSettings {
 
 	return &configSettings{
 		AccessPointMode: configBoolOrFatal(c, configKeyAccessPointMode),
-		APSettings: &APSettingsStruct{
+		APSettings: &models.APSettingsStruct{
 			Channel: configIntOrFatal(c, configKeyAPChannel),
 			Key:     configStringOrFatal(c, configKeyAPKey, true),
 			SSID:    configStringOrFatal(c, configKeyAPSSID, false),
 		},
-		LocationSettings: &LocationStruct{
+		LocationSettings: &models.LocationStruct{
 			Latitude:       configFloatOrFatal(c, configKeyLocationLatitude),
 			MagDeclination: configFloatOrFatal(c, configKeyLocationMagDeclination),
 			AzError:        configFloatOrFatal(c, configKeyLocationAzError),
@@ -144,17 +147,7 @@ func ShellOut(command string) (error, string, string) {
 }
 
 func getWirelessInterface() (string, error) {
-	// ip link | grep wl
-	// app := "/usr/bin/ip"
-	// arg0 := "link"
-	// arg1 := "|"
-	// arg2 := "grep"
-	// arg3 := "wl"
-
 	err, stdOut, _ := ShellOut("ip link | grep wl")
-
-	// cmd := exec.Command(app, arg0)
-	// stdout, err := cmd.Output()
 
 	if err != nil {
 		return "", err
@@ -180,27 +173,27 @@ func getWirelessInterface() (string, error) {
 	return builder.String(), nil
 }
 
-func CreateAppContext(previousTime time.Time) (*AppContext, error) {
+func CreateAppContext(previousTime time.Time) (*models.AppContext, error) {
 	user, _ := user.Current()
 
 	configSettings := loadConfig()
 
 	gotRoot := user.Uid == "0"
 
-	var flags = FlagStruct{
+	var flags = models.FlagStruct{
 		NeedsNetworkSettings:  configSettings.NeedsNetworkSettings,
 		NeedsLocationSettings: configSettings.NeedsLocationSettings,
 		RunningAsRoot:         gotRoot,
 	}
 
-	var alignStatus = AlignStatusStruct{
+	var alignStatus = models.AlignStatusStruct{
 		AltAligned: true,
 		AzAligned:  true,
 		CurrentAz:  181.2,
 		CurrentAlt: -37.4,
 	}
 
-	var wirelessStations = []*WirelessStation{}
+	var wirelessStations = []*models.WirelessStation{}
 
 	wirelessInterface, err := getWirelessInterface()
 	if err != nil {
@@ -211,10 +204,10 @@ func CreateAppContext(previousTime time.Time) (*AppContext, error) {
 	log.Printf("Wireless interface is %q", wirelessInterface)
 
 	if gotRoot {
-
+		log.Println(wireless.ReadProfiles())
 	}
 
-	var networkSettings = NetworkSettingsStruct{
+	var networkSettings = models.NetworkSettingsStruct{
 		AccessPointMode:   configSettings.AccessPointMode,
 		APSettings:        configSettings.APSettings,
 		ManagementEnabled: flags.RunningAsRoot,
@@ -222,7 +215,7 @@ func CreateAppContext(previousTime time.Time) (*AppContext, error) {
 		WirelessInterface: wirelessInterface,
 	}
 
-	return &AppContext{
+	return &models.AppContext{
 		AlignStatus:           &alignStatus,
 		Flags:                 &flags,
 		Location:              configSettings.LocationSettings,

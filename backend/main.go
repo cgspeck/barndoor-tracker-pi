@@ -7,11 +7,13 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 )
 
 type AppHandler struct {
-	*AppContext
-	H func(*AppContext, http.ResponseWriter, *http.Request) (int, error)
+	*models.AppContext
+	H func(*models.AppContext, http.ResponseWriter, *http.Request) (int, error)
 }
 
 func (ah AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -34,12 +36,12 @@ func (ah AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 }
 
-func IndexHandler(a *AppContext, w http.ResponseWriter, r *http.Request) (int, error) {
+func IndexHandler(a *models.AppContext, w http.ResponseWriter, r *http.Request) (int, error) {
 	io.WriteString(w, fmt.Sprintf("%v", a.PreviousTime))
 	return 200, nil
 }
 
-func DebugHandler(a *AppContext, w http.ResponseWriter, r *http.Request) (int, error) {
+func DebugHandler(a *models.AppContext, w http.ResponseWriter, r *http.Request) (int, error) {
 	b, err := json.MarshalIndent(a, "", "  ")
 	if err != nil {
 		return 500, err
