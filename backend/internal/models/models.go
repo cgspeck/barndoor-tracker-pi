@@ -68,6 +68,11 @@ type CmdFlags struct {
 	DisableAP bool
 }
 
+type IAppContext interface {
+	AppContext() AppContext
+	WriteConfig() error
+}
+
 // the app context!
 type AppContext struct {
 	AlignStatus     *AlignStatus     `json:"alignStatus"`

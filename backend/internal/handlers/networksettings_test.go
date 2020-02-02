@@ -48,7 +48,7 @@ func doPost(
 }
 func TestNetworkSettingsHandlerPost(t *testing.T) {
 	body := `{
-
+	"accessPointMode": true
 }
 `
 	rr := doPost(NetworkSettingsHandler, body, &models.AppContext{}, t)

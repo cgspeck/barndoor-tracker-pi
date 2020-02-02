@@ -9,11 +9,15 @@ import (
 )
 
 func NetworkSettingsHandler(a *models.AppContext, w http.ResponseWriter, r *http.Request) (int, error) {
-	b, err := json.MarshalIndent(a.NetworkSettings, "", "  ")
-	if err != nil {
-		return 500, err
-	}
-	io.WriteString(w, string(b))
+	if r.Method == "GET" {
+		b, err := json.MarshalIndent(a.NetworkSettings, "", "  ")
+		if err != nil {
+			return 500, err
+		}
+		io.WriteString(w, string(b))
 
-	return 200, nil
+		return 200, nil
+	}
+
+	return 501, nil
 }
