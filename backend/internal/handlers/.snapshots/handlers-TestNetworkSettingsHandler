@@ -1,0 +1,26 @@
+(*httptest.ResponseRecorder)({
+  Code: (int) 200,
+  HeaderMap: (http.Header) (len=1) {
+    (string) (len=12) "Content-Type": ([]string) (len=1) {
+      (string) (len=16) "application/json"
+    }
+  },
+  Body: (*bytes.Buffer)({
+  "AccessPointMode": true,
+  "Channel": 11,
+  "key": "",
+  "ssid": "barndoor-tracker",
+  "AvailableNetworks": [],
+  "ManagementEnabled": false,
+  "WirelessInterface": "wlp2s0",
+  "WirelessProfiles": []
+}),
+  Flushed: (bool) false,
+  result: (*http.Response)(<nil>),
+  snapHeader: (http.Header) (len=1) {
+    (string) (len=12) "Content-Type": ([]string) (len=1) {
+      (string) (len=25) "text/plain; charset=utf-8"
+    }
+  },
+  wroteHeader: (bool) true
+})

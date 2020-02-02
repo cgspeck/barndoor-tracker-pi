@@ -42,6 +42,7 @@ func main() {
 
 	http.Handle("/", handlers.AppHandler{context, IndexHandler})
 	http.Handle("/debug", handlers.AppHandler{context, handlers.DebugHandler})
+	http.Handle("/settings/network", handlers.AppHandler{context, handlers.DebugHandler})
 
 	port := 5000
 	if context.Flags.RunningAsRoot {
