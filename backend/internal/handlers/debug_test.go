@@ -13,6 +13,10 @@ import (
 	"github.com/pyros2097/cupaloy"
 )
 
+func getWirelessInterfaceRpi() (string, error) {
+	return "wlan0", nil
+}
+
 func TestDebugHandler(t *testing.T) {
 	fmt.Println("hello testing!")
 
@@ -22,7 +26,7 @@ func TestDebugHandler(t *testing.T) {
 	}
 	cmdFlags := models.CmdFlags{}
 
-	appContext, err := config.CreateAppContext(time.Time{}, cmdFlags)
+	appContext, err := config.NewAppContext(time.Time{}, cmdFlags, getWirelessInterfaceRpi)
 	if err != nil {
 		t.Fatal(err)
 	}

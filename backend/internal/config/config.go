@@ -159,7 +159,13 @@ func getWirelessInterface() (string, error) {
 	return builder.String(), nil
 }
 
-func CreateAppContext(previousTime time.Time, cmdFlags models.CmdFlags) (*models.AppContext, error) {
+// CreateAppContext returns a new context taking in current time and command line flags
+func CreateAppContext(timeMarker time.Time, cmdFlags models.CmdFlags) (*models.AppContext, error) {
+	return NewAppContext(timeMarker, cmdFlags, getWirelessInterface)
+}
+
+// NewAppContext returns a new context with dependency injection
+func NewAppContext(timeMarker time.Time, cmdFlags models.CmdFlags, fnGetWirelessInterface func() (string, error)) (*models.AppContext, error) {
 	user, _ := user.Current()
 
 	configSettings := loadConfig()
@@ -187,7 +193,7 @@ func CreateAppContext(previousTime time.Time, cmdFlags models.CmdFlags) (*models
 	var wirelessProfiles = []*models.WirelessProfile{}
 	var avaliableNetworks = []*models.AvailableNetwork{}
 
-	wirelessInterface, err := getWirelessInterface()
+	wirelessInterface, err := fnGetWirelessInterface()
 	if err != nil {
 		log.Print("Unable to determine wireless interface")
 		return nil, err
@@ -226,7 +232,7 @@ func CreateAppContext(previousTime time.Time, cmdFlags models.CmdFlags) (*models
 		AlignStatus:     &alignStatus,
 		Flags:           &flags,
 		Location:        configSettings.LocationSettings,
-		Time:            &previousTime,
+		Time:            &timeMarker,
 		NetworkSettings: &networkSettings,
 	}
 

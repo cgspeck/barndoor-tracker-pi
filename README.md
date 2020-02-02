@@ -12,5 +12,5 @@ Then run `./arch/bootstrap.sh` as root.
 
 ```
 cd backend
-UPDATE_SNAPSHOTS=true go test . -v
+UPDATE_SNAPSHOTS=true go test ./... -v
 ```
