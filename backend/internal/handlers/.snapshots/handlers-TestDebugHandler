@@ -28,12 +28,14 @@
   },
   "time": "0001-01-01T00:00:00Z",
   "networkSettings": {
-    "AccessPointMode": true,
-    "Channel": 11,
-    "key": "",
-    "ssid": "barndoor-tracker",
+    "accessPointMode": true,
+    "aPSettings": {
+      "channel": 11,
+      "key": "",
+      "ssid": "barndoor-tracker"
+    },
     "AvailableNetworks": [],
-    "ManagementEnabled": false,
+    "managementEnabled": false,
     "WirelessInterface": "wlan0",
     "WirelessProfiles": []
   }

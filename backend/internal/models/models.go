@@ -23,7 +23,7 @@ type Location struct {
 }
 
 type APSettings struct {
-	Channel int
+	Channel int    `json:"channel"`
 	Key     string `json:"key"`
 	SSID    string `json:"ssid"`
 }
@@ -41,10 +41,10 @@ type AvailableNetwork struct {
 }
 
 type NetworkSettings struct {
-	AccessPointMode bool
-	*APSettings
+	AccessPointMode   bool        `json:"accessPointMode"`
+	APSettings        *APSettings `json:"aPSettings"`
 	AvailableNetworks []*AvailableNetwork
-	ManagementEnabled bool
+	ManagementEnabled bool `json:"managementEnabled"`
 	WirelessInterface string
 	WirelessProfiles  []*WirelessProfile
 }

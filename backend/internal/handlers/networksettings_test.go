@@ -3,29 +3,37 @@ package handlers
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
-	"time"
 
-	"github.com/cgspeck/barndoor-tracker-pi/internal/config"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 
 	"github.com/pyros2097/cupaloy"
 )
 
 func TestNetworkSettingsHandler(t *testing.T) {
-	req, err := http.NewRequest("GET", "/network_settings", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	cmdFlags := models.CmdFlags{}
+	rr := doRequest(NetworkSettingsHandler, getWirelessInterfaceRpi, t)
 
-	appContext, err := config.CreateAppContext(time.Time{}, cmdFlags)
+	// Check the response body is what we expect.
+	err2 := cupaloy.Snapshot(rr)
+	if err2 != nil {
+		t.Error(err2)
+	}
+}
+
+func doPost(
+	appHandlerFunc func(*models.AppContext, http.ResponseWriter, *http.Request) (int, error),
+	body string,
+	appContext *models.AppContext,
+	t *testing.T) *httptest.ResponseRecorder {
+	t.Helper()
+	req, err := http.NewRequest("POST", "/", strings.NewReader(body))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	rr := httptest.NewRecorder()
-	handler := AppHandler{appContext, NetworkSettingsHandler}
+	handler := AppHandler{appContext, appHandlerFunc}
 
 	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
 	// directly and pass in our Request and ResponseRecorder.
@@ -36,6 +44,14 @@ func TestNetworkSettingsHandler(t *testing.T) {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusOK)
 	}
+	return rr
+}
+func TestNetworkSettingsHandlerPost(t *testing.T) {
+	body := `{
+
+}
+`
+	rr := doPost(NetworkSettingsHandler, body, &models.AppContext{}, t)
 
 	// Check the response body is what we expect.
 	err2 := cupaloy.Snapshot(rr)
