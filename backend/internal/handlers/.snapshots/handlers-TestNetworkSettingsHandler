@@ -12,7 +12,7 @@
   "ssid": "barndoor-tracker",
   "AvailableNetworks": [],
   "ManagementEnabled": false,
-  "WirelessInterface": "wlp2s0",
+  "WirelessInterface": "",
   "WirelessProfiles": []
 }),
   Flushed: (bool) false,

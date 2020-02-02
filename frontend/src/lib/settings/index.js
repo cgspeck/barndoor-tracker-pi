@@ -2,7 +2,7 @@ import axios from "axios";
 import config from "../../config";
 
 async function getAllSettings() {
-  return axios.get(`${config.endpoint}/settings/debug`).then(r => r.data);
+  return axios.get(`${config.endpoint}/status/debug`).then(r => r.data);
 }
 
 async function getAPSettings() {
@@ -45,7 +45,7 @@ async function setLocationSettings(
 }
 
 async function getFlags() {
-  return axios.get(`${config.endpoint}/flags`).then(r => r.data);
+  return axios.get(`${config.endpoint}/status/flags`).then(r => r.data);
 }
 
 async function getAlignStatus() {

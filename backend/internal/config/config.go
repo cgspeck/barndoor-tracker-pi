@@ -194,14 +194,14 @@ func NewAppContext(timeMarker time.Time, cmdFlags models.CmdFlags, fnGetWireless
 	var avaliableNetworks = []*models.AvailableNetwork{}
 
 	wirelessInterface, err := fnGetWirelessInterface()
-	if err != nil {
+	if err != nil && err.Error() != "exit status 1" {
 		log.Print("Unable to determine wireless interface")
 		return nil, err
 	}
 
 	log.Printf("Wireless interface is %q", wirelessInterface)
 
-	if gotRoot {
+	if gotRoot && wirelessInterface != "" {
 		wireless.Setup(wirelessInterface)
 		wirelessProfiles, err = wireless.ReadProfiles(wirelessInterface)
 		if err != nil {

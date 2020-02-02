@@ -40,9 +40,18 @@ func main() {
 		log.Fatalf("Unable to apply desired network settings: %v\n\n%+v\n", err, context.NetworkSettings)
 	}
 
-	http.Handle("/", handlers.AppHandler{context, IndexHandler})
-	http.Handle("/debug", handlers.AppHandler{context, handlers.DebugHandler})
-	http.Handle("/settings/network", handlers.AppHandler{context, handlers.DebugHandler})
+	http.Handle("/", handlers.AppHandler{AppContext: context, H: IndexHandler})
+
+	http.Handle("/settings/network", handlers.AppHandler{AppContext: context, H: handlers.NetworkSettingsHandler})
+	// http.Handle("/settings/network/ap", handlers.AppHandler{context, ...})
+	// low prio: http.Handle("/settings/network/profiles", handlers.AppHandler{context, ...})
+	// low prio: http.Handle("/settings/network/avaliable", handlers.AppHandler{context, ...})
+
+	// http.Handle("/settings/location", handlers.AppHandler{context, ...})
+
+	// http.Handle("/status/flags", handlers.AppHandler{context, ...})
+	// http.Handle("/status/align", handlers.AppHandler{context, ...})
+	http.Handle("/status/debug", handlers.AppHandler{AppContext: context, H: handlers.DebugHandler})
 
 	port := 5000
 	if context.Flags.RunningAsRoot {
