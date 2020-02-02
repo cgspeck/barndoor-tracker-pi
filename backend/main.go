@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"time"
@@ -14,11 +13,6 @@ import (
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 )
-
-func IndexHandler(a *models.AppContext, w http.ResponseWriter, r *http.Request) (int, error) {
-	io.WriteString(w, fmt.Sprintf("%v", a.Time))
-	return 200, nil
-}
 
 func main() {
 	log.Println("Barndoor Tracker Startup")
@@ -40,7 +34,7 @@ func main() {
 		log.Fatalf("Unable to apply desired network settings: %v\n\n%+v\n", err, context.NetworkSettings)
 	}
 
-	http.Handle("/", handlers.AppHandler{AppContext: context, H: IndexHandler})
+	http.Handle("/", handlers.AppHandler{AppContext: context, H: handlers.IndexHandler})
 
 	http.Handle("/settings/network", handlers.AppHandler{AppContext: context, H: handlers.NetworkSettingsHandler})
 	// http.Handle("/settings/network/ap", handlers.AppHandler{context, ...})

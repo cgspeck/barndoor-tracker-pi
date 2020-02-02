@@ -4,12 +4,10 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-
-	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 )
 
-func DebugHandler(a *models.AppContext, w http.ResponseWriter, r *http.Request) (int, error) {
-	b, err := json.MarshalIndent(a, "", "  ")
+func DebugHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, error) {
+	b, err := json.MarshalIndent(ah.GetContext(), "", "  ")
 	if err != nil {
 		return 500, err
 	}

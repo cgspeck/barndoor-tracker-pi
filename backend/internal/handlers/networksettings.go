@@ -4,13 +4,11 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-
-	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 )
 
-func NetworkSettingsHandler(a *models.AppContext, w http.ResponseWriter, r *http.Request) (int, error) {
+func NetworkSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, error) {
 	if r.Method == "GET" {
-		b, err := json.MarshalIndent(a.NetworkSettings, "", "  ")
+		b, err := json.MarshalIndent(ah.GetNetworkSettings(), "", "  ")
 		if err != nil {
 			return 500, err
 		}

@@ -22,7 +22,7 @@ func TestNetworkSettingsHandler(t *testing.T) {
 }
 
 func doPost(
-	appHandlerFunc func(*models.AppContext, http.ResponseWriter, *http.Request) (int, error),
+	appHandlerFunc func(IAppHandler, http.ResponseWriter, *http.Request) (int, error),
 	body string,
 	appContext *models.AppContext,
 	t *testing.T) *httptest.ResponseRecorder {

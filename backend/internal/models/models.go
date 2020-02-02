@@ -68,9 +68,13 @@ type CmdFlags struct {
 	DisableAP bool
 }
 
-type IAppContext interface {
-	AppContext() AppContext
-	WriteConfig() error
+type AppContextProvider interface {
+	SetContext(a *AppContext)
+	SetTime(currentTime time.Time)
+	GetNetworkSettings() *NetworkSettings
+	SetAPMode(bool)
+	GetContext() *AppContext
+	// WriteConfig() error
 }
 
 // the app context!

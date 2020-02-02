@@ -15,7 +15,7 @@ func getWirelessInterfaceRpi() (string, error) {
 }
 
 func doRequest(
-	appHandlerFunc func(*models.AppContext, http.ResponseWriter, *http.Request) (int, error),
+	appHandlerFunc func(IAppHandler, http.ResponseWriter, *http.Request) (int, error),
 	getwirelessInterfaceFunc func() (string, error), t *testing.T) *httptest.ResponseRecorder {
 	t.Helper()
 	req, err := http.NewRequest("GET", "/", nil)
