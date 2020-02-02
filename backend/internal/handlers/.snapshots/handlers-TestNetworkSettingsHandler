@@ -21,7 +21,7 @@
   result: (*http.Response)(<nil>),
   snapHeader: (http.Header) (len=1) {
     (string) (len=12) "Content-Type": ([]string) (len=1) {
-      (string) (len=25) "text/plain; charset=utf-8"
+      (string) (len=16) "application/json"
     }
   },
   wroteHeader: (bool) true

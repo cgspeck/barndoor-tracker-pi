@@ -58,5 +58,4 @@ func (ah AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.StatusText(status), status)
 		}
 	}
-	w.Header().Set("Content-Type", "application/json")
 }
