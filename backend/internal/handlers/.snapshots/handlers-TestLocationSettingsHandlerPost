@@ -1,0 +1,26 @@
+(*httptest.ResponseRecorder)({
+  Code: (int) 200,
+  HeaderMap: (http.Header) (len=1) {
+    (string) (len=12) "Content-Type": ([]string) (len=1) {
+      (string) (len=16) "application/json"
+    }
+  },
+  Body: (*bytes.Buffer)({
+  "latitude": 3.4,
+  "magDeclination": -5.6,
+  "azError": 2,
+  "altError": 1,
+  "xOffset": 7,
+  "yOffset": 8,
+  "zOffset": 9,
+  "managementEnabled": true
+}),
+  Flushed: (bool) false,
+  result: (*http.Response)(<nil>),
+  snapHeader: (http.Header) (len=1) {
+    (string) (len=12) "Content-Type": ([]string) (len=1) {
+      (string) (len=16) "application/json"
+    }
+  },
+  wroteHeader: (bool) true
+})

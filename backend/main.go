@@ -41,10 +41,11 @@ func main() {
 	// low prio: http.Handle("/settings/network/profiles", handlers.AppHandler{context, ...})
 	// low prio: http.Handle("/settings/network/avaliable", handlers.AppHandler{context, ...})
 
-	// http.Handle("/settings/location", handlers.AppHandler{context, ...})
+	http.Handle("/settings/location", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
 
 	// http.Handle("/status/flags", handlers.AppHandler{context, ...})
 	// http.Handle("/status/align", handlers.AppHandler{context, ...})
+	// http.Handle("/status/track", handlers.AppHandler{context, ...})
 	http.Handle("/status/debug", handlers.AppHandler{AppContext: context, H: handlers.DebugHandler})
 
 	port := 5000

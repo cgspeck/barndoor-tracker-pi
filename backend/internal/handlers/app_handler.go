@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -56,9 +58,18 @@ func (ah AppHandler) GetTime() *time.Time {
 	return ah.AppContext.Time
 }
 
-// func (ah AppHandler) SetTime(t *time.Time) {
+// func (ah *AppHandler) SetTime(t *time.Time) {
 // 	ah.AppContext.Time = t
 // }
+
+func writeJson(v interface{}, w http.ResponseWriter) error {
+	b, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return err
+	}
+	io.WriteString(w, string(b))
+	return nil
+}
 
 func handleHandlerResult(status int, err error, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
