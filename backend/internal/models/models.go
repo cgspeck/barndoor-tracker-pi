@@ -13,13 +13,14 @@ type Flags struct {
 
 // configuration
 type Location struct {
-	Latitude       float64 `json:"latitude"`
-	MagDeclination float64 `json:"magDeclination"`
-	AzError        float64 `json:"azError"`
-	AltError       float64 `json:"altError"`
-	XOffset        int     `json:"xOffset"`
-	YOffset        int     `json:"yOffset"`
-	ZOffset        int     `json:"zOffset"`
+	Latitude          float64 `json:"latitude"`
+	MagDeclination    float64 `json:"magDeclination"`
+	AzError           float64 `json:"azError"`
+	AltError          float64 `json:"altError"`
+	XOffset           int     `json:"xOffset"`
+	YOffset           int     `json:"yOffset"`
+	ZOffset           int     `json:"zOffset"`
+	ManagementEnabled bool    `json:"managementEnabled"`
 }
 
 type APSettings struct {

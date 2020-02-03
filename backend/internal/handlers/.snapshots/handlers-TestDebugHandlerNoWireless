@@ -24,7 +24,8 @@
     "altError": 2,
     "xOffset": 0,
     "yOffset": 0,
-    "zOffset": 0
+    "zOffset": 0,
+    "managementEnabled": true
   },
   "time": "0001-01-01T00:00:00Z",
   "networkSettings": {

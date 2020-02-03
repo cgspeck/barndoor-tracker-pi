@@ -55,9 +55,7 @@ func (ah AppHandler) GetTime() *time.Time {
 // 	ah.AppContext.Time = t
 // }
 
-func (ah AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	status, err := ah.H(&ah, w, r)
-
+func handleHandlerResult(status int, err error, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("HTTP %d: %q", status, err)
 		switch status {
@@ -72,4 +70,10 @@ func (ah AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.StatusText(status), status)
 		}
 	}
+}
+
+func (ah AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	status, err := ah.H(&ah, w, r)
+	handleHandlerResult(status, err, w, r)
 }

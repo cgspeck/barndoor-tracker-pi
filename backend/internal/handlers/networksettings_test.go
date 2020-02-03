@@ -5,7 +5,6 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 
@@ -13,7 +12,23 @@ import (
 )
 
 func TestNetworkSettingsHandler(t *testing.T) {
-	rr := doRequest(NetworkSettingsHandler, getWirelessInterfaceRpi, t)
+	handler := newTestAppHandler()
+	handler.H = NetworkSettingsHandler
+
+	handler.NetworkSettings = &models.NetworkSettings{
+		AccessPointMode: true,
+		APSettings: &models.APSettings{
+			Channel: 11,
+			Key:     "",
+			SSID:    "barndoor-tracker",
+		},
+		AvailableNetworks: make([]*models.AvailableNetwork, 0),
+		ManagementEnabled: false,
+		WirelessInterface: "wlan0",
+		WirelessProfiles:  make([]*models.WirelessProfile, 0),
+	}
+
+	rr := doRequest(&handler, 200, t)
 
 	// Check the response body is what we expect.
 	err2 := cupaloy.Snapshot(rr)
@@ -22,34 +37,10 @@ func TestNetworkSettingsHandler(t *testing.T) {
 	}
 }
 
-type networkSettingsTestAppHandler struct {
-	NetworkSettings *models.NetworkSettings
-	H               func(IAppHandler, http.ResponseWriter, *http.Request) (int, error)
-	SetAPModeCalls  []bool
-}
-
-func (ah networkSettingsTestAppHandler) GetContext() *models.AppContext {
-	return &models.AppContext{}
-}
-
-func (ah networkSettingsTestAppHandler) WriteConfig() {}
-
-func (ah *networkSettingsTestAppHandler) SetAPMode(v bool) error {
-	ah.SetAPModeCalls = append(ah.SetAPModeCalls, v)
-	return nil
-}
-
-func (ah networkSettingsTestAppHandler) GetNetworkSettings() *models.NetworkSettings {
-	return ah.NetworkSettings
-}
-func (ah networkSettingsTestAppHandler) GetTime() *time.Time {
-	v := time.Now()
-	return &v
-}
-
 func doNetworkSettingsPost(
 	body string,
-	networkSettingsTestAppHandler *networkSettingsTestAppHandler,
+	testAppHandler *testAppHandler,
+	expectedStatus int,
 	t *testing.T) *httptest.ResponseRecorder {
 	t.Helper()
 	req, err := http.NewRequest("POST", "/", strings.NewReader(body))
@@ -61,12 +52,12 @@ func doNetworkSettingsPost(
 
 	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
 	// directly and pass in our Request and ResponseRecorder.
-	networkSettingsTestAppHandler.H(networkSettingsTestAppHandler, rr, req)
+	testAppHandler.ServeHTTP(rr, req)
 
 	// Check the status code is what we expect.
-	if status := rr.Code; status != http.StatusOK {
+	if status := rr.Code; status != expectedStatus {
 		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
+			status, expectedStatus)
 	}
 	return rr
 }
@@ -76,11 +67,14 @@ func TestNetworkSettingsHandlerPost(t *testing.T) {
 }
 `
 
-	handler := networkSettingsTestAppHandler{&models.NetworkSettings{
-		AccessPointMode: false,
-	}, NetworkSettingsHandler, []bool{}}
+	handler := newTestAppHandler()
+	handler.H = NetworkSettingsHandler
+	handler.NetworkSettings = &models.NetworkSettings{
+		AccessPointMode:   false,
+		ManagementEnabled: true,
+	}
 
-	rr := doNetworkSettingsPost(body, &handler, t)
+	rr := doNetworkSettingsPost(body, &handler, http.StatusOK, t)
 
 	// Check the response body is what we expect.
 	err := cupaloy.Snapshot(rr)
@@ -94,5 +88,31 @@ func TestNetworkSettingsHandlerPost(t *testing.T) {
 
 	if handler.SetAPModeCalls[0] != true {
 		t.Errorf("Expected true call to SetAPMode")
+	}
+}
+
+func TestNetworkSettingsHandlerPostManagementDisabled(t *testing.T) {
+	body := `{
+	"accessPointMode": true
+}
+`
+
+	handler := newTestAppHandler()
+	handler.H = NetworkSettingsHandler
+	handler.NetworkSettings = &models.NetworkSettings{
+		AccessPointMode:   false,
+		ManagementEnabled: false,
+	}
+
+	rr := doNetworkSettingsPost(body, &handler, http.StatusBadRequest, t)
+
+	// Check the response body is what we expect.
+	err := cupaloy.Snapshot(rr)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(handler.SetAPModeCalls) != 0 {
+		t.Errorf("Expected no call to SetAPMode")
 	}
 }

@@ -9,7 +9,7 @@
   "accessPointMode": false,
   "aPSettings": null,
   "AvailableNetworks": null,
-  "managementEnabled": false,
+  "managementEnabled": true,
   "WirelessInterface": "",
   "WirelessProfiles": null
 }),

@@ -282,6 +282,7 @@ func NewAppContext(timeMarker time.Time, cmdFlags models.CmdFlags, fnGetWireless
 		Time:            &timeMarker,
 		NetworkSettings: &networkSettings,
 	}
+	res.Location.ManagementEnabled = true
 
 	return res, nil
 }

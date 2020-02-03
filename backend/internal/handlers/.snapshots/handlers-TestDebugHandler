@@ -6,39 +6,11 @@
     }
   },
   Body: (*bytes.Buffer)({
-  "alignStatus": {
-    "azAligned": true,
-    "altAligned": true,
-    "currentAz": 181.2,
-    "currentAlt": -37.4
-  },
-  "flags": {
-    "needsAPSettings": false,
-    "needsLocationSettings": true,
-    "RunningAsRoot": false
-  },
-  "location": {
-    "latitude": -37.74,
-    "magDeclination": 11.64,
-    "azError": 2,
-    "altError": 2,
-    "xOffset": 0,
-    "yOffset": 0,
-    "zOffset": 0
-  },
+  "alignStatus": null,
+  "flags": null,
+  "location": null,
   "time": "0001-01-01T00:00:00Z",
-  "networkSettings": {
-    "accessPointMode": true,
-    "aPSettings": {
-      "channel": 11,
-      "key": "",
-      "ssid": "barndoor-tracker"
-    },
-    "AvailableNetworks": [],
-    "managementEnabled": false,
-    "WirelessInterface": "wlan0",
-    "WirelessProfiles": []
-  }
+  "networkSettings": null
 }),
   Flushed: (bool) false,
   result: (*http.Response)(<nil>),
