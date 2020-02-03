@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/cgspeck/barndoor-tracker-pi/internal/config"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/wireless"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
@@ -14,7 +15,7 @@ type IAppHandler interface {
 	GetContext() *models.AppContext
 	GetTime() *time.Time
 	// SetTime(*time.Time)
-	SetAPMode(bool)
+	SetAPMode(bool) error
 	GetNetworkSettings() *models.NetworkSettings
 }
 
@@ -38,7 +39,7 @@ func (ah *AppHandler) SetAPMode(v bool) error {
 	if err != nil {
 		return err
 	}
-	err = ah.writeConfig()
+	err = config.SaveConfig(ah.GetContext())
 	return err
 }
 

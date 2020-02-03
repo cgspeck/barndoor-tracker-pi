@@ -1,7 +1,9 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/user"
@@ -130,6 +132,51 @@ func loadConfig() *configSettings {
 		NeedsNetworkSettings:  configBoolOrFatal(c, configKeyNeedsNetworkSettings),
 	}
 	return &cs
+}
+
+func SaveConfig(a *models.AppContext) error {
+	fh, err := os.Create(configFilename)
+	if err != nil {
+		log.Printf("Unable to create %v:%v", configFilename, err)
+		return err
+	}
+	defer fh.Close()
+	c := configSettings{
+		AccessPointMode:       a.NetworkSettings.AccessPointMode,
+		APSettings:            a.NetworkSettings.APSettings,
+		LocationSettings:      a.Location,
+		NeedsNetworkSettings:  a.Flags.NeedsNetworkSettings,
+		NeedsLocationSettings: a.Flags.NeedsLocationSettings,
+	}
+	err = saveConfig(&c, fh)
+	return err
+}
+
+func saveConfig(c *configSettings, w io.Writer) error {
+	transformed := map[string]interface{}{
+		configKeyAccessPointMode:       c.AccessPointMode,
+		configKeyNeedsNetworkSettings:  c.NeedsNetworkSettings,
+		configKeyNeedsLocationSettings: c.NeedsLocationSettings,
+
+		configKeyAPChannel: c.APSettings.Channel,
+		configKeyAPKey:     c.APSettings.Key,
+		configKeyAPSSID:    c.APSettings.SSID,
+
+		configKeyLocationLatitude:       c.LocationSettings.Latitude,
+		configKeyLocationMagDeclination: c.LocationSettings.MagDeclination,
+		configKeyLocationAzError:        c.LocationSettings.AzError,
+		configKeyLocationAltError:       c.LocationSettings.AltError,
+		configKeyLocationXOffset:        c.LocationSettings.XOffset,
+		configKeyLocationYOffset:        c.LocationSettings.YOffset,
+		configKeyLocationZOffset:        c.LocationSettings.ZOffset,
+	}
+	b, err := json.MarshalIndent(transformed, "", "  ")
+	if err != nil {
+		log.Printf("Unable to json.MarshallIndent %v:%v", c, err)
+		return err
+	}
+	io.WriteString(w, string(b))
+	return nil
 }
 
 func getWirelessInterface() (string, error) {

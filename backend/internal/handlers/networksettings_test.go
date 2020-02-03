@@ -34,9 +34,11 @@ func (ah networkSettingsTestAppHandler) GetContext() *models.AppContext {
 
 func (ah networkSettingsTestAppHandler) WriteConfig() {}
 
-func (ah *networkSettingsTestAppHandler) SetAPMode(v bool) {
+func (ah *networkSettingsTestAppHandler) SetAPMode(v bool) error {
 	ah.SetAPModeCalls = append(ah.SetAPModeCalls, v)
+	return nil
 }
+
 func (ah networkSettingsTestAppHandler) GetNetworkSettings() *models.NetworkSettings {
 	return ah.NetworkSettings
 }
