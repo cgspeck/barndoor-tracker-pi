@@ -17,6 +17,7 @@ type IAppHandler interface {
 	// SetTime(*time.Time)
 	SetAPMode(bool) error
 	GetNetworkSettings() *models.NetworkSettings
+	GetLocationSettings() *models.LocationSettings
 }
 
 type AppHandler struct {
@@ -45,6 +46,10 @@ func (ah *AppHandler) SetAPMode(v bool) error {
 
 func (ah AppHandler) GetNetworkSettings() *models.NetworkSettings {
 	return ah.AppContext.NetworkSettings
+}
+
+func (ah AppHandler) GetLocationSettings() *models.LocationSettings {
+	return ah.AppContext.LocationSettings
 }
 
 func (ah AppHandler) GetTime() *time.Time {

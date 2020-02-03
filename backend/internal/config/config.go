@@ -41,7 +41,7 @@ const configKeyLocationZOffset = "zOffset"
 type configSettings struct {
 	AccessPointMode       bool
 	APSettings            *models.APSettings
-	LocationSettings      *models.Location
+	LocationSettings      *models.LocationSettings
 	NeedsNetworkSettings  bool
 	NeedsLocationSettings bool
 }
@@ -119,7 +119,7 @@ func loadConfig() *configSettings {
 			Key:     configStringOrFatal(c, configKeyAPKey, true),
 			SSID:    configStringOrFatal(c, configKeyAPSSID, false),
 		},
-		LocationSettings: &models.Location{
+		LocationSettings: &models.LocationSettings{
 			Latitude:       configFloatOrFatal(c, configKeyLocationLatitude),
 			MagDeclination: configFloatOrFatal(c, configKeyLocationMagDeclination),
 			AzError:        configFloatOrFatal(c, configKeyLocationAzError),
@@ -144,7 +144,7 @@ func SaveConfig(a *models.AppContext) error {
 	c := configSettings{
 		AccessPointMode:       a.NetworkSettings.AccessPointMode,
 		APSettings:            a.NetworkSettings.APSettings,
-		LocationSettings:      a.Location,
+		LocationSettings:      a.LocationSettings,
 		NeedsNetworkSettings:  a.Flags.NeedsNetworkSettings,
 		NeedsLocationSettings: a.Flags.NeedsLocationSettings,
 	}
@@ -289,12 +289,12 @@ func NewAppContext(
 		WirelessInterface: wirelessInterface,
 	}
 	res := &models.AppContext{
-		AlignStatus:     &alignStatus,
-		Flags:           &flags,
-		Location:        configSettings.LocationSettings,
-		Time:            &timeMarker,
-		NetworkSettings: &networkSettings,
+		AlignStatus:      &alignStatus,
+		Flags:            &flags,
+		LocationSettings: configSettings.LocationSettings,
+		Time:             &timeMarker,
+		NetworkSettings:  &networkSettings,
 	}
-	res.Location.ManagementEnabled = true
+	res.LocationSettings.ManagementEnabled = true
 	return res, nil
 }

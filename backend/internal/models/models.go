@@ -12,7 +12,7 @@ type Flags struct {
 }
 
 // configuration
-type Location struct {
+type LocationSettings struct {
 	Latitude          float64 `json:"latitude"`
 	MagDeclination    float64 `json:"magDeclination"`
 	AzError           float64 `json:"azError"`
@@ -80,9 +80,9 @@ type AppContextProvider interface {
 
 // the app context!
 type AppContext struct {
-	AlignStatus     *AlignStatus     `json:"alignStatus"`
-	Flags           *Flags           `json:"flags"`
-	Location        *Location        `json:"location"`
-	Time            *time.Time       `json:"time"`
-	NetworkSettings *NetworkSettings `json:"networkSettings"`
+	AlignStatus      *AlignStatus      `json:"alignStatus"`
+	Flags            *Flags            `json:"flags"`
+	LocationSettings *LocationSettings `json:"location"`
+	Time             *time.Time        `json:"time"`
+	NetworkSettings  *NetworkSettings  `json:"networkSettings"`
 }

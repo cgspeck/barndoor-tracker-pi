@@ -18,7 +18,7 @@ func createTestConfigSettings(t *testing.T) configSettings {
 			Key:     "some key",
 			SSID:    "my amazing hotspot",
 		},
-		LocationSettings: &models.Location{
+		LocationSettings: &models.LocationSettings{
 			AltError:       1,
 			AzError:        2,
 			Latitude:       3.4,

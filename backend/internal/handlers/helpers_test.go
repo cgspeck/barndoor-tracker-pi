@@ -15,16 +15,18 @@ func getWirelessInterfaceRpi() (string, error) {
 
 func newTestAppHandler() testAppHandler {
 	return testAppHandler{
-		NetworkSettings: nil,
-		H:               nil,
-		SetAPModeCalls:  []bool{},
+		NetworkSettings:  nil,
+		LocationSettings: nil,
+		H:                nil,
+		SetAPModeCalls:   []bool{},
 	}
 }
 
 type testAppHandler struct {
-	NetworkSettings *models.NetworkSettings
-	H               func(IAppHandler, http.ResponseWriter, *http.Request) (int, error)
-	SetAPModeCalls  []bool
+	NetworkSettings  *models.NetworkSettings
+	LocationSettings *models.LocationSettings
+	H                func(IAppHandler, http.ResponseWriter, *http.Request) (int, error)
+	SetAPModeCalls   []bool
 }
 
 func (ah testAppHandler) GetContext() *models.AppContext {
@@ -44,6 +46,11 @@ func (ah *testAppHandler) SetAPMode(v bool) error {
 func (ah testAppHandler) GetNetworkSettings() *models.NetworkSettings {
 	return ah.NetworkSettings
 }
+
+func (ah testAppHandler) GetLocationSettings() *models.LocationSettings {
+	return ah.LocationSettings
+}
+
 func (ah testAppHandler) GetTime() *time.Time {
 	v := time.Now()
 	return &v
