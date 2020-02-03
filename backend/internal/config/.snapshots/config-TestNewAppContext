@@ -1,0 +1,39 @@
+(*models.AppContext)({
+  AlignStatus: (*models.AlignStatus)({
+    AzAligned: (bool) true,
+    AltAligned: (bool) true,
+    CurrentAz: (float64) 181.2,
+    CurrentAlt: (float64) -37.4
+  }),
+  Flags: (*models.Flags)({
+    NeedsNetworkSettings: (bool) false,
+    NeedsLocationSettings: (bool) true,
+    RunningAsRoot: (bool) false
+  }),
+  Location: (*models.Location)({
+    Latitude: (float64) 3.4,
+    MagDeclination: (float64) -5.6,
+    AzError: (float64) 2,
+    AltError: (float64) 1,
+    XOffset: (int) 7,
+    YOffset: (int) 8,
+    ZOffset: (int) 9,
+    ManagementEnabled: (bool) true
+  }),
+  Time: (*time.Time)(0001-01-01 00:00:00 +0000 UTC),
+  NetworkSettings: (*models.NetworkSettings)({
+    AccessPointMode: (bool) true,
+    APSettings: (*models.APSettings)({
+      Channel: (int) 11,
+      Key: (string) (len=8) "some key",
+      SSID: (string) (len=18) "my amazing hotspot"
+    }),
+    AvailableNetworks: ([]*models.AvailableNetwork) {
+    },
+    ManagementEnabled: (bool) false,
+    WirelessInterface: (string) (len=5) "wlan0",
+    WirelessProfiles: ([]*models.WirelessProfile) {
+    }
+  })
+})
+(interface {}) <nil>

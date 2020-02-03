@@ -149,6 +149,15 @@ func SaveConfig(a *models.AppContext) error {
 		NeedsLocationSettings: a.Flags.NeedsLocationSettings,
 	}
 	err = saveConfig(&c, fh)
+
+	if a.Flags.RunningAsRoot {
+		log.Println("Running as root so setting config mode 0666")
+		err = os.Chmod(configFilename, 0666)
+		if err != nil {
+			log.Printf("Unable to chmod %v 0666:%v", configFilename, err)
+			return err
+		}
+	}
 	return err
 }
 
@@ -208,14 +217,27 @@ func getWirelessInterface() (string, error) {
 
 // CreateAppContext returns a new context taking in current time and command line flags
 func CreateAppContext(timeMarker time.Time, cmdFlags models.CmdFlags) (*models.AppContext, error) {
-	return NewAppContext(timeMarker, cmdFlags, getWirelessInterface)
+	wirelessInterface, err := getWirelessInterface()
+	if err != nil && err.Error() != "exit status 1" {
+		log.Print("Unable to determine wireless interface")
+		return nil, err
+	}
+
+	if wirelessInterface != "" {
+		log.Printf("Wireless interface is %q", wirelessInterface)
+	}
+
+	return NewAppContext(timeMarker, cmdFlags, wirelessInterface, loadConfig())
 }
 
 // NewAppContext returns a new context with dependency injection
-func NewAppContext(timeMarker time.Time, cmdFlags models.CmdFlags, fnGetWirelessInterface func() (string, error)) (*models.AppContext, error) {
+func NewAppContext(
+	timeMarker time.Time,
+	cmdFlags models.CmdFlags,
+	wirelessInterface string,
+	configSettings *configSettings,
+) (*models.AppContext, error) {
 	user, _ := user.Current()
-
-	configSettings := loadConfig()
 
 	if cmdFlags.DisableAP {
 		log.Println("Disabling Access Point per start-up options")
@@ -239,14 +261,7 @@ func NewAppContext(timeMarker time.Time, cmdFlags models.CmdFlags, fnGetWireless
 
 	var wirelessProfiles = []*models.WirelessProfile{}
 	var avaliableNetworks = []*models.AvailableNetwork{}
-
-	wirelessInterface, err := fnGetWirelessInterface()
-	if err != nil && err.Error() != "exit status 1" {
-		log.Print("Unable to determine wireless interface")
-		return nil, err
-	}
-
-	log.Printf("Wireless interface is %q", wirelessInterface)
+	var err error
 
 	if gotRoot && wirelessInterface != "" {
 		wireless.Setup(wirelessInterface)
@@ -265,7 +280,6 @@ func NewAppContext(timeMarker time.Time, cmdFlags models.CmdFlags, fnGetWireless
 		log.Println("Not running as root so not insisting on network configuration")
 		flags.NeedsNetworkSettings = false
 	}
-
 	var networkSettings = models.NetworkSettings{
 		AccessPointMode:   configSettings.AccessPointMode,
 		APSettings:        configSettings.APSettings,
@@ -274,7 +288,6 @@ func NewAppContext(timeMarker time.Time, cmdFlags models.CmdFlags, fnGetWireless
 		WirelessProfiles:  wirelessProfiles,
 		WirelessInterface: wirelessInterface,
 	}
-
 	res := &models.AppContext{
 		AlignStatus:     &alignStatus,
 		Flags:           &flags,
@@ -283,6 +296,5 @@ func NewAppContext(timeMarker time.Time, cmdFlags models.CmdFlags, fnGetWireless
 		NetworkSettings: &networkSettings,
 	}
 	res.Location.ManagementEnabled = true
-
 	return res, nil
 }

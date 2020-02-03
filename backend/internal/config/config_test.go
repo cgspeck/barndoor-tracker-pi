@@ -3,15 +3,15 @@ package config
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 	"github.com/pyros2097/cupaloy"
 )
 
-func TestSaveConfig(t *testing.T) {
-	var b strings.Builder
-
-	c := configSettings{
+func createTestConfigSettings(t *testing.T) configSettings {
+	t.Helper()
+	return configSettings{
 		AccessPointMode: true,
 		APSettings: &models.APSettings{
 			Channel: 11,
@@ -30,12 +30,33 @@ func TestSaveConfig(t *testing.T) {
 		NeedsNetworkSettings:  false,
 		NeedsLocationSettings: true,
 	}
+}
+func TestSaveConfig(t *testing.T) {
+	var b strings.Builder
+
+	c := createTestConfigSettings(t)
 
 	err := saveConfig(&c, &b)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
 	err = cupaloy.Snapshot(b.String())
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestNewAppContext(t *testing.T) {
+
+	c := createTestConfigSettings(t)
+
+	res, err := NewAppContext(
+		time.Time{},
+		models.CmdFlags{},
+		"wlan0",
+		&c,
+	)
+	err = cupaloy.Snapshot(res, err)
 	if err != nil {
 		t.Error(err)
 	}
