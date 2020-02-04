@@ -1,0 +1,24 @@
+(*httptest.ResponseRecorder)({
+  Code: (int) 400,
+  HeaderMap: (http.Header) (len=2) {
+    (string) (len=12) "Content-Type": ([]string) (len=1) {
+      (string) (len=25) "text/plain; charset=utf-8"
+    },
+    (string) (len=22) "X-Content-Type-Options": ([]string) (len=1) {
+      (string) (len=7) "nosniff"
+    }
+  },
+  Body: (*bytes.Buffer)(Bad Request
+),
+  Flushed: (bool) false,
+  result: (*http.Response)(<nil>),
+  snapHeader: (http.Header) (len=2) {
+    (string) (len=12) "Content-Type": ([]string) (len=1) {
+      (string) (len=25) "text/plain; charset=utf-8"
+    },
+    (string) (len=22) "X-Content-Type-Options": ([]string) (len=1) {
+      (string) (len=7) "nosniff"
+    }
+  },
+  wroteHeader: (bool) true
+})

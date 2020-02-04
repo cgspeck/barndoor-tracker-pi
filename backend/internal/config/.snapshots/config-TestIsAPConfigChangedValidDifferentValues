@@ -1,0 +1,7 @@
+(bool) true
+(models.APSettings) {
+  Channel: (int) 2,
+  Key: (string) (len=8) "somekey1",
+  SSID: (string) (len=8) "someSSID"
+}
+(interface {}) <nil>

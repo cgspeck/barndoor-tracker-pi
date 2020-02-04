@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/user"
+	"runtime"
 	"strings"
 	"time"
 
@@ -148,6 +149,7 @@ func SaveConfig(a *models.AppContext) error {
 		NeedsNetworkSettings:  a.Flags.NeedsNetworkSettings,
 		NeedsLocationSettings: a.Flags.NeedsLocationSettings,
 	}
+	log.Printf("Saving config to %v", configFilename)
 	err = saveConfig(&c, fh)
 
 	if a.Flags.RunningAsRoot {
@@ -184,6 +186,7 @@ func saveConfig(c *configSettings, w io.Writer) error {
 		log.Printf("Unable to json.MarshallIndent %v:%v", c, err)
 		return err
 	}
+	log.Printf("Writing: \n%v\n", string(b))
 	io.WriteString(w, string(b))
 	return nil
 }
@@ -227,7 +230,10 @@ func CreateAppContext(timeMarker time.Time, cmdFlags models.CmdFlags) (*models.A
 		log.Printf("Wireless interface is %q", wirelessInterface)
 	}
 
-	return NewAppContext(timeMarker, cmdFlags, wirelessInterface, loadConfig())
+	goOS := runtime.GOOS
+	goArch := runtime.GOARCH
+
+	return NewAppContext(timeMarker, cmdFlags, wirelessInterface, loadConfig(), goOS, goArch)
 }
 
 // NewAppContext returns a new context with dependency injection
@@ -236,6 +242,8 @@ func NewAppContext(
 	cmdFlags models.CmdFlags,
 	wirelessInterface string,
 	configSettings *configSettings,
+	goOS string,
+	goArch string,
 ) (*models.AppContext, error) {
 	user, _ := user.Current()
 
@@ -294,6 +302,8 @@ func NewAppContext(
 		LocationSettings: configSettings.LocationSettings,
 		Time:             &timeMarker,
 		NetworkSettings:  &networkSettings,
+		OS:               goOS,
+		Arch:             goArch,
 	}
 	res.LocationSettings.ManagementEnabled = true
 	return res, nil

@@ -14,19 +14,31 @@ func getWirelessInterfaceRpi() (string, error) {
 }
 
 func newTestAppHandler() testAppHandler {
+	lsc := make([]map[string]interface{}, 0)
+	asc := make([]map[string]interface{}, 0)
+
 	return testAppHandler{
+		APSettings:       nil,
 		NetworkSettings:  nil,
 		LocationSettings: nil,
+		Flags:            nil,
 		H:                nil,
-		SetAPModeCalls:   []bool{},
+		// the following are so the tests can inspect what the handlers do
+		SetAPModeCalls:           []bool{},
+		SetLocationSettingsCalls: lsc,
+		SetAPSettingsCalls:       asc,
 	}
 }
 
 type testAppHandler struct {
-	NetworkSettings  *models.NetworkSettings
-	LocationSettings *models.LocationSettings
-	H                func(IAppHandler, http.ResponseWriter, *http.Request) (int, error)
-	SetAPModeCalls   []bool
+	APSettings               *models.APSettings
+	NetworkSettings          *models.NetworkSettings
+	LocationSettings         *models.LocationSettings
+	Flags                    *models.Flags
+	H                        func(IAppHandler, http.ResponseWriter, *http.Request) (int, error)
+	SetAPModeCalls           []bool
+	SetLocationSettingsCalls []map[string]interface{}
+	SetAPSettingsCalls       []map[string]interface{}
 }
 
 func (ah testAppHandler) GetContext() *models.AppContext {
@@ -43,6 +55,11 @@ func (ah *testAppHandler) SetAPMode(v bool) error {
 	return nil
 }
 
+func (ah *testAppHandler) SetLocationSettings(input map[string]interface{}) error {
+	ah.SetLocationSettingsCalls = append(ah.SetLocationSettingsCalls, input)
+	return nil
+}
+
 func (ah testAppHandler) GetNetworkSettings() *models.NetworkSettings {
 	return ah.NetworkSettings
 }
@@ -51,9 +68,22 @@ func (ah testAppHandler) GetLocationSettings() *models.LocationSettings {
 	return ah.LocationSettings
 }
 
+func (ah testAppHandler) GetAPSettings() *models.APSettings {
+	return ah.APSettings
+}
+
+func (ah *testAppHandler) SetAPSettings(input map[string]interface{}) error {
+	ah.SetAPSettingsCalls = append(ah.SetAPSettingsCalls, input)
+	return nil
+}
+
 func (ah testAppHandler) GetTime() *time.Time {
 	v := time.Now()
 	return &v
+}
+
+func (ah testAppHandler) GetFlags() *models.Flags {
+	return ah.Flags
 }
 
 func (ah *testAppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

@@ -1,0 +1,12 @@
+(bool) false
+(models.LocationSettings) {
+  Latitude: (float64) 3.4,
+  MagDeclination: (float64) -5.6,
+  AzError: (float64) 2,
+  AltError: (float64) 1,
+  XOffset: (int) 7,
+  YOffset: (int) 8,
+  ZOffset: (int) 9,
+  ManagementEnabled: (bool) true
+}
+(config.MagneticDeclinationValidationError) invalid value

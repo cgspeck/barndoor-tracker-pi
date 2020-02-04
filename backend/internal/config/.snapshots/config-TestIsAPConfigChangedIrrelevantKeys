@@ -1,0 +1,7 @@
+(bool) false
+(models.APSettings) {
+  Channel: (int) 11,
+  Key: (string) "",
+  SSID: (string) (len=16) "barndoor_tracker"
+}
+(interface {}) <nil>

@@ -20,7 +20,7 @@ afterEach(() => {
 
 describe("getAllSettings", () => {
   beforeEach(() => {
-    mock.onGet(`${config.endpoint}/settings/debug`).reply(200, {
+    mock.onGet(`${config.endpoint}/status/debug`).reply(200, {
       apSettings: {
         ssid: "foo",
         key: "bar"
@@ -124,7 +124,7 @@ describe("setLocationSettings", () => {
   });
 
   it("returns expected value", async () => {
-    const res = await setLocationSettings(-37.74, 11.64, 4, 5, 1, 2, 3);
+    const res = await setLocationSettings("-37.74", 11.64, 4, 5, 1, 2, 3);
     expect(res).toEqual({
       latitude: -37.74,
       magDeclination: 11.64,
@@ -139,7 +139,7 @@ describe("setLocationSettings", () => {
 
 describe("getFlags", () => {
   beforeEach(() => {
-    mock.onGet(`${config.endpoint}/flags`).reply(200, {
+    mock.onGet(`${config.endpoint}/status/flags`).reply(200, {
       needsAPSettings: false,
       needsLocationSettings: true
     });

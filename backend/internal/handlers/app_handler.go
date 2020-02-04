@@ -8,9 +8,8 @@ import (
 	"time"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/config"
-	"github.com/cgspeck/barndoor-tracker-pi/internal/wireless"
-
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
+	"github.com/cgspeck/barndoor-tracker-pi/internal/wireless"
 )
 
 type IAppHandler interface {
@@ -20,6 +19,12 @@ type IAppHandler interface {
 	SetAPMode(bool) error
 	GetNetworkSettings() *models.NetworkSettings
 	GetLocationSettings() *models.LocationSettings
+	SetLocationSettings(map[string]interface{}) error
+
+	GetAPSettings() *models.APSettings
+	SetAPSettings(map[string]interface{}) error
+
+	GetFlags() *models.Flags
 }
 
 type AppHandler struct {
@@ -38,6 +43,7 @@ func (ah AppHandler) writeConfig() error {
 
 func (ah *AppHandler) SetAPMode(v bool) error {
 	ah.AppContext.NetworkSettings.AccessPointMode = v
+	ah.AppContext.Flags.NeedsNetworkSettings = false
 	err := wireless.ApplyDesiredConfiguration(ah.GetNetworkSettings())
 	if err != nil {
 		return err
@@ -54,8 +60,58 @@ func (ah AppHandler) GetLocationSettings() *models.LocationSettings {
 	return ah.AppContext.LocationSettings
 }
 
+func (ah *AppHandler) SetLocationSettings(input map[string]interface{}) error {
+	currentSettings := ah.GetLocationSettings()
+	mustApplyChanges, newSettings, err := config.IsLocationConfigChanged(input, *currentSettings)
+	if err != nil {
+		return err
+	}
+
+	if ah.GetFlags().NeedsLocationSettings {
+		mustApplyChanges = true
+	}
+	if mustApplyChanges {
+		ah.AppContext.LocationSettings = &newSettings
+		ah.AppContext.Flags.NeedsLocationSettings = false
+		err = config.SaveConfig(ah.GetContext())
+		// TODO: hook to recalculate align status
+	}
+	return err
+}
+
+func (ah AppHandler) GetAPSettings() *models.APSettings {
+	return ah.AppContext.NetworkSettings.APSettings
+}
+
+func (ah *AppHandler) SetAPSettings(input map[string]interface{}) error {
+	currentSettings := ah.GetAPSettings()
+	mustApplyChanges, newSettings, err := config.IsAPConfigChanged(input, *currentSettings)
+	if err != nil {
+		return err
+	}
+
+	if ah.GetFlags().NeedsNetworkSettings {
+		mustApplyChanges = true
+	}
+
+	if mustApplyChanges {
+		ah.AppContext.NetworkSettings.APSettings = &newSettings
+		ah.AppContext.Flags.NeedsNetworkSettings = false
+		err = config.SaveConfig(ah.GetContext())
+		if err != nil {
+			return err
+		}
+		err = wireless.ApplyDesiredConfiguration(ah.GetNetworkSettings())
+	}
+	return err
+}
+
 func (ah AppHandler) GetTime() *time.Time {
 	return ah.AppContext.Time
+}
+
+func (ah AppHandler) GetFlags() *models.Flags {
+	return ah.AppContext.Flags
 }
 
 // func (ah *AppHandler) SetTime(t *time.Time) {
@@ -89,6 +145,7 @@ func handleHandlerResult(status int, err error, w http.ResponseWriter, r *http.R
 }
 
 func (ah AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 	status, err := ah.H(&ah, w, r)
 	handleHandlerResult(status, err, w, r)

@@ -1,0 +1,11 @@
+(bool) true
+(models.LocationSettings) {
+  Latitude: (float64) -37.814,
+  MagDeclination: (float64) 11.72,
+  AzError: (float64) 2,
+  AltError: (float64) 1,
+  XOffset: (int) 7,
+  YOffset: (int) 8,
+  ZOffset: (int) 9,
+  ManagementEnabled: (bool) true
+}

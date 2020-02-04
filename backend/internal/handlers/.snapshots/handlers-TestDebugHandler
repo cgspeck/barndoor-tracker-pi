@@ -10,7 +10,9 @@
   "flags": null,
   "location": null,
   "time": "0001-01-01T00:00:00Z",
-  "networkSettings": null
+  "networkSettings": null,
+  "os": "",
+  "arch": ""
 }),
   Flushed: (bool) false,
   result: (*http.Response)(<nil>),

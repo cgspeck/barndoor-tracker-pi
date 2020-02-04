@@ -24,3 +24,6 @@
   },
   wroteHeader: (bool) true
 })
+(map[string]interface {}) (len=1) {
+  (string) (len=8) "latitude": (float64) -37.4
+}

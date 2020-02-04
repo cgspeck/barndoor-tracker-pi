@@ -32,15 +32,34 @@ async function setLocationSettings(
   zOffset
 ) {
   return axios
-    .post(`${config.endpoint}/settings/location`, {
-      latitude,
-      magDeclination,
-      azError,
-      altError,
-      xOffset,
-      yOffset,
-      zOffset
-    })
+    .post(
+      `${config.endpoint}/settings/location`,
+      {
+        latitude,
+        magDeclination,
+        azError,
+        altError,
+        xOffset,
+        yOffset,
+        zOffset
+      },
+      {
+        transformRequest: [
+          function(data, _) {
+            const res = {
+              latitude: parseFloat(data.latitude),
+              magDeclination: parseFloat(data.magDeclination),
+              azError: parseFloat(data.azError),
+              altError: parseFloat(data.altError),
+              xOffset: parseInt(data.xOffset),
+              yOffset: parseInt(data.yOffset),
+              zOffset: parseInt(data.zOffset)
+            };
+            return JSON.stringify(res);
+          }
+        ]
+      }
+    )
     .then(r => r.data);
 }
 

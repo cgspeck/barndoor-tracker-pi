@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-
-	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 )
 
 type LocationManagementDisabledError struct{}
@@ -30,15 +28,16 @@ func LocationSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *http.Requ
 			if err != nil {
 				return 500, err
 			}
-			var LocationSettings models.LocationSettings
-			err = json.Unmarshal(body, &LocationSettings)
+
+			input := make(map[string]interface{})
+			err = json.Unmarshal(body, &input)
 			if err != nil {
 				return 500, err
 			}
-
-			// if ah.GetLocationSettings().AccessPointMode != LocationSettings.AccessPointMode {
-			// 	ah.SetAPMode(LocationSettings.AccessPointMode)
-			// }
+			err = ah.SetLocationSettings(input)
+			if err != nil {
+				return 500, err
+			}
 			err = writeJson(ah.GetLocationSettings(), w)
 			if err != nil {
 				return 500, err

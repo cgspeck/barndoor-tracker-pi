@@ -55,6 +55,8 @@ func TestNewAppContext(t *testing.T) {
 		models.CmdFlags{},
 		"wlan0",
 		&c,
+		"linux",
+		"amd64",
 	)
 	err = cupaloy.Snapshot(res, err)
 	if err != nil {

@@ -34,6 +34,8 @@
     WirelessInterface: (string) (len=5) "wlan0",
     WirelessProfiles: ([]*models.WirelessProfile) {
     }
-  })
+  }),
+  OS: (string) (len=5) "linux",
+  Arch: (string) (len=5) "amd64"
 })
 (interface {}) <nil>

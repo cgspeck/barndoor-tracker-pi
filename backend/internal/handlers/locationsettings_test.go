@@ -60,7 +60,7 @@ func doLocationSettingsPost(
 }
 func TestLocationSettingsHandlerPost(t *testing.T) {
 	body := `{
-	"Latitude": -37.4
+	"latitude": -37.4
 }
 `
 
@@ -79,24 +79,20 @@ func TestLocationSettingsHandlerPost(t *testing.T) {
 
 	rr := doLocationSettingsPost(body, &handler, http.StatusOK, t)
 
+	if len(handler.SetLocationSettingsCalls) != 1 {
+		t.Errorf("Expected a call to SetLocationSetting")
+	}
+
 	// Check the response body is what we expect.
-	err := cupaloy.Snapshot(rr)
+	err := cupaloy.Snapshot(rr, handler.SetLocationSettingsCalls[0])
 	if err != nil {
 		t.Error(err)
 	}
-
-	// if len(handler.SetAPModeCalls) != 1 {
-	// 	t.Errorf("Expected call to SetAPMode")
-	// }
-
-	// if handler.SetAPModeCalls[0] != true {
-	// 	t.Errorf("Expected true call to SetAPMode")
-	// }
 }
 
 func TestLocationSettingsHandlerPostManagementDisabled(t *testing.T) {
 	body := `{
-	"Latitude": -37.4
+	"latitude": -37.4
 }
 `
 
@@ -121,7 +117,7 @@ func TestLocationSettingsHandlerPostManagementDisabled(t *testing.T) {
 		t.Error(err)
 	}
 
-	// if len(handler.SetAPModeCalls) != 0 {
-	// 	t.Errorf("Expected no call to SetAPMode")
-	// }
+	if len(handler.SetLocationSettingsCalls) != 0 {
+		t.Errorf("Expected no calls to SetLocationSetting")
+	}
 }

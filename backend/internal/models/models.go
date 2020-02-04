@@ -1,6 +1,7 @@
 package models
 
 import (
+	"reflect"
 	"time"
 )
 
@@ -8,7 +9,7 @@ import (
 type Flags struct {
 	NeedsNetworkSettings  bool `json:"needsAPSettings"`
 	NeedsLocationSettings bool `json:"needsLocationSettings"`
-	RunningAsRoot         bool
+	RunningAsRoot         bool `json:"runningAsRoot"`
 }
 
 // configuration
@@ -21,6 +22,11 @@ type LocationSettings struct {
 	YOffset           int     `json:"yOffset"`
 	ZOffset           int     `json:"zOffset"`
 	ManagementEnabled bool    `json:"managementEnabled"`
+}
+
+func (l LocationSettings) Equals(o LocationSettings) bool {
+	o.ManagementEnabled = l.ManagementEnabled
+	return reflect.DeepEqual(l, o)
 }
 
 type APSettings struct {
@@ -85,4 +91,6 @@ type AppContext struct {
 	LocationSettings *LocationSettings `json:"location"`
 	Time             *time.Time        `json:"time"`
 	NetworkSettings  *NetworkSettings  `json:"networkSettings"`
+	OS               string            `json:"os"`
+	Arch             string            `json:"arch"`
 }
