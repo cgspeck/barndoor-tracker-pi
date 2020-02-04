@@ -55,6 +55,10 @@ func main() {
 	fs := http.FileServer(http.Dir(static))
 	http.Handle("/", fs)
 
+	http.HandleFunc("/config.json", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./config.json")
+	})
+
 	port := 5000
 	if context.Flags.RunningAsRoot {
 		port = 80

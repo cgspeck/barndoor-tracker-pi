@@ -41,7 +41,7 @@ describe("getAllSettings", () => {
 
 describe("getAPSettings", () => {
   beforeEach(() => {
-    mock.onGet(`${config.endpoint}/settings/ap`).reply(200, {
+    mock.onGet(`${config.endpoint}/settings/network/ap`).reply(200, {
       ssid: "foo",
       key: "bar"
     });
@@ -58,7 +58,10 @@ describe("getAPSettings", () => {
 
 describe("setAPSettings", () => {
   beforeEach(() => {
-    mock.onPost(`${config.endpoint}/settings/ap`).reply(200, {
+    mock.onPost(`${config.endpoint}/settings/network`).reply(200, {
+      accessPointMode: true
+    });
+    mock.onPost(`${config.endpoint}/settings/network/ap`).reply(200, {
       ssid: "foo2",
       key: "bar2"
     });
@@ -124,7 +127,15 @@ describe("setLocationSettings", () => {
   });
 
   it("returns expected value", async () => {
-    const res = await setLocationSettings("-37.74", 11.64, 4, 5, 1, 2, 3);
+    const res = await setLocationSettings(
+      "-37.74",
+      "11.64",
+      "4",
+      "5",
+      "1",
+      "2",
+      "3"
+    );
     expect(res).toEqual({
       latitude: -37.74,
       magDeclination: 11.64,

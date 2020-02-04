@@ -146,6 +146,7 @@ func handleHandlerResult(status int, err error, w http.ResponseWriter, r *http.R
 
 func (ah AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
 	w.Header().Set("Content-Type", "application/json")
 	status, err := ah.H(&ah, w, r)
 	handleHandlerResult(status, err, w, r)

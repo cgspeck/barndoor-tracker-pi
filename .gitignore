@@ -5,5 +5,7 @@ frontend/build/
 .vscode/ipch
 .vscode/.browse.c_cpp.db
 backend/backend
+backend/config.json
 pocs/ghoami/ghoami
 backend/barndoor-tracker-pi
+pi/config.json

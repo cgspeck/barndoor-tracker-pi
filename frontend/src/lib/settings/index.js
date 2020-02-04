@@ -6,12 +6,16 @@ async function getAllSettings() {
 }
 
 async function getAPSettings() {
-  return axios.get(`${config.endpoint}/settings/ap`).then(r => r.data);
+  return axios.get(`${config.endpoint}/settings/network/ap`).then(r => r.data);
 }
 
 async function setAPSettings(ssid, key) {
+  // remove when frontend actually has wireless management features
+  await axios.post(`${config.endpoint}/settings/network`, {
+    accessPointMode: true
+  });
   return axios
-    .post(`${config.endpoint}/settings/ap`, {
+    .post(`${config.endpoint}/settings/network/ap`, {
       ssid: ssid,
       key: key
     })
