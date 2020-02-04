@@ -25,6 +25,7 @@ type IAppHandler interface {
 	SetAPSettings(map[string]interface{}) error
 
 	GetFlags() *models.Flags
+	GetAlignStatus() *models.AlignStatus
 }
 
 type AppHandler struct {
@@ -112,6 +113,10 @@ func (ah AppHandler) GetTime() *time.Time {
 
 func (ah AppHandler) GetFlags() *models.Flags {
 	return ah.AppContext.Flags
+}
+
+func (ah AppHandler) GetAlignStatus() *models.AlignStatus {
+	return ah.AppContext.AlignStatus
 }
 
 // func (ah *AppHandler) SetTime(t *time.Time) {

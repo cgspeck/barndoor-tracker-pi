@@ -18,6 +18,7 @@ func newTestAppHandler() testAppHandler {
 	asc := make([]map[string]interface{}, 0)
 
 	return testAppHandler{
+		AlignStatus:      nil,
 		APSettings:       nil,
 		NetworkSettings:  nil,
 		LocationSettings: nil,
@@ -32,6 +33,7 @@ func newTestAppHandler() testAppHandler {
 
 type testAppHandler struct {
 	APSettings               *models.APSettings
+	AlignStatus              *models.AlignStatus
 	NetworkSettings          *models.NetworkSettings
 	LocationSettings         *models.LocationSettings
 	Flags                    *models.Flags
@@ -84,6 +86,10 @@ func (ah testAppHandler) GetTime() *time.Time {
 
 func (ah testAppHandler) GetFlags() *models.Flags {
 	return ah.Flags
+}
+
+func (ah testAppHandler) GetAlignStatus() *models.AlignStatus {
+	return ah.AlignStatus
 }
 
 func (ah *testAppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
