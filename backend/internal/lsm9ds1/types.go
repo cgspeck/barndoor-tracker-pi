@@ -85,8 +85,8 @@ const (
 )
 
 const (
-	XG_INT1 = INT1_CTRL
-	XG_INT2 = INT2_CTRL
+	XG_INT1 = 0x0C // INT1_CTRL
+	XG_INT2 = 0x0D // INT2_CTRL
 )
 
 const (
@@ -208,4 +208,28 @@ type IMUSettings struct {
 	accel  accelSettings
 	mag    magSettings
 	temp   temperatureSettings
+}
+
+type LSM9DS1 struct {
+	settings                     IMUSettings
+	gx, gy, gz                   int // x, y, and z axis readings of the gyroscope
+	ax, ay, az                   int // x, y, and z axis readings of the accelerometer
+	mx, my, mz                   int // x, y, and z axis readings of the magnetometer
+	temperature                  int // Chip temperature
+	gBias, aBias, mBias          [3]float32
+	gBiasRaw, aBiasRaw, mBiasRaw [3]int
+
+	// protected
+	// x_mAddress and gAddress store the I2C address or SPI chip select pin
+	// for each sensor.
+	_mAddress, _xgAddress uint
+
+	// gRes, aRes, and mRes store the current resolution for each sensor.
+	// Units of these values would be DPS (or g's or Gs's) per ADC tick.
+	// This value is calculated as (sensor scale) / (2^15).
+	gRes, aRes, mRes float32
+
+	// _autoCalc keeps track of whether we're automatically subtracting off
+	// accelerometer and gyroscope bias calculated in calibrate().
+	_autoCalc bool
 }
