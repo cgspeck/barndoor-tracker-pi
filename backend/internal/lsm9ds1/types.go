@@ -168,7 +168,7 @@ type deviceSettings struct {
 	commInterface uint // Can be I2C SPI 4-wire or SPI 3-wire
 	agAddress     uint // I2C address or SPI CS pin
 	mAddress      uint // I2C address or SPI CS pin
-	TwoWire       *embd.I2CBus
+	i2c           *embd.I2CBus
 	//   TwoWire* i2c;    // pointer to an instance of I2C interface
 }
 
