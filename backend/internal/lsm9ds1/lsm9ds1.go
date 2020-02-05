@@ -30,8 +30,7 @@ const SENSITIVITY_MAGNETOMETER_8   = 0.00029
 const SENSITIVITY_MAGNETOMETER_12  = 0.00043
 const SENSITIVITY_MAGNETOMETER_16  = 0.00058
 
-void LSM9DS1::init()
-{
+func (l *LSM9DS1) init() {
 	settings.gyro.enabled = true;
 	settings.gyro.enableX = true;
 	settings.gyro.enableY = true;
@@ -118,7 +117,7 @@ void LSM9DS1::init()
 }
 
 
-uint16_t LSM9DS1::begin(uint8_t agAddress, uint8_t mAddress, TwoWire &wirePort)
+func (l *LSM9DS1) begin(uint8_t agAddress, uint8_t mAddress, TwoWire &wirePort) uint
 {
 	// Set device settings, they are used in many other places
 	settings.device.commInterface = IMU_MODE_I2C;
@@ -165,7 +164,7 @@ uint16_t LSM9DS1::begin(uint8_t agAddress, uint8_t mAddress, TwoWire &wirePort)
 	return whoAmICombined;
 }
 
-uint16_t LSM9DS1::beginSPI(uint8_t ag_CS_pin, uint8_t m_CS_pin)
+func (l *LSM9DS1) beginSPI(uint8_t ag_CS_pin, uint8_t m_CS_pin) uint
 {
 	// Set device settings, they are used in many other places
 	settings.device.commInterface = IMU_MODE_SPI;
@@ -210,7 +209,7 @@ uint16_t LSM9DS1::beginSPI(uint8_t ag_CS_pin, uint8_t m_CS_pin)
 	return whoAmICombined;
 }
 
-void LSM9DS1::initGyro()
+func (l *LSM9DS1) initGyro()
 {
 	uint8_t tempRegValue = 0;
 
@@ -282,7 +281,7 @@ void LSM9DS1::initGyro()
 	xgWriteByte(ORIENT_CFG_G, tempRegValue);
 }
 
-void LSM9DS1::initAccel()
+func (l *LSM9DS1) initAccel()
 {
 	uint8_t tempRegValue = 0;
 
@@ -353,7 +352,7 @@ void LSM9DS1::initAccel()
 // subtract the biases ourselves. This results in a more accurate measurement in general and can
 // remove errors due to imprecise or varying initial placement. Calibration of sensor data in this manner
 // is good practice.
-void LSM9DS1::calibrate(bool autoCalc)
+func (l *LSM9DS1) calibrate(bool autoCalc)
 {
 	uint8_t samples = 0;
 	int ii;
@@ -392,7 +391,7 @@ void LSM9DS1::calibrate(bool autoCalc)
 	if (autoCalc) _autoCalc = true;
 }
 
-void LSM9DS1::calibrateMag(bool loadIn)
+func (l *LSM9DS1) calibrateMag(bool loadIn)
 {
 	int i, j;
 	int16_t magMin[3] = {0, 0, 0};
@@ -422,7 +421,7 @@ void LSM9DS1::calibrateMag(bool loadIn)
 	}
 
 }
-void LSM9DS1::magOffset(uint8_t axis, int16_t offset)
+func (l *LSM9DS1) magOffset(uint8_t axis, int16_t offset)
 {
 	if (axis > 2)
 		return;
@@ -433,7 +432,7 @@ void LSM9DS1::magOffset(uint8_t axis, int16_t offset)
 	mWriteByte(OFFSET_X_REG_H_M + (2 * axis), msb);
 }
 
-void LSM9DS1::initMag()
+func (l *LSM9DS1) initMag()
 {
 	uint8_t tempRegValue = 0;
 
@@ -502,28 +501,28 @@ void LSM9DS1::initMag()
 	mWriteByte(CTRL_REG5_M, tempRegValue);
 }
 
-uint8_t LSM9DS1::accelAvailable()
+func (l *LSM9DS1) accelAvailable() uint
 {
 	uint8_t status = xgReadByte(STATUS_REG_1);
 
 	return (status & (1<<0));
 }
 
-uint8_t LSM9DS1::gyroAvailable()
+func (l *LSM9DS1) gyroAvailable() uint
 {
 	uint8_t status = xgReadByte(STATUS_REG_1);
 
 	return ((status & (1<<1)) >> 1);
 }
 
-uint8_t LSM9DS1::tempAvailable()
+func (l *LSM9DS1) tempAvailable() uint
 {
 	uint8_t status = xgReadByte(STATUS_REG_1);
 
 	return ((status & (1<<2)) >> 2);
 }
 
-uint8_t LSM9DS1::magAvailable(lsm9ds1_axis axis)
+func (l *LSM9DS1) magAvailable(lsm9ds1_axis axis) uint
 {
 	uint8_t status;
 	status = mReadByte(STATUS_REG_M);
@@ -531,7 +530,7 @@ uint8_t LSM9DS1::magAvailable(lsm9ds1_axis axis)
 	return ((status & (1<<axis)) >> axis);
 }
 
-void LSM9DS1::readAccel()
+func (l *LSM9DS1) readAccel()
 {
 	uint8_t temp[6]; // We'll read six bytes from the accelerometer into temp
 	if ( xgReadBytes(OUT_X_L_XL, temp, 6) == 6 ) // Read 6 bytes, beginning at OUT_X_L_XL
@@ -548,7 +547,7 @@ void LSM9DS1::readAccel()
 	}
 }
 
-int16_t LSM9DS1::readAccel(lsm9ds1_axis axis)
+func (l *LSM9DS1) readAccel(lsm9ds1_axis axis) int
 {
 	uint8_t temp[2];
 	int16_t value;
@@ -564,7 +563,7 @@ int16_t LSM9DS1::readAccel(lsm9ds1_axis axis)
 	return 0;
 }
 
-void LSM9DS1::readMag()
+func (l *LSM9DS1) readMag()
 {
 	uint8_t temp[6]; // We'll read six bytes from the mag into temp
 	if ( mReadBytes(OUT_X_L_M, temp, 6) == 6) // Read 6 bytes, beginning at OUT_X_L_M
@@ -575,7 +574,7 @@ void LSM9DS1::readMag()
 	}
 }
 
-int16_t LSM9DS1::readMag(lsm9ds1_axis axis)
+func (l *LSM9DS1) readMag(lsm9ds1_axis axis) int
 {
 	uint8_t temp[2];
 	if ( mReadBytes(OUT_X_L_M + (2 * axis), temp, 2) == 2)
@@ -585,7 +584,7 @@ int16_t LSM9DS1::readMag(lsm9ds1_axis axis)
 	return 0;
 }
 
-void LSM9DS1::readTemp()
+func (l *LSM9DS1) readTemp()
 {
 	uint8_t temp[2]; // We'll read two bytes from the temperature sensor into temp
 	if ( xgReadBytes(OUT_TEMP_L, temp, 2) == 2 ) // Read 2 bytes, beginning at OUT_TEMP_L
@@ -595,7 +594,7 @@ void LSM9DS1::readTemp()
 	}
 }
 
-void LSM9DS1::readGyro()
+func (l *LSM9DS1) readGyro()
 {
 	uint8_t temp[6]; // We'll read six bytes from the gyro into temp
 	if ( xgReadBytes(OUT_X_L_G, temp, 6) == 6) // Read 6 bytes, beginning at OUT_X_L_G
@@ -612,7 +611,7 @@ void LSM9DS1::readGyro()
 	}
 }
 
-int16_t LSM9DS1::readGyro(lsm9ds1_axis axis)
+func (l *LSM9DS1) readGyro(lsm9ds1_axis axis) int
 {
 	uint8_t temp[2];
 	int16_t value;
@@ -629,25 +628,25 @@ int16_t LSM9DS1::readGyro(lsm9ds1_axis axis)
 	return 0;
 }
 
-float LSM9DS1::calcGyro(int16_t gyro)
+func (l *LSM9DS1) calcGyro(int16_t gyro) float32
 {
 	// Return the gyro raw reading times our pre-calculated DPS / (ADC tick):
 	return gRes * gyro;
 }
 
-float LSM9DS1::calcAccel(int16_t accel)
+func (l *LSM9DS1) calcAccel(int16_t accel) float32
 {
 	// Return the accel raw reading times our pre-calculated g's / (ADC tick):
 	return aRes * accel;
 }
 
-float LSM9DS1::calcMag(int16_t mag)
+func (l *LSM9DS1) calcMag(int16_t mag) float32
 {
 	// Return the mag raw reading times our pre-calculated Gs / (ADC tick):
 	return mRes * mag;
 }
 
-void LSM9DS1::setGyroScale(uint16_t gScl)
+func (l *LSM9DS1) setGyroScale(uint16_t gScl)
 {
 	// Read current value of CTRL_REG1_G:
 	uint8_t ctrl1RegValue = xgReadByte(CTRL_REG1_G);
@@ -672,7 +671,7 @@ void LSM9DS1::setGyroScale(uint16_t gScl)
 	calcgRes();
 }
 
-void LSM9DS1::setAccelScale(uint8_t aScl)
+func (l *LSM9DS1) setAccelScale(uint8_t aScl)
 {
 	// We need to preserve the other bytes in CTRL_REG6_XL. So, first read it:
 	uint8_t tempRegValue = xgReadByte(CTRL_REG6_XL);
@@ -703,7 +702,7 @@ void LSM9DS1::setAccelScale(uint8_t aScl)
 	calcaRes();
 }
 
-void LSM9DS1::setMagScale(uint8_t mScl)
+func (l *LSM9DS1) setMagScale(uint8_t mScl)
 {
 	// We need to preserve the other bytes in CTRL_REG6_XM. So, first read it:
 	uint8_t temp = mReadByte(CTRL_REG2_M);
@@ -739,7 +738,7 @@ void LSM9DS1::setMagScale(uint8_t mScl)
 	calcmRes();
 }
 
-void LSM9DS1::setGyroODR(uint8_t gRate)
+func (l *LSM9DS1) setGyroODR(uint8_t gRate)
 {
 	// Only do this if gRate is not 0 (which would disable the gyro)
 	if ((gRate & 0x07) != 0)
@@ -756,7 +755,7 @@ void LSM9DS1::setGyroODR(uint8_t gRate)
 	}
 }
 
-void LSM9DS1::setAccelODR(uint8_t aRate)
+func (l *LSM9DS1) setAccelODR(uint8_t aRate)
 {
 	// Only do this if aRate is not 0 (which would disable the accel)
 	if ((aRate & 0x07) != 0)
@@ -773,7 +772,7 @@ void LSM9DS1::setAccelODR(uint8_t aRate)
 	}
 }
 
-void LSM9DS1::setMagODR(uint8_t mRate)
+func (l *LSM9DS1) setMagODR(uint8_t mRate)
 {
 	// We need to preserve the other bytes in CTRL_REG5_XM. So, first read it:
 	uint8_t temp = mReadByte(CTRL_REG1_M);
@@ -786,7 +785,7 @@ void LSM9DS1::setMagODR(uint8_t mRate)
 	mWriteByte(CTRL_REG1_M, temp);
 }
 
-void LSM9DS1::calcgRes()
+func (l *LSM9DS1) calcgRes()
 {
 	switch (settings.gyro.scale)
 	{
@@ -804,7 +803,7 @@ void LSM9DS1::calcgRes()
 	}
 }
 
-void LSM9DS1::calcaRes()
+func (l *LSM9DS1) calcaRes()
 {
 	switch (settings.accel.scale)
 	{
@@ -825,7 +824,7 @@ void LSM9DS1::calcaRes()
 	}
 }
 
-void LSM9DS1::calcmRes()
+func (l *LSM9DS1) calcmRes()
 {
 	switch (settings.mag.scale)
 	{
@@ -844,7 +843,7 @@ void LSM9DS1::calcmRes()
 	}
 }
 
-void LSM9DS1::configInt(interrupt_select interrupt, uint8_t generator,
+func (l *LSM9DS1) configInt(interrupt_select interrupt, uint8_t generator,
 	                     h_lactive activeLow, pp_od pushPull)
 {
 	// Write to INT1_CTRL or INT2_CTRL. [interupt] should already be one of
@@ -865,7 +864,7 @@ void LSM9DS1::configInt(interrupt_select interrupt, uint8_t generator,
 	xgWriteByte(CTRL_REG8, temp);
 }
 
-void LSM9DS1::configInactivity(uint8_t duration, uint8_t threshold, bool sleepOn)
+func (l *LSM9DS1) configInactivity(uint8_t duration, uint8_t threshold, bool sleepOn)
 {
 	uint8_t temp = 0;
 
@@ -876,14 +875,14 @@ void LSM9DS1::configInactivity(uint8_t duration, uint8_t threshold, bool sleepOn
 	xgWriteByte(ACT_DUR, duration);
 }
 
-uint8_t LSM9DS1::getInactivity()
+func (l *LSM9DS1) getInactivity() uint
 {
 	uint8_t temp = xgReadByte(STATUS_REG_0);
 	temp &= (0x10);
 	return temp;
 }
 
-void LSM9DS1::configAccelInt(uint8_t generator, bool andInterrupts)
+func (l *LSM9DS1) configAccelInt(uint8_t generator, bool andInterrupts)
 {
 	// Use variables from accel_interrupt_generator, OR'd together to create
 	// the [generator]value.
@@ -892,7 +891,7 @@ void LSM9DS1::configAccelInt(uint8_t generator, bool andInterrupts)
 	xgWriteByte(INT_GEN_CFG_XL, temp);
 }
 
-void LSM9DS1::configAccelThs(uint8_t threshold, lsm9ds1_axis axis, uint8_t duration, bool wait)
+func (l *LSM9DS1) configAccelThs(uint8_t threshold, lsm9ds1_axis axis, uint8_t duration, bool wait)
 {
 	// Write threshold value to INT_GEN_THS_?_XL.
 	// axis will be 0, 1, or 2 (x, y, z respectively)
@@ -905,7 +904,7 @@ void LSM9DS1::configAccelThs(uint8_t threshold, lsm9ds1_axis axis, uint8_t durat
 	xgWriteByte(INT_GEN_DUR_XL, temp);
 }
 
-uint8_t LSM9DS1::getAccelIntSrc()
+func (l *LSM9DS1) getAccelIntSrc() uint
 {
 	uint8_t intSrc = xgReadByte(INT_GEN_SRC_XL);
 
@@ -918,7 +917,7 @@ uint8_t LSM9DS1::getAccelIntSrc()
 	return 0;
 }
 
-void LSM9DS1::configGyroInt(uint8_t generator, bool aoi, bool latch)
+func (l *LSM9DS1) configGyroInt(uint8_t generator, bool aoi, bool latch)
 {
 	// Use variables from accel_interrupt_generator, OR'd together to create
 	// the [generator]value.
@@ -928,7 +927,7 @@ void LSM9DS1::configGyroInt(uint8_t generator, bool aoi, bool latch)
 	xgWriteByte(INT_GEN_CFG_G, temp);
 }
 
-void LSM9DS1::configGyroThs(int16_t threshold, lsm9ds1_axis axis, uint8_t duration, bool wait)
+func (l *LSM9DS1) configGyroThs(int16_t threshold, lsm9ds1_axis axis, uint8_t duration, bool wait)
 {
 	uint8_t buffer[2];
 	buffer[0] = (threshold & 0x7F00) >> 8;
@@ -945,7 +944,7 @@ void LSM9DS1::configGyroThs(int16_t threshold, lsm9ds1_axis axis, uint8_t durati
 	xgWriteByte(INT_GEN_DUR_G, temp);
 }
 
-uint8_t LSM9DS1::getGyroIntSrc()
+func (l *LSM9DS1) getGyroIntSrc() uint
 {
 	uint8_t intSrc = xgReadByte(INT_GEN_SRC_G);
 
@@ -958,7 +957,7 @@ uint8_t LSM9DS1::getGyroIntSrc()
 	return 0;
 }
 
-void LSM9DS1::configMagInt(uint8_t generator, h_lactive activeLow, bool latch)
+func (l *LSM9DS1) configMagInt(uint8_t generator, h_lactive activeLow, bool latch)
 {
 	// Mask out non-generator bits (0-4)
 	uint8_t config = (generator & 0xE0);
@@ -972,7 +971,7 @@ void LSM9DS1::configMagInt(uint8_t generator, h_lactive activeLow, bool latch)
 	mWriteByte(INT_CFG_M, config);
 }
 
-void LSM9DS1::configMagThs(uint16_t threshold)
+func (l *LSM9DS1) configMagThs(uint16_t threshold)
 {
 	// Write high eight bits of [threshold] to INT_THS_H_M
 	mWriteByte(INT_THS_H_M, uint8_t((threshold & 0x7F00) >> 8));
@@ -980,7 +979,7 @@ void LSM9DS1::configMagThs(uint16_t threshold)
 	mWriteByte(INT_THS_L_M, uint8_t(threshold & 0x00FF));
 }
 
-uint8_t LSM9DS1::getMagIntSrc()
+func (l *LSM9DS1) getMagIntSrc() uint
 {
 	uint8_t intSrc = mReadByte(INT_SRC_M);
 
@@ -993,7 +992,7 @@ uint8_t LSM9DS1::getMagIntSrc()
 	return 0;
 }
 
-void LSM9DS1::sleepGyro(bool enable)
+func (l *LSM9DS1) sleepGyro(bool enable)
 {
 	uint8_t temp = xgReadByte(CTRL_REG9);
 	if (enable) temp |= (1<<6);
@@ -1001,7 +1000,7 @@ void LSM9DS1::sleepGyro(bool enable)
 	xgWriteByte(CTRL_REG9, temp);
 }
 
-void LSM9DS1::enableFIFO(bool enable)
+func (l *LSM9DS1) enableFIFO(bool enable)
 {
 	uint8_t temp = xgReadByte(CTRL_REG9);
 	if (enable) temp |= (1<<1);
@@ -1009,7 +1008,7 @@ void LSM9DS1::enableFIFO(bool enable)
 	xgWriteByte(CTRL_REG9, temp);
 }
 
-void LSM9DS1::setFIFO(fifoMode_type fifoMode, uint8_t fifoThs)
+func (l *LSM9DS1) setFIFO(fifoMode_type fifoMode, uint8_t fifoThs)
 {
 	// Limit threshold - 0x1F (31) is the maximum. If more than that was asked
 	// limit it to the maximum.
@@ -1017,12 +1016,12 @@ void LSM9DS1::setFIFO(fifoMode_type fifoMode, uint8_t fifoThs)
 	xgWriteByte(FIFO_CTRL, ((fifoMode & 0x7) << 5) | (threshold & 0x1F));
 }
 
-uint8_t LSM9DS1::getFIFOSamples()
+func (l *LSM9DS1) getFIFOSamples() uint
 {
 	return (xgReadByte(FIFO_SRC) & 0x3F);
 }
 
-void LSM9DS1::constrainScales()
+func (l *LSM9DS1) constrainScales()
 {
 	if ((settings.gyro.scale != 245) && (settings.gyro.scale != 500) &&
 		(settings.gyro.scale != 2000))
@@ -1043,7 +1042,7 @@ void LSM9DS1::constrainScales()
 	}
 }
 
-void LSM9DS1::xgWriteByte(uint8_t subAddress, uint8_t data)
+func (l *LSM9DS1) xgWriteByte(uint8_t subAddress, uint8_t data)
 {
 	// Whether we're using I2C or SPI, write a byte using the
 	// gyro-specific I2C address or SPI CS pin.
@@ -1053,7 +1052,7 @@ void LSM9DS1::xgWriteByte(uint8_t subAddress, uint8_t data)
 		SPIwriteByte(_xgAddress, subAddress, data);
 }
 
-void LSM9DS1::mWriteByte(uint8_t subAddress, uint8_t data)
+func (l *LSM9DS1) mWriteByte(uint8_t subAddress, uint8_t data)
 {
 	// Whether we're using I2C or SPI, write a byte using the
 	// accelerometer-specific I2C address or SPI CS pin.
@@ -1063,7 +1062,7 @@ void LSM9DS1::mWriteByte(uint8_t subAddress, uint8_t data)
 		return SPIwriteByte(_mAddress, subAddress, data);
 }
 
-uint8_t LSM9DS1::xgReadByte(uint8_t subAddress)
+func (l *LSM9DS1) xgReadByte(uint8_t subAddress) uint
 {
 	// Whether we're using I2C or SPI, read a byte using the
 	// gyro-specific I2C address or SPI CS pin.
@@ -1074,7 +1073,7 @@ uint8_t LSM9DS1::xgReadByte(uint8_t subAddress)
 	return -1;
 }
 
-uint8_t LSM9DS1::xgReadBytes(uint8_t subAddress, uint8_t * dest, uint8_t count)
+func (l *LSM9DS1) xgReadBytes(uint8_t subAddress, uint8_t * dest, uint8_t count) uint
 {
 	// Whether we're using I2C or SPI, read multiple bytes using the
 	// gyro-specific I2C address or SPI CS pin.
@@ -1085,7 +1084,7 @@ uint8_t LSM9DS1::xgReadBytes(uint8_t subAddress, uint8_t * dest, uint8_t count)
 	return -1;
 }
 
-uint8_t LSM9DS1::mReadByte(uint8_t subAddress)
+func (l *LSM9DS1) mReadByte(uint8_t subAddress) uint
 {
 	// Whether we're using I2C or SPI, read a byte using the
 	// accelerometer-specific I2C address or SPI CS pin.
@@ -1096,7 +1095,7 @@ uint8_t LSM9DS1::mReadByte(uint8_t subAddress)
 	return -1;
 }
 
-uint8_t LSM9DS1::mReadBytes(uint8_t subAddress, uint8_t * dest, uint8_t count)
+func (l *LSM9DS1) mReadBytes(uint8_t subAddress, uint8_t * dest, uint8_t count) uint
 {
 	// Whether we're using I2C or SPI, read multiple bytes using the
 	// accelerometer-specific I2C address or SPI CS pin.
@@ -1107,7 +1106,7 @@ uint8_t LSM9DS1::mReadBytes(uint8_t subAddress, uint8_t * dest, uint8_t count)
 	return -1;
 }
 
-void LSM9DS1::initSPI()
+func (l *LSM9DS1) initSPI()
 {
 	pinMode(_xgAddress, OUTPUT);
 	digitalWrite(_xgAddress, HIGH);
@@ -1124,7 +1123,7 @@ void LSM9DS1::initSPI()
 	SPI.setDataMode(SPI_MODE0);
 }
 
-void LSM9DS1::SPIwriteByte(uint8_t csPin, uint8_t subAddress, uint8_t data)
+func (l *LSM9DS1) SPIwriteByte(uint8_t csPin, uint8_t subAddress, uint8_t data)
 {
 	digitalWrite(csPin, LOW); // Initiate communication
 
@@ -1136,7 +1135,7 @@ void LSM9DS1::SPIwriteByte(uint8_t csPin, uint8_t subAddress, uint8_t data)
 	digitalWrite(csPin, HIGH); // Close communication
 }
 
-uint8_t LSM9DS1::SPIreadByte(uint8_t csPin, uint8_t subAddress)
+func (l *LSM9DS1) SPIreadByte(uint8_t csPin, uint8_t subAddress) uint
 {
 	uint8_t temp;
 	// Use the multiple read function to read 1 byte.
@@ -1145,7 +1144,7 @@ uint8_t LSM9DS1::SPIreadByte(uint8_t csPin, uint8_t subAddress)
 	return temp;
 }
 
-uint8_t LSM9DS1::SPIreadBytes(uint8_t csPin, uint8_t subAddress,
+func (l *LSM9DS1) SPIreadBytes(uint8_t csPin, uint8_t subAddress, uint
 							uint8_t * dest, uint8_t count)
 {
 	// To indicate a read, set bit 0 (msb) of first byte to 1
@@ -1167,7 +1166,7 @@ uint8_t LSM9DS1::SPIreadBytes(uint8_t csPin, uint8_t subAddress,
 }
 
 // Wire.h read and write protocols
-void LSM9DS1::I2CwriteByte(uint8_t address, uint8_t subAddress, uint8_t data)
+func (l *LSM9DS1) I2CwriteByte(uint8_t address, uint8_t subAddress, uint8_t data)
 {
 	settings.device.i2c->beginTransmission(address);  // Initialize the Tx buffer
 	settings.device.i2c->write(subAddress);           // Put slave register address in Tx buffer
@@ -1175,7 +1174,7 @@ void LSM9DS1::I2CwriteByte(uint8_t address, uint8_t subAddress, uint8_t data)
 	settings.device.i2c->endTransmission();           // Send the Tx buffer
 }
 
-uint8_t LSM9DS1::I2CreadByte(uint8_t address, uint8_t subAddress)
+func (l *LSM9DS1) I2CreadByte(uint8_t address, uint8_t subAddress) uint
 {
 	uint8_t data; // `data` will store the register data
 
@@ -1188,7 +1187,7 @@ uint8_t LSM9DS1::I2CreadByte(uint8_t address, uint8_t subAddress)
 	return data;                             // Return data read from slave register
 }
 
-uint8_t LSM9DS1::I2CreadBytes(uint8_t address, uint8_t subAddress, uint8_t * dest, uint8_t count)
+func (l *LSM9DS1) I2CreadBytes(uint8_t address, uint8_t subAddress, uint8_t * dest, uint8_t count) uint
 {
 	byte retVal;
 	settings.device.i2c->beginTransmission(address);      // Initialize the Tx buffer
