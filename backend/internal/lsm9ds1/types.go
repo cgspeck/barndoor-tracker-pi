@@ -145,23 +145,33 @@ const (
 	FIFO_CONT         = 6
 )
 
+// enum lsm9ds1_axis {
+type Axis int
+
+const (
+	X_AXIS Axis = iota
+	Y_AXIS
+	Z_AXIS
+	ALL_AXIS
+)
+
 type gyroSettings struct {
 	// Gyroscope settings:
 	enabled        bool
 	scale          uint // Changed this to 16-bit
 	sampleRate     uint
 	bandwidth      uint
-	lowPowerEnable uint
-	HPFEnable      uint
+	lowPowerEnable bool
+	HPFEnable      bool
 	HPFCutoff      uint
-	flipX          uint
-	flipY          uint
-	flipZ          uint
+	flipX          bool
+	flipY          bool
+	flipZ          bool
 	orientation    uint
 	enableX        bool
 	enableY        bool
 	enableZ        bool
-	latchInterrupt uint
+	latchInterrupt bool
 }
 
 type deviceSettings struct {
@@ -181,7 +191,7 @@ type accelSettings struct {
 	enableY          bool
 	enableZ          bool
 	bandwidth        int
-	highResEnable    uint
+	highResEnable    bool
 	highResBandwidth uint
 }
 
@@ -190,7 +200,7 @@ type magSettings struct {
 	enabled                bool
 	scale                  uint
 	sampleRate             uint
-	tempCompensationEnable uint
+	tempCompensationEnable bool
 	XYPerformance          uint
 	ZPerformance           uint
 	lowPowerEnable         bool

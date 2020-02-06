@@ -1,6 +1,10 @@
 package lsm9ds1
 
-import "github.com/kidoman/embd"
+import (
+	"log"
+
+	"github.com/kidoman/embd"
+)
 
 /******************************************************************************
 SFE_LSM9DS1 Library Source File
@@ -113,7 +117,7 @@ func (l *LSM9DS1) init() {
 		l.aBiasRaw[i] = 0
 		l.mBiasRaw[i] = 0
 	}
-	_autoCalc = false
+	l._autoCalc = false
 }
 
 func (l *LSM9DS1) begin(agAddress uint, mAddress uint, wirePort *embd.I2CBus) uint {
@@ -121,20 +125,20 @@ func (l *LSM9DS1) begin(agAddress uint, mAddress uint, wirePort *embd.I2CBus) ui
 	l.settings.device.commInterface = IMU_MODE_I2C
 	l.settings.device.agAddress = agAddress
 	l.settings.device.mAddress = mAddress
-	l.settings.device.i2c = &wirePort
+	l.settings.device.i2c = wirePort
 
 	//! Todo: don't use _xgAddress or _mAddress, duplicating memory
 	_xgAddress := l.settings.device.agAddress
 	_mAddress := l.settings.device.mAddress
 
-	init()
+	l.init()
 
-	constrainScales()
+	l.constrainScales()
 	// Once we have the scale values, we can calculate the resolution
 	// of each sensor. That's what these functions are for. One for each sensor
-	calcgRes() // Calculate DPS / ADC tick, stored in gRes variable
-	calcmRes() // Calculate Gs / ADC tick, stored in mRes variable
-	calcaRes() // Calculate g / ADC tick, stored in aRes variable
+	l.calcgRes() // Calculate DPS / ADC tick, stored in gRes variable
+	l.calcmRes() // Calculate Gs / ADC tick, stored in mRes variable
+	l.calcaRes() // Calculate g / ADC tick, stored in aRes variable
 
 	// We expect caller to begin their I2C port, with the speed of their choice external to the library
 	// But if they forget, we could start the hardware here.
@@ -142,21 +146,21 @@ func (l *LSM9DS1) begin(agAddress uint, mAddress uint, wirePort *embd.I2CBus) ui
 
 	// To verify communication, we can read from the WHO_AM_I register of
 	// each device. Store those in a variable so we can return them.
-	mTest := mReadByte(WHO_AM_I_M)    // Read the gyro WHO_AM_I
-	xgTest := xgReadByte(WHO_AM_I_XG) // Read the accel/mag WHO_AM_I
+	mTest := l.mReadByte(WHO_AM_I_M)    // Read the gyro WHO_AM_I
+	xgTest := l.xgReadByte(WHO_AM_I_XG) // Read the accel/mag WHO_AM_I
 	whoAmICombined := (xgTest << 8) | mTest
 
 	if whoAmICombined != ((WHO_AM_I_AG_RSP << 8) | WHO_AM_I_M_RSP) {
 		return 0
 	}
 	// Gyro initialization stuff:
-	initGyro() // This will "turn on" the gyro. Setting up interrupts, etc.
+	l.initGyro() // This will "turn on" the gyro. Setting up interrupts, etc.
 
 	// Accelerometer initialization stuff:
-	initAccel() // "Turn on" all axes of the accel. Set up interrupts, etc.
+	l.initAccel() // "Turn on" all axes of the accel. Set up interrupts, etc.
 
 	// Magnetometer initialization stuff:
-	initMag() // "Turn on" all axes of the mag. Set up interrupts, etc.
+	l.initMag() // "Turn on" all axes of the mag. Set up interrupts, etc.
 
 	// Once everything is initialized, return the WHO_AM_I registers we read:
 	return whoAmICombined
@@ -172,22 +176,22 @@ func (l *LSM9DS1) beginSPI(ag_CS_pin uint, m_CS_pin uint) uint {
 	_xgAddress := l.settings.device.agAddress
 	_mAddress := l.settings.device.mAddress
 
-	init()
+	l.init()
 
-	constrainScales()
+	l.constrainScales()
 	// Once we have the scale values, we can calculate the resolution
 	// of each sensor. That's what these functions are for. One for each sensor
-	calcgRes() // Calculate DPS / ADC tick, stored in gRes variable
-	calcmRes() // Calculate Gs / ADC tick, stored in mRes variable
-	calcaRes() // Calculate g / ADC tick, stored in aRes variable
+	l.calcgRes() // Calculate DPS / ADC tick, stored in gRes variable
+	l.calcmRes() // Calculate Gs / ADC tick, stored in mRes variable
+	l.calcaRes() // Calculate g / ADC tick, stored in aRes variable
 
 	// Now, initialize our hardware interface.
-	initSPI() // Initialize SPI
+	l.initSPI() // Initialize SPI
 
 	// To verify communication, we can read from the WHO_AM_I register of
 	// each device. Store those in a variable so we can return them.
-	mTest := mReadByte(WHO_AM_I_M)    // Read the gyro WHO_AM_I
-	xgTest := xgReadByte(WHO_AM_I_XG) // Read the accel/mag WHO_AM_I
+	mTest := l.mReadByte(WHO_AM_I_M)    // Read the gyro WHO_AM_I
+	xgTest := l.xgReadByte(WHO_AM_I_XG) // Read the accel/mag WHO_AM_I
 	whoAmICombined := (xgTest << 8) | mTest
 
 	if whoAmICombined != ((WHO_AM_I_AG_RSP << 8) | WHO_AM_I_M_RSP) {
@@ -195,20 +199,20 @@ func (l *LSM9DS1) beginSPI(ag_CS_pin uint, m_CS_pin uint) uint {
 	}
 
 	// Gyro initialization stuff:
-	initGyro() // This will "turn on" the gyro. Setting up interrupts, etc.
+	l.initGyro() // This will "turn on" the gyro. Setting up interrupts, etc.
 
 	// Accelerometer initialization stuff:
-	initAccel() // "Turn on" all axes of the accel. Set up interrupts, etc.
+	l.initAccel() // "Turn on" all axes of the accel. Set up interrupts, etc.
 
 	// Magnetometer initialization stuff:
-	initMag() // "Turn on" all axes of the mag. Set up interrupts, etc.
+	l.initMag() // "Turn on" all axes of the mag. Set up interrupts, etc.
 
 	// Once everything is initialized, return the WHO_AM_I registers we read:
 	return whoAmICombined
 }
 
 func (l *LSM9DS1) initGyro() {
-	tempRegValue := 0
+	var tempRegValue uint = 0
 
 	// CTRL_REG1_G (Default value: 0x00)
 	// [ODR_G2][ODR_G1][ODR_G0][FS_G1][FS_G0][0][BW_G1][BW_G0]
@@ -219,7 +223,7 @@ func (l *LSM9DS1) initGyro() {
 	// To disable gyro, set sample rate bits to 0. We'll only set sample
 	// rate if the gyro is enabled.
 	if l.settings.gyro.enabled {
-		tempRegValue = (l.settings.gyro.sampleRate & 0x07) << 5
+		tempRegValue = uint((l.settings.gyro.sampleRate & 0x07) << 5)
 	}
 
 	switch l.settings.gyro.scale {
@@ -231,13 +235,13 @@ func (l *LSM9DS1) initGyro() {
 	}
 
 	tempRegValue |= (l.settings.gyro.bandwidth & 0x3)
-	xgWriteByte(CTRL_REG1_G, tempRegValue)
+	l.xgWriteByte(CTRL_REG1_G, tempRegValue)
 
 	// CTRL_REG2_G (Default value: 0x00)
 	// [0][0][0][0][INT_SEL1][INT_SEL0][OUT_SEL1][OUT_SEL0]
 	// INT_SEL[1:0] - INT selection configuration
 	// OUT_SEL[1:0] - Out selection configuration
-	xgWriteByte(CTRL_REG2_G, 0x00)
+	l.xgWriteByte(CTRL_REG2_G, 0x00)
 
 	// CTRL_REG3_G (Default value: 0x00)
 	// [LP_mode][HP_EN][0][0][HPCF3_G][HPCF2_G][HPCF1_G][HPCF0_G]
@@ -253,7 +257,7 @@ func (l *LSM9DS1) initGyro() {
 	if l.settings.gyro.HPFEnable {
 		tempRegValue |= (1 << 6) | (l.settings.gyro.HPFCutoff & 0x0F)
 	}
-	xgWriteByte(CTRL_REG3_G, tempRegValue)
+	l.xgWriteByte(CTRL_REG3_G, tempRegValue)
 
 	// CTRL_REG4 (Default value: 0x38)
 	// [0][0][Zen_G][Yen_G][Xen_G][0][LIR_XL1][4D_XL1]
@@ -275,7 +279,7 @@ func (l *LSM9DS1) initGyro() {
 	if l.settings.gyro.latchInterrupt {
 		tempRegValue |= (1 << 1)
 	}
-	xgWriteByte(CTRL_REG4, tempRegValue)
+	l.xgWriteByte(CTRL_REG4, tempRegValue)
 
 	// ORIENT_CFG_G (Default value: 0x00)
 	// [0][0][SignX_G][SignY_G][SignZ_G][Orient_2][Orient_1][Orient_0]
@@ -291,11 +295,11 @@ func (l *LSM9DS1) initGyro() {
 	if l.settings.gyro.flipZ {
 		tempRegValue |= (1 << 3)
 	}
-	xgWriteByte(ORIENT_CFG_G, tempRegValue)
+	l.xgWriteByte(ORIENT_CFG_G, tempRegValue)
 }
 
 func (l *LSM9DS1) initAccel() {
-	tempRegValue := 0
+	var tempRegValue uint = 0
 
 	//	CTRL_REG5_XL (0x1F) (Default value: 0x38)
 	//	[DEC_1][DEC_0][Zen_XL][Yen_XL][Zen_XL][0][0][0]
@@ -314,7 +318,7 @@ func (l *LSM9DS1) initAccel() {
 		tempRegValue |= (1 << 3)
 	}
 
-	xgWriteByte(CTRL_REG5_XL, tempRegValue)
+	l.xgWriteByte(CTRL_REG5_XL, tempRegValue)
 
 	// CTRL_REG6_XL (0x20) (Default value: 0x00)
 	// [ODR_XL2][ODR_XL1][ODR_XL0][FS1_XL][FS0_XL][BW_SCAL_ODR][BW_XL1][BW_XL0]
@@ -339,9 +343,9 @@ func (l *LSM9DS1) initAccel() {
 
 	if l.settings.accel.bandwidth >= 0 {
 		tempRegValue |= (1 << 2) // Set BW_SCAL_ODR
-		tempRegValue |= (l.settings.accel.bandwidth & 0x03)
+		tempRegValue |= uint(l.settings.accel.bandwidth & 0x03)
 	}
-	xgWriteByte(CTRL_REG6_XL, tempRegValue)
+	l.xgWriteByte(CTRL_REG6_XL, tempRegValue)
 
 	// CTRL_REG7_XL (0x21) (Default value: 0x00)
 	// [HR][DCF1][DCF0][0][0][FDS][0][HPIS1]
@@ -354,7 +358,7 @@ func (l *LSM9DS1) initAccel() {
 		tempRegValue |= (1 << 7) // Set HR bit
 		tempRegValue |= (l.settings.accel.highResBandwidth & 0x3) << 5
 	}
-	xgWriteByte(CTRL_REG7_XL, tempRegValue)
+	l.xgWriteByte(CTRL_REG7_XL, tempRegValue)
 }
 
 // This is a function that uses the FIFO to accumulate sample of accelerometer and gyro data, average
@@ -365,40 +369,39 @@ func (l *LSM9DS1) initAccel() {
 // remove errors due to imprecise or varying initial placement. Calibration of sensor data in this manner
 // is good practice.
 func (l *LSM9DS1) calibrate(autoCalc bool) {
-	samples := 0
-	var ii int
+	var samples uint = 0
+	var ii uint
 
 	aBiasRawTemp := [3]int{0, 0, 0}
 	gBiasRawTemp := [3]int{0, 0, 0}
 
 	// Turn on FIFO and set threshold to 32 samples
-	enableFIFO(true)
-	setFIFO(FIFO_THS, 0x1F)
-	while(samples < 0x1F)
-	{
-		samples = (xgReadByte(FIFO_SRC) & 0x3F) // Read number of stored samples
+	l.enableFIFO(true)
+	l.setFIFO(FIFO_THS, 0x1F)
+	for samples < 0x1F {
+		samples = (l.xgReadByte(FIFO_SRC) & 0x3F) // Read number of stored samples
 	}
-	for ii := 0; ii < samples; ii++ {
+	for ii = 0; ii < samples; ii++ {
 		// Read the gyro data stored in the FIFO
-		readGyro()
-		gBiasRawTemp[0] += gx
-		gBiasRawTemp[1] += gy
-		gBiasRawTemp[2] += gz
-		readAccel()
-		aBiasRawTemp[0] += ax
-		aBiasRawTemp[1] += ay
-		aBiasRawTemp[2] += az - (int16_t)(1./aRes) // Assumes sensor facing up!
+		l.readGyro()
+		gBiasRawTemp[0] += l.gx
+		gBiasRawTemp[1] += l.gy
+		gBiasRawTemp[2] += l.gz
+		l.readAccel()
+		aBiasRawTemp[0] += l.ax
+		aBiasRawTemp[1] += l.ay
+		aBiasRawTemp[2] += l.az - int(1./l.aRes) // Assumes sensor facing up!
 	}
 
-	for ii := 0; ii < 3; ii++ {
-		l.gBiasRaw[ii] = gBiasRawTemp[ii] / samples
-		l.gBias[ii] = calcGyro(l.gBiasRaw[ii])
-		l.aBiasRaw[ii] = aBiasRawTemp[ii] / samples
-		l.aBias[ii] = calcAccel(l.aBiasRaw[ii])
+	for ii = 0; ii < 3; ii++ {
+		l.gBiasRaw[ii] = gBiasRawTemp[ii] / int(samples)
+		l.gBias[ii] = l.calcGyro(l.gBiasRaw[ii])
+		l.aBiasRaw[ii] = aBiasRawTemp[ii] / int(samples)
+		l.aBias[ii] = l.calcAccel(l.aBiasRaw[ii])
 	}
 
-	enableFIFO(false)
-	setFIFO(FIFO_OFF, 0x00)
+	l.enableFIFO(false)
+	l.setFIFO(FIFO_OFF, 0x00)
 
 	if autoCalc {
 		l._autoCalc = true
@@ -411,13 +414,13 @@ func (l *LSM9DS1) calibrateMag(loadIn bool) {
 	magMax := [3]int{0, 0, 0} // The road warrior
 
 	for i = 0; i < 128; i++ {
-		while(!magAvailable())
-
-		readMag()
+		for l.magAvailable(X_AXIS) == 0 {
+		}
+		l.readMag()
 		magTemp := [3]int{0, 0, 0}
-		magTemp[0] = mx
-		magTemp[1] = my
-		magTemp[2] = mz
+		magTemp[0] = l.mx
+		magTemp[1] = l.my
+		magTemp[2] = l.mz
 		for j = 0; j < 3; j++ {
 			if magTemp[j] > magMax[j] {
 				magMax[j] = magTemp[j]
@@ -429,23 +432,24 @@ func (l *LSM9DS1) calibrateMag(loadIn bool) {
 	}
 	for j = 0; j < 3; j++ {
 		l.mBiasRaw[j] = (magMax[j] + magMin[j]) / 2
-		l.mBias[j] = calcMag(l.mBiasRaw[j])
+		l.mBias[j] = l.calcMag(l.mBiasRaw[j])
 		if loadIn {
-			magOffset(j, l.mBiasRaw[j])
+			l.magOffset(Axis(j), l.mBiasRaw[j])
 		}
 	}
 
 }
 
-func (l *LSM9DS1) magOffset(axis uint, offset int) {
+func (l *LSM9DS1) magOffset(axis Axis, offset int) {
 	if axis > 2 {
 		return
 	}
-	var msb, lsb uint
+	var msb, lsb int
 	msb = (offset & 0xFF00) >> 8
 	lsb = offset & 0x00FF
-	mWriteByte(OFFSET_X_REG_L_M+(2*axis), lsb)
-	mWriteByte(OFFSET_X_REG_H_M+(2*axis), msb)
+	iAxis := int(axis)
+	l.miWriteByte(OFFSET_X_REG_L_M+(2*iAxis), lsb)
+	l.miWriteByte(OFFSET_X_REG_H_M+(2*iAxis), msb)
 }
 
 func (l *LSM9DS1) initMag() {
@@ -464,7 +468,7 @@ func (l *LSM9DS1) initMag() {
 	}
 	tempRegValue |= (l.settings.mag.XYPerformance & 0x3) << 5
 	tempRegValue |= (l.settings.mag.sampleRate & 0x7) << 2
-	mWriteByte(CTRL_REG1_M, tempRegValue)
+	l.mWriteByte(CTRL_REG1_M, tempRegValue)
 
 	// CTRL_REG2_M (Default value 0x00)
 	// [0][FS1][FS0][0][REBOOT][SOFT_RST][0][0]
@@ -484,7 +488,7 @@ func (l *LSM9DS1) initMag() {
 		break
 		// Otherwise we'll default to 4 gauss (00)
 	}
-	mWriteByte(CTRL_REG2_M, tempRegValue) // +/-4Gauss
+	l.mWriteByte(CTRL_REG2_M, tempRegValue) // +/-4Gauss
 
 	// CTRL_REG3_M (Default value: 0x03)
 	// [I2C_DISABLE][0][LP][0][0][SIM][MD1][MD0]
@@ -499,7 +503,7 @@ func (l *LSM9DS1) initMag() {
 		tempRegValue |= (1 << 5)
 	}
 	tempRegValue |= (l.settings.mag.operatingMode & 0x3)
-	mWriteByte(CTRL_REG3_M, tempRegValue) // Continuous conversion mode
+	l.mWriteByte(CTRL_REG3_M, tempRegValue) // Continuous conversion mode
 
 	// CTRL_REG4_M (Default value: 0x00)
 	// [0][0][0][0][OMZ1][OMZ0][BLE][0]
@@ -509,47 +513,46 @@ func (l *LSM9DS1) initMag() {
 	// BLE - Big/little endian data
 	tempRegValue = 0
 	tempRegValue = (l.settings.mag.ZPerformance & 0x3) << 2
-	mWriteByte(CTRL_REG4_M, tempRegValue)
+	l.mWriteByte(CTRL_REG4_M, tempRegValue)
 
 	// CTRL_REG5_M (Default value: 0x00)
 	// [0][BDU][0][0][0][0][0][0]
 	// BDU - Block data update for magnetic data
 	//	0:continuous, 1:not updated until MSB/LSB are read
 	tempRegValue = 0
-	mWriteByte(CTRL_REG5_M, tempRegValue)
+	l.mWriteByte(CTRL_REG5_M, tempRegValue)
 }
 
 func (l *LSM9DS1) accelAvailable() uint {
-	status = xgReadByte(STATUS_REG_1)
+	status := l.xgReadByte(STATUS_REG_1)
 
 	return (status & (1 << 0))
 }
 
 func (l *LSM9DS1) gyroAvailable() uint {
-	status = xgReadByte(STATUS_REG_1)
+	status := l.xgReadByte(STATUS_REG_1)
 
 	return ((status & (1 << 1)) >> 1)
 }
 
 func (l *LSM9DS1) tempAvailable() uint {
-	status = xgReadByte(STATUS_REG_1)
+	status := l.xgReadByte(STATUS_REG_1)
 
 	return ((status & (1 << 2)) >> 2)
 }
 
-func (l *LSM9DS1) magAvailable(axis uint) uint {
-	status
-	status = mReadByte(STATUS_REG_M)
+func (l *LSM9DS1) magAvailable(axis Axis) uint {
+	status := l.mReadByte(STATUS_REG_M)
 
 	return ((status & (1 << axis)) >> axis)
 }
 
 func (l *LSM9DS1) readAccel() {
 	// We'll read six bytes from the accelerometer into temp
-	temp := [6]uint{}
+	temp := [6]int{}
 
 	// Read 6 bytes, beginning at OUT_X_L_XL
-	if xgReadBytes(OUT_X_L_XL, temp, 6) == 6 {
+	if l.xgReadBytes(OUT_X_L_XL, &temp, 6) == 6 {
 		l.ax = (temp[1] << 8) | temp[0] // Store x-axis values into ax
 		l.ay = (temp[3] << 8) | temp[2] // Store y-axis values into ay
 		l.az = (temp[5] << 8) | temp[4] // Store z-axis values into az
@@ -561,10 +564,11 @@ func (l *LSM9DS1) readAccel() {
 	}
 }
 
-func (l *LSM9DS1) readAccelAxis(axis uint) int {
-	temp := [6]uint{}
+func (l *LSM9DS1) readAccelAxis(axis axis) int {
+	uaxis := uint(axis)
+	temp := make([]int, 0)
 	var value int
-	if xgReadBytes(OUT_X_L_XL+(2*axis), temp, 2) == 2 {
+	if l.xgReadBytes(OUT_X_L_XL+(2*uaxis), &temp, 2) == 2 {
 		value = (temp[1] << 8) | temp[0]
 
 		if _autoCalc {
@@ -598,7 +602,7 @@ func (l *LSM9DS1) readMagAxis(axis uint) int {
 func (l *LSM9DS1) readTemp() {
 	temp := [2]int{} // We'll read two bytes from the temperature sensor into temp
 	// Read 2 bytes, beginning at OUT_TEMP_L
-	if xgReadBytes(OUT_TEMP_L, temp, 2) == 2 {
+	if l.xgReadBytes(OUT_TEMP_L, temp, 2) == 2 {
 		offset := 25 // Per datasheet sensor outputs 0 typically @ 25 degrees centigrade
 		temperature = offset + (((temp[1] << 8) | temp[0]) >> 8)
 	}
@@ -607,7 +611,7 @@ func (l *LSM9DS1) readTemp() {
 func (l *LSM9DS1) readGyro() {
 	temp := [6]uint{} // We'll read six bytes from the gyro into temp
 	// Read 6 bytes, beginning at OUT_X_L_G
-	if xgReadBytes(OUT_X_L_G, temp, 6) == 6 {
+	if l.xgReadBytes(OUT_X_L_G, temp, 6) == 6 {
 		l.gx = (temp[1] << 8) | temp[0] // Store x-axis values into gx
 		l.gy = (temp[3] << 8) | temp[2] // Store y-axis values into gy
 		l.gz = (temp[5] << 8) | temp[4] // Store z-axis values into gz
@@ -623,7 +627,7 @@ func (l *LSM9DS1) readGyroAxis(axis uint) int {
 	temp := [2]int{}
 	var value int
 
-	if xgReadBytes(OUT_X_L_G+(2*axis), temp, 2) == 2 {
+	if l.xgReadBytes(OUT_X_L_G+(2*axis), temp, 2) == 2 {
 		value = (temp[1] << 8) | temp[0]
 
 		if _autoCalc {
@@ -634,24 +638,24 @@ func (l *LSM9DS1) readGyroAxis(axis uint) int {
 	return 0
 }
 
-func (l *LSM9DS1) calcGyro(gyro uint) float32 {
+func (l *LSM9DS1) calcGyro(gyro int) float32 {
 	// Return the gyro raw reading times our pre-calculated DPS / (ADC tick):
 	return l.gRes * gyro
 }
 
-func (l *LSM9DS1) calcAccel(accel uint) float32 {
+func (l *LSM9DS1) calcAccel(accel int) float32 {
 	// Return the accel raw reading times our pre-calculated g's / (ADC tick):
 	return l.aRes * accel
 }
 
-func (l *LSM9DS1) calcMag(mag uint) float32 {
+func (l *LSM9DS1) calcMag(mag int) float32 {
 	// Return the mag raw reading times our pre-calculated Gs / (ADC tick):
 	return l.mRes * mag
 }
 
 func (l *LSM9DS1) setGyroScale(gScl uint) {
 	// Read current value of CTRL_REG1_G:
-	ctrl1RegValue := xgReadByte(CTRL_REG1_G)
+	ctrl1RegValue := l.xgReadByte(CTRL_REG1_G)
 	// Mask out scale bits (3 & 4):
 	ctrl1RegValue &= 0xE7
 	switch gScl; {
@@ -664,14 +668,14 @@ func (l *LSM9DS1) setGyroScale(gScl uint) {
 	default: // Otherwise we'll set it to 245 dps (0x0 << 4)
 		l.settings.gyro.scale = 245
 	}
-	xgWriteByte(CTRL_REG1_G, ctrl1RegValue)
+	l.xgWriteByte(CTRL_REG1_G, ctrl1RegValue)
 
 	calcgRes()
 }
 
 func (l *LSM9DS1) setAccelScale(aScl uint) {
 	// We need to preserve the other bytes in CTRL_REG6_XL. So, first read it:
-	tempRegValue := xgReadByte(CTRL_REG6_XL)
+	tempRegValue := l.xgReadByte(CTRL_REG6_XL)
 	// Mask out accel scale bits:
 	tempRegValue &= 0xE7
 
@@ -688,7 +692,7 @@ func (l *LSM9DS1) setAccelScale(aScl uint) {
 	default: // Otherwise it'll be set to 2g (0x0 << 3)
 		l.settings.accel.scale = 2
 	}
-	xgWriteByte(CTRL_REG6_XL, tempRegValue)
+	l.xgWriteByte(CTRL_REG6_XL, tempRegValue)
 
 	// Then calculate a new aRes, which relies on aScale being set correctly:
 	calcaRes()
@@ -732,14 +736,14 @@ func (l *LSM9DS1) setGyroODR(gRate uint) {
 	// Only do this if gRate is not 0 (which would disable the gyro)
 	if (gRate & 0x07) != 0 {
 		// We need to preserve the other bytes in CTRL_REG1_G. So, first read it:
-		temp := xgReadByte(CTRL_REG1_G)
+		temp := l.xgReadByte(CTRL_REG1_G)
 		// Then mask out the gyro ODR bits:
 		temp &= 0xFF ^ (0x7 << 5)
 		temp |= (gRate & 0x07) << 5
 		// Update our settings struct
 		l.settings.gyro.sampleRate = gRate & 0x07
 		// And write the new register value back into CTRL_REG1_G:
-		xgWriteByte(CTRL_REG1_G, temp)
+		l.xgWriteByte(CTRL_REG1_G, temp)
 	}
 }
 
@@ -747,14 +751,14 @@ func (l *LSM9DS1) setAccelODR(aRate uint) {
 	// Only do this if aRate is not 0 (which would disable the accel)
 	if (aRate & 0x07) != 0 {
 		// We need to preserve the other bytes in CTRL_REG1_XM. So, first read it:
-		temp := xgReadByte(CTRL_REG6_XL)
+		temp := l.xgReadByte(CTRL_REG6_XL)
 		// Then mask out the accel ODR bits:
 		temp &= 0x1F
 		// Then shift in our new ODR bits:
 		temp |= ((aRate & 0x07) << 5)
 		l.settings.accel.sampleRate = aRate & 0x07
 		// And write the new register value back into CTRL_REG1_XM:
-		xgWriteByte(CTRL_REG6_XL, temp)
+		l.xgWriteByte(CTRL_REG6_XL, temp)
 	}
 }
 
@@ -822,11 +826,11 @@ func (l *LSM9DS1) configInt(interrupt uint, generator uint,
 	// Write to INT1_CTRL or INT2_CTRL. [interupt] should already be one of
 	// those two values.
 	// [generator] should be an OR'd list of values from the interrupt_generators enum
-	xgWriteByte(interrupt, generator)
+	l.xgWriteByte(interrupt, generator)
 
 	// Configure CTRL_REG8
 	var temp uint
-	temp = xgReadByte(CTRL_REG8)
+	temp = l.xgReadByte(CTRL_REG8)
 
 	if activeLow {
 		temp |= (1 << 5)
@@ -840,7 +844,7 @@ func (l *LSM9DS1) configInt(interrupt uint, generator uint,
 		temp |= (1 << 4)
 	}
 
-	xgWriteByte(CTRL_REG8, temp)
+	l.xgWriteByte(CTRL_REG8, temp)
 }
 
 func (l *LSM9DS1) configInactivity(duration uint, threshold uint, sleepOn bool) {
@@ -850,13 +854,13 @@ func (l *LSM9DS1) configInactivity(duration uint, threshold uint, sleepOn bool) 
 	if sleepOn {
 		temp |= (1 << 7)
 	}
-	xgWriteByte(ACT_THS, temp)
+	l.xgWriteByte(ACT_THS, temp)
 
-	xgWriteByte(ACT_DUR, duration)
+	l.xgWriteByte(ACT_DUR, duration)
 }
 
 func (l *LSM9DS1) getInactivity() uint {
-	temp := xgReadByte(STATUS_REG_0)
+	temp := l.xgReadByte(STATUS_REG_0)
 	temp &= (0x10)
 	return temp
 }
@@ -868,13 +872,13 @@ func (l *LSM9DS1) configAccelInt(generator uint, andInterrupts bool) {
 	if andInterrupts {
 		temp |= 0x80
 	}
-	xgWriteByte(INT_GEN_CFG_XL, temp)
+	l.xgWriteByte(INT_GEN_CFG_XL, temp)
 }
 
 func (l *LSM9DS1) configAccelThs(threshold uint, axis uint, duration uint, wait bool) {
 	// Write threshold value to INT_GEN_THS_?_XL.
 	// axis will be 0, 1, or 2 (x, y, z respectively)
-	xgWriteByte(INT_GEN_THS_X_XL+axis, threshold)
+	l.xgWriteByte(INT_GEN_THS_X_XL+axis, threshold)
 
 	// Write duration and wait to INT_GEN_DUR_XL
 	var temp uint
@@ -882,11 +886,11 @@ func (l *LSM9DS1) configAccelThs(threshold uint, axis uint, duration uint, wait 
 	if wait {
 		temp |= 0x80
 	}
-	xgWriteByte(INT_GEN_DUR_XL, temp)
+	l.xgWriteByte(INT_GEN_DUR_XL, temp)
 }
 
 func (l *LSM9DS1) getAccelIntSrc() uint {
-	intSrc := xgReadByte(INT_GEN_SRC_XL)
+	intSrc := l.xgReadByte(INT_GEN_SRC_XL)
 
 	// Check if the IA_XL (interrupt active) bit is set
 	if intSrc & (1 << 6) {
@@ -906,7 +910,7 @@ func (l *LSM9DS1) configGyroInt(generator uint, aoi bool, latch bool) {
 	if latch {
 		temp |= 0x40
 	}
-	xgWriteByte(INT_GEN_CFG_G, temp)
+	l.xgWriteByte(INT_GEN_CFG_G, temp)
 }
 
 func (l *LSM9DS1) configGyroThs(threshold int, axis uint, duration uint, wait bool) {
@@ -915,8 +919,8 @@ func (l *LSM9DS1) configGyroThs(threshold int, axis uint, duration uint, wait bo
 	buffer[1] = (threshold & 0x00FF)
 	// Write threshold value to INT_GEN_THS_?H_G and  INT_GEN_THS_?L_G.
 	// axis will be 0, 1, or 2 (x, y, z respectively)
-	xgWriteByte(INT_GEN_THS_XH_G+(axis*2), buffer[0])
-	xgWriteByte(INT_GEN_THS_XH_G+1+(axis*2), buffer[1])
+	l.xgWriteByte(INT_GEN_THS_XH_G+(axis*2), buffer[0])
+	l.xgWriteByte(INT_GEN_THS_XH_G+1+(axis*2), buffer[1])
 
 	// Write duration and wait to INT_GEN_DUR_XL
 	var temp uint
@@ -924,11 +928,11 @@ func (l *LSM9DS1) configGyroThs(threshold int, axis uint, duration uint, wait bo
 	if wait {
 		temp |= 0x80
 	}
-	xgWriteByte(INT_GEN_DUR_G, temp)
+	l.xgWriteByte(INT_GEN_DUR_G, temp)
 }
 
 func (l *LSM9DS1) getGyroIntSrc() uint {
-	intSrc := xgReadByte(INT_GEN_SRC_G)
+	intSrc := l.xgReadByte(INT_GEN_SRC_G)
 
 	// Check if the IA_G (interrupt active) bit is set
 	if intSrc & (1 << 6) {
@@ -976,23 +980,23 @@ func (l *LSM9DS1) getMagIntSrc() uint {
 }
 
 func (l *LSM9DS1) sleepGyro(enable bool) {
-	temp := xgReadByte(CTRL_REG9)
+	temp := l.xgReadByte(CTRL_REG9)
 	if enable {
 		temp |= (1 << 6)
 	} else {
 		temp &= ^(1 << 6)
 	}
-	xgWriteByte(CTRL_REG9, temp)
+	l.xgWriteByte(CTRL_REG9, temp)
 }
 
 func (l *LSM9DS1) enableFIFO(enable bool) {
-	temp := xgReadByte(CTRL_REG9)
+	temp := l.xgReadByte(CTRL_REG9)
 	if enable {
 		temp |= (1 << 1)
 	} else {
 		temp &= ^(1 << 1)
 	}
-	xgWriteByte(CTRL_REG9, temp)
+	l.xgWriteByte(CTRL_REG9, temp)
 }
 
 func (l *LSM9DS1) setFIFO(fifoMode uint, fifoThs uint) {
@@ -1004,11 +1008,11 @@ func (l *LSM9DS1) setFIFO(fifoMode uint, fifoThs uint) {
 	} else {
 		threshold = 0x1F
 	}
-	xgWriteByte(FIFO_CTRL, ((fifoMode&0x7)<<5)|(threshold&0x1F))
+	l.xgWriteByte(FIFO_CTRL, ((fifoMode&0x7)<<5)|(threshold&0x1F))
 }
 
 func (l *LSM9DS1) getFIFOSamples() uint {
-	return (xgReadByte(FIFO_SRC) & 0x3F)
+	return (l.xgReadByte(FIFO_SRC) & 0x3F)
 }
 
 func (l *LSM9DS1) constrainScales() {
@@ -1031,8 +1035,12 @@ func (l *LSM9DS1) xgWriteByte(subAddress uint, data uint) {
 	if l.settings.device.commInterface == IMU_MODE_I2C {
 		I2CwriteByte(_xgAddress, subAddress, data)
 	} else if l.settings.device.commInterface == IMU_MODE_SPI {
-		SPIwriteByte(_xgAddress, subAddress, data)
+		// SPIwriteByte(_xgAddress, subAddress, data)
 	}
+}
+
+func (l *LSM9DS1) miWriteByte(subAddress int, data int) {
+	return mWriteByte(uint(subAddress), uint(data))
 }
 
 func (l *LSM9DS1) mWriteByte(subAddress uint, data uint) {
@@ -1041,7 +1049,7 @@ func (l *LSM9DS1) mWriteByte(subAddress uint, data uint) {
 	if l.settings.device.commInterface == IMU_MODE_I2C {
 		return I2CwriteByte(_mAddress, subAddress, data)
 	} else if l.settings.device.commInterface == IMU_MODE_SPI {
-		return SPIwriteByte(_mAddress, subAddress, data)
+		// return SPIwriteByte(_mAddress, subAddress, data)
 	}
 }
 
@@ -1051,30 +1059,30 @@ func (l *LSM9DS1) xgReadByte(subAddress uint) uint {
 	if l.settings.device.commInterface == IMU_MODE_I2C {
 		return I2CreadByte(_xgAddress, subAddress)
 	} else if l.settings.device.commInterface == IMU_MODE_SPI {
-		return SPIreadByte(_xgAddress, subAddress)
+		// return SPIreadByte(_xgAddress, subAddress)
 	}
 	return -1
 }
 
-func (l *LSM9DS1) xgReadBytes(subAddress uint, dest *uint, count uint) uint {
+func (l *LSM9DS1) xgReadBytes(subAddress uint, dest *[]uint, count uint) uint {
 	// Whether we're using I2C or SPI, read multiple bytes using the
 	// gyro-specific I2C address or SPI CS pin.
 	if l.settings.device.commInterface == IMU_MODE_I2C {
 		return I2CreadBytes(_xgAddress, subAddress, dest, count)
 	} else if l.settings.device.commInterface == IMU_MODE_SPI {
-		return SPIreadBytes(_xgAddress, subAddress, dest, count)
+		// return SPIreadBytes(_xgAddress, subAddress, dest, count)
 	}
 	return -1
 }
 
-func (l *LSM9DS1) mReadByte(subAddress uint) {
+func (l *LSM9DS1) mReadByte(subAddress uint) uint {
 	uint
 	// Whether we're using I2C or SPI, read a byte using the
 	// accelerometer-specific I2C address or SPI CS pin.
 	if l.settings.device.commInterface == IMU_MODE_I2C {
 		return I2CreadByte(_mAddress, subAddress)
 	} else if l.settings.device.commInterface == IMU_MODE_SPI {
-		return SPIreadByte(_mAddress, subAddress)
+		// return SPIreadByte(_mAddress, subAddress)
 	}
 	return -1
 }
@@ -1085,7 +1093,7 @@ func (l *LSM9DS1) mReadBytes(subAddress uint, dest *uint, count uint) uint {
 	if l.settings.device.commInterface == IMU_MODE_I2C {
 		return I2CreadBytes(_mAddress, subAddress, dest, count)
 	} else if l.settings.device.commInterface == IMU_MODE_SPI {
-		return SPIreadBytes(_mAddress, subAddress, dest, count)
+		// return SPIreadBytes(_mAddress, subAddress, dest, count)
 	}
 	return -1
 }
@@ -1106,6 +1114,7 @@ func (l *LSM9DS1) initSPI() {
 	SPI.setDataMode(SPI_MODE0)
 }
 
+/*
 func (l *LSM9DS1) SPIwriteByte(csPin uint, subAddress uint, data uint) {
 	digitalWrite(csPin, LOW) // Initiate communication
 
@@ -1147,7 +1156,7 @@ func (l *LSM9DS1) SPIreadBytes(
 
 	return count
 }
-
+*/
 // Wire.h read and write protocols
 func (l *LSM9DS1) I2CwriteByte(address int, subAddress int, data int) {
 	l.settings.device.i2c.beginTransmission(address) // Initialize the Tx buffer
@@ -1169,21 +1178,27 @@ func (l *LSM9DS1) I2CreadByte(address uint, subAddress uint) uint {
 }
 
 func (l *LSM9DS1) I2CreadBytes(address uint, subAddress uint, dest *uint, count uint) uint {
-	var retVal byte
-	l.settings.device.i2c.beginTransmission(address) // Initialize the Tx buffer
+	// var retVal []byte{}
+	// l.settings.device.i2c.beginTransmission(address) // Initialize the Tx buffer
 	// Next send the register to be read. OR with 0x80 to indicate multi-read.
-	l.settings.device.i2c.write(subAddress | 0x80)        // Put slave register address in Tx buffer
-	retVal = l.settings.device.i2c.endTransmission(false) // Send Tx buffer, send a restart to keep connection alive
+	// l.settings.device.i2c.write(subAddress | 0x80)        // Put slave register address in Tx buffer
+	// retVal = l.settings.device.i2c.endTransmission(false) // Send Tx buffer, send a restart to keep connection alive
 	// endTransmission should return 0 on success
-	if retVal != 0 {
-		return 0
+	// if retVal != 0 {
+	// 	return 0
+	// }
+	l.settings.device.i2c.WriteByte(address, byte{byte(subAddress) | 0x80})
+	// retVal = l.settings.device.i2c.requestFrom(address, count) // Read bytes from slave register address
+	retVal, err := l.settings.device.i2c.ReadBytes(address, count) // Read bytes from slave register address
+	if err != nil {
+		log.Panic(err)
 	}
-	retVal = l.settings.device.i2c.requestFrom(address, count) // Read bytes from slave register address
-	if retVal != count {
-		return 0
+	if len(retVal) != count {
+		log.Panic("Expected %v recieved %v", count, len(retVal))
 	}
-	for i := 0; i < count; i++ {
-		dest[i] = l.settings.device.i2c.read()
-	}
-	return count
+	// for i := 0; i < count; i++ {
+	// 	dest[i] = l.settings.device.i2c.read()
+	// }
+	// return count
+	return retVal
 }
