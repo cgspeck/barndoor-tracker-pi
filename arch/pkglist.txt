@@ -2,6 +2,10 @@ crda
 go
 go-tools
 hostapd
+i2c-tools
+lm_sensors
+man-db
+man-pages
 npm
 neovim
 sudo
