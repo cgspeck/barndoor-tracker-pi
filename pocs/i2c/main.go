@@ -13,7 +13,7 @@ import (
 func main() {
 	log.Println("hello world")
 	bus := embd.NewI2CBus(1)
-	bus.Close()
+	defer bus.Close()
 
 	mAddress := 0x1e
 	agAddress := 0x6b
