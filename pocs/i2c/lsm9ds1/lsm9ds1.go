@@ -27,7 +27,7 @@ func New(i2c embd.I2CBus) (*LSM9DS1, error) {
 	l.initAccel() // "Turn on" all axes of the accel. Set up interrupts, etc.
 
 	// // Magnetometer initialization stuff:
-	// l.initMag() // "Turn on" all axes of the mag. Set up interrupts, etc.
+	l.initMag() // "Turn on" all axes of the mag. Set up interrupts, etc.
 
 	return &l, nil
 }
@@ -294,6 +294,77 @@ func (l *LSM9DS1) initAccel() {
 	l.agWriteToReg(CTRL_REG7_XL, []byte{tempRegValue})
 }
 
+func (l *LSM9DS1) initMag() {
+	var tempRegValue byte = 0
+
+	// CTRL_REG1_M (Default value: 0x10)
+	// [TEMP_COMP][OM1][OM0][DO2][DO1][DO0][0][ST]
+	// TEMP_COMP - Temperature compensation
+	// OM[1:0] - X & Y axes op mode selection
+	//	00:low-power, 01:medium performance
+	//	10: high performance, 11:ultra-high performance
+	// DO[2:0] - Output data rate selection
+	// ST - Self-test enable
+	if l.settings.mag.tempCompensationEnable {
+		tempRegValue |= (1 << 7)
+	}
+	tempRegValue |= (l.settings.mag.XYPerformance & 0x3) << 5
+	tempRegValue |= (byte(l.settings.mag.sampleRate) & 0x7) << 2
+	l.mWriteToReg(CTRL_REG1_M, []byte{tempRegValue})
+
+	// CTRL_REG2_M (Default value 0x00)
+	// [0][FS1][FS0][0][REBOOT][SOFT_RST][0][0]
+	// FS[1:0] - Full-scale configuration
+	// REBOOT - Reboot memory content (0:normal, 1:reboot)
+	// SOFT_RST - Reset config and user registers (0:default, 1:reset)
+	tempRegValue = 0
+	switch l.settings.mag.scale {
+	case 8:
+		tempRegValue |= (0x1 << 5)
+		break
+	case 12:
+		tempRegValue |= (0x2 << 5)
+		break
+	case 16:
+		tempRegValue |= (0x3 << 5)
+		break
+		// Otherwise we'll default to 4 gauss (00)
+	}
+	l.mWriteToReg(CTRL_REG2_M, []byte{tempRegValue}) // +/-4Gauss
+
+	// CTRL_REG3_M (Default value: 0x03)
+	// [I2C_DISABLE][0][LP][0][0][SIM][MD1][MD0]
+	// I2C_DISABLE - Disable I2C interace (0:enable, 1:disable)
+	// LP - Low-power mode cofiguration (1:enable)
+	// SIM - SPI mode selection (0:write-only, 1:read/write enable)
+	// MD[1:0] - Operating mode
+	//	00:continuous conversion, 01:single-conversion,
+	//  10,11: Power-down
+	tempRegValue = 0
+	if l.settings.mag.lowPowerEnable {
+		tempRegValue |= (1 << 5)
+	}
+	tempRegValue |= (l.settings.mag.operatingMode & 0x3)
+	l.mWriteToReg(CTRL_REG3_M, []byte{tempRegValue}) // Continuous conversion mode
+
+	// CTRL_REG4_M (Default value: 0x00)
+	// [0][0][0][0][OMZ1][OMZ0][BLE][0]
+	// OMZ[1:0] - Z-axis operative mode selection
+	//	00:low-power mode, 01:medium performance
+	//	10:high performance, 10:ultra-high performance
+	// BLE - Big/little endian data
+	tempRegValue = 0
+	tempRegValue = (l.settings.mag.ZPerformance & 0x3) << 2
+	l.mWriteToReg(CTRL_REG4_M, []byte{tempRegValue})
+
+	// CTRL_REG5_M (Default value: 0x00)
+	// [0][BDU][0][0][0][0][0][0]
+	// BDU - Block data update for magnetic data
+	//	0:continuous, 1:not updated until MSB/LSB are read
+	tempRegValue = 0
+	l.mWriteToReg(CTRL_REG5_M, []byte{tempRegValue})
+}
+
 func (l *LSM9DS1) GyroAvailable() bool {
 	status, err := l.agReadByteFromReg(STATUS_REG_1)
 	if err != nil {
@@ -312,6 +383,16 @@ func (l *LSM9DS1) AccelAvailable() bool {
 		return false
 	}
 	return (status & (1 << 0)) == 1
+}
+
+func (l *LSM9DS1) MagAvailable(axis Axis) bool {
+	status, err := l.mReadByteFromReg(STATUS_REG_M)
+	if err != nil {
+		log.Printf("error reading magneto avaliable register: %v", err)
+		return false
+	}
+
+	return ((status & (1 << byte(axis))) >> byte(axis)) == 1
 }
 
 // ReadGyro reads the Gyroscope and stores values in Gx, Gy, Gz
@@ -335,7 +416,7 @@ func (l *LSM9DS1) ReadGyro() error {
 	return nil
 }
 
-func (l *LSM9DS1) readAccel() error {
+func (l *LSM9DS1) ReadAccel() error {
 	// We'll read six bytes from the accelerometer into temp
 	var raw = make([]byte, 6)
 
@@ -355,6 +436,22 @@ func (l *LSM9DS1) readAccel() error {
 		l.Ay -= l.aBiasRaw[Y_AXIS]
 		l.Az -= l.aBiasRaw[Z_AXIS]
 	}
+	return nil
+}
+
+func (l *LSM9DS1) ReadMag() error {
+	var raw = make([]byte, 6)
+	// We'll read six bytes from the mag into temp
+
+	err := l.mReadFromReg(OUT_X_L_M, raw)
+	if err != nil {
+		log.Printf("error reading magnetometer values: %v", err)
+		return err
+	}
+	// Read 6 bytes, beginning at OUT_X_L_M
+	l.Mx = (raw[1] << 8) | raw[0] // Store x-axis values into mx
+	l.My = (raw[3] << 8) | raw[2] // Store y-axis values into my
+	l.Mz = (raw[5] << 8) | raw[4] // Store z-axis values into mz
 	return nil
 }
 
@@ -381,6 +478,10 @@ func (l *LSM9DS1) agReadByteFromReg(regAddress byte) (byte, error) {
 	return l.i2c.ReadByteFromReg(l.agAddress, regAddress)
 }
 
+// func (l *LSM9DS1) mReadByteFromReg(regAddress byte) (byte, error) {
+// 	return l.i2c.ReadByteFromReg(l.mAddress, regAddress)
+// }
+
 // func (l *LSM9DS1) agReadBytes(regAddress byte, count int) ([]byte, error) {
 // 	// have to write to device the register we want to read from
 // 	// 0x80 indicates a "multiread"
@@ -398,6 +499,10 @@ func (l *LSM9DS1) mReadByteFromReg(regAddress byte) (byte, error) {
 
 func (l *LSM9DS1) agWriteToReg(regAddress byte, data []byte) error {
 	return l.i2c.WriteToReg(l.agAddress, regAddress, data)
+}
+
+func (l *LSM9DS1) mWriteToReg(regAddress byte, data []byte) error {
+	return l.i2c.WriteToReg(l.mAddress, regAddress, data)
 }
 
 func (l *LSM9DS1) agWriteWordToReg(regAddress byte, data uint16) error {

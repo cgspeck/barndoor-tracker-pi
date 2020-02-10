@@ -28,7 +28,13 @@ func main() {
 		}
 
 		if l.AccelAvailable() {
+			l.ReadAccel()
 			fmt.Printf("Accel read: x=%v y=%v z=%v\n", l.Ax, l.Ay, l.Az)
+		}
+
+		if l.MagAvailable(lsm9ds1.ALL_AXIS) {
+			l.ReadMag()
+			fmt.Printf("Magneto read: x=%v y=%v z=%v\n", l.Mx, l.My, l.Mz)
 		}
 	}
 }

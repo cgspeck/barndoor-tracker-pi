@@ -238,10 +238,10 @@ type magSettings struct {
 	scale                  MagScale
 	sampleRate             MagSampleRate
 	tempCompensationEnable bool
-	XYPerformance          uint16
-	ZPerformance           uint16
+	XYPerformance          byte
+	ZPerformance           byte
 	lowPowerEnable         bool
-	operatingMode          uint16
+	operatingMode          byte
 }
 
 type temperatureSettings struct {
