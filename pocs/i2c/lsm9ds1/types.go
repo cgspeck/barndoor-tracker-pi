@@ -13,55 +13,89 @@ This file defines all types and enumerations used by the LSM9DS1 struct.
 // The LSM9DS1 functions over both I2C or SPI. This library supports both.
 // But the interface mode used must be sent to the LSM9DS1 constructor. Use
 // one of these two as the first parameter of the constructor.
-const (
-	IMU_MODE_SPI = iota
-	IMU_MODE_I2C
-)
+// const (
+// 	IMU_MODE_SPI = iota
+// 	IMU_MODE_I2C
+// )
 
 // accel_scale defines all possible FSR's of the accelerometer:
+
+type AccelScale byte
+
 const (
-	A_SCALE_2G  = iota // 00:  2g
-	A_SCALE_16G        // 01:  16g
-	A_SCALE_4G         // 10:  4g
-	A_SCALE_8G         // 11:  8g
+	A_SCALE_2G  AccelScale = iota // 00:  2g
+	A_SCALE_16G                   // 01:  16g
+	A_SCALE_4G                    // 10:  4g
+	A_SCALE_8G                    // 11:  8g
 )
+
+var aScaleSensitivity = map[AccelScale]float32{
+	A_SCALE_2G:  0.000061,
+	A_SCALE_4G:  0.000122,
+	A_SCALE_8G:  0.000244,
+	A_SCALE_16G: 0.000732,
+}
 
 // gyro_scale defines the possible full-scale ranges of the gyroscope:
+
+type GyroScale byte
+
 const (
-	G_SCALE_245DPS  = iota // 00:  245 degrees per second
-	G_SCALE_500DPS         // 01:  500 dps
-	G_SCALE_2000DPS        // 11:  2000 dps
+	G_SCALE_245DPS  GyroScale = iota // 00:  245 degrees per second
+	G_SCALE_500DPS                   // 01:  500 dps
+	G_SCALE_2000DPS                  // 11:  2000 dps
 )
+
+var gScaleSensitivity = map[GyroScale]float32{
+	G_SCALE_245DPS:  0.00875,
+	G_SCALE_500DPS:  0.0175,
+	G_SCALE_2000DPS: 0.07,
+}
 
 // mag_scale defines all possible FSR's of the magnetometer:
+
+type MagScale byte
+
 const (
-	M_SCALE_4GS  = iota // 00:  4Gs
-	M_SCALE_8GS         // 01:  8Gs
-	M_SCALE_12GS        // 10:  12Gs
-	M_SCALE_16GS        // 11:  16Gs
+	M_SCALE_4GS  MagScale = iota // 00:  4Gs
+	M_SCALE_8GS                  // 01:  8Gs
+	M_SCALE_12GS                 // 10:  12Gs
+	M_SCALE_16GS                 // 11:  16Gs
 )
 
+var mScaleSensitivity = map[MagScale]float32{
+	M_SCALE_4GS:  0.00014,
+	M_SCALE_8GS:  0.00029,
+	M_SCALE_12GS: 0.00043,
+	M_SCALE_16GS: 0.00058,
+}
+
 // gyro_odr defines all possible data rate/bandwidth combos of the gyro:
+
+type GyroSampleRate uint16
+
 const (
-	//! TODO
-	G_ODR_PD  = iota // Power down (0)
-	G_ODR_149        // 14.9 Hz (1)
-	G_ODR_595        // 59.5 Hz (2)
-	G_ODR_119        // 119 Hz (3)
-	G_ODR_238        // 238 Hz (4)
-	G_ODR_476        // 476 Hz (5)
-	G_ODR_952        // 952 Hz (6)
+	G_ODR_PD  GyroSampleRate = iota // TODO: Power down (0)
+	G_ODR_149                       // 14.9 Hz (1)
+	G_ODR_595                       // 59.5 Hz (2)
+	G_ODR_119                       // 119 Hz (3)
+	G_ODR_238                       // 238 Hz (4)
+	G_ODR_476                       // 476 Hz (5)
+	G_ODR_952                       // 952 Hz (6)
 )
 
 // accel_oder defines all possible output data rates of the accelerometer:
+
+type AccelSampleRate byte
+
 const (
-	XL_POWER_DOWN = iota // Power-down mode (0x0)
-	XL_ODR_10            // 10 Hz (0x1)
-	XL_ODR_50            // 50 Hz (0x02)
-	XL_ODR_119           // 119 Hz (0x3)
-	XL_ODR_238           // 238 Hz (0x4)
-	XL_ODR_476           // 476 Hz (0x5)
-	XL_ODR_952           // 952 Hz (0x6)
+	XL_POWER_DOWN AccelSampleRate = iota // Power-down mode (0x0)
+	XL_ODR_10                            // 10 Hz (0x1)
+	XL_ODR_50                            // 50 Hz (0x02)
+	XL_ODR_119                           // 119 Hz (0x3)
+	XL_ODR_238                           // 238 Hz (0x4)
+	XL_ODR_476                           // 476 Hz (0x5)
+	XL_ODR_952                           // 952 Hz (0x6)
 )
 
 // accel_abw defines all possible anti-aliasing filter rates of the accelerometer:
@@ -73,15 +107,18 @@ const (
 )
 
 // mag_odr defines all possible output data rates of the magnetometer:
+
+type MagSampleRate byte
+
 const (
-	M_ODR_0625 = iota // 0.625 Hz (0)
-	M_ODR_125         // 1.25 Hz (1)
-	M_ODR_250         // 2.5 Hz (2)
-	M_ODR_5           // 5 Hz (3)
-	M_ODR_10          // 10 Hz (4)
-	M_ODR_20          // 20 Hz (5)
-	M_ODR_40          // 40 Hz (6)
-	M_ODR_80          // 80 Hz (7)
+	M_ODR_0625 MagSampleRate = iota // 0.625 Hz (0)
+	M_ODR_125                       // 1.25 Hz (1)
+	M_ODR_250                       // 2.5 Hz (2)
+	M_ODR_5                         // 5 Hz (3)
+	M_ODR_10                        // 10 Hz (4)
+	M_ODR_20                        // 20 Hz (5)
+	M_ODR_40                        // 40 Hz (6)
+	M_ODR_80                        // 80 Hz (7)
 )
 
 const (
@@ -158,16 +195,16 @@ const (
 type gyroSettings struct {
 	// Gyroscope settings:
 	enabled        bool
-	scale          uint // Changed this to 16-bit
-	sampleRate     uint
-	bandwidth      uint
+	scale          GyroScale
+	sampleRate     GyroSampleRate
+	bandwidth      uint16
 	lowPowerEnable bool
 	HPFEnable      bool
-	HPFCutoff      uint
+	HPFCutoff      uint16
 	flipX          bool
 	flipY          bool
 	flipZ          bool
-	orientation    uint
+	orientation    uint16
 	enableX        bool
 	enableY        bool
 	enableZ        bool
@@ -175,9 +212,9 @@ type gyroSettings struct {
 }
 
 type deviceSettings struct {
-	commInterface uint // Can be I2C SPI 4-wire or SPI 3-wire
-	agAddress     uint // I2C address or SPI CS pin
-	mAddress      uint // I2C address or SPI CS pin
+	commInterface uint16 // Can be I2C SPI 4-wire or SPI 3-wire
+	agAddress     uint16 // I2C address or SPI CS pin
+	mAddress      uint16 // I2C address or SPI CS pin
 	i2c           *embd.I2CBus
 	//   TwoWire* i2c;    // pointer to an instance of I2C interface
 }
@@ -185,26 +222,26 @@ type deviceSettings struct {
 type accelSettings struct {
 	// Accelerometer settings:
 	enabled          bool
-	scale            uint
-	sampleRate       uint
+	scale            AccelScale
+	sampleRate       AccelSampleRate
 	enableX          bool
 	enableY          bool
 	enableZ          bool
 	bandwidth        int
 	highResEnable    bool
-	highResBandwidth uint
+	highResBandwidth uint16
 }
 
 type magSettings struct {
 	// Magnetometer settings:
 	enabled                bool
-	scale                  uint
-	sampleRate             uint
+	scale                  MagScale
+	sampleRate             MagSampleRate
 	tempCompensationEnable bool
-	XYPerformance          uint
-	ZPerformance           uint
+	XYPerformance          uint16
+	ZPerformance           uint16
 	lowPowerEnable         bool
-	operatingMode          uint
+	operatingMode          uint16
 }
 
 type temperatureSettings struct {
@@ -222,12 +259,12 @@ type IMUSettings struct {
 
 type LSM9DS1 struct {
 	settings                     IMUSettings
-	gx, gy, gz                   int // x, y, and z axis readings of the gyroscope
-	ax, ay, az                   int // x, y, and z axis readings of the accelerometer
-	mx, my, mz                   int // x, y, and z axis readings of the magnetometer
-	temperature                  int // Chip temperature
+	Gx, Gy, Gz                   byte // x, y, and z axis readings of the gyroscope
+	Ax, Ay, Az                   byte // x, y, and z axis readings of the accelerometer
+	Mx, My, Mz                   byte // x, y, and z axis readings of the magnetometer
+	Temperature                  byte // Chip temperature
 	gBias, aBias, mBias          [3]float32
-	gBiasRaw, aBiasRaw, mBiasRaw [3]int
+	gBiasRaw, aBiasRaw, mBiasRaw [3]byte
 
 	// protected
 	// x_mAddress and gAddress store the I2C address or SPI chip select pin

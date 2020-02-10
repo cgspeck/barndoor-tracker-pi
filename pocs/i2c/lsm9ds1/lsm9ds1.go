@@ -3,6 +3,8 @@ package lsm9ds1
 import (
 	"log"
 
+	"github.com/davecgh/go-spew/spew"
+
 	"github.com/kidoman/embd"
 )
 
@@ -13,33 +15,44 @@ func New(i2c embd.I2CBus) (*LSM9DS1, error) {
 		i2c:       i2c,
 	}
 	l.setDefaults()
-	err := l.checkWhoAmI()
+	l.setSensitivities()
 
-	return &l, err
+	err := l.checkWhoAmI()
+	if err != nil {
+		return &l, err
+	}
+
+	// Gyro initialization stuff:
+	l.initGyro() // This will "turn on" the gyro. Setting up interrupts, etc.
+
+	// // Accelerometer initialization stuff:
+	// l.initAccel() // "Turn on" all axes of the accel. Set up interrupts, etc.
+
+	// // Magnetometer initialization stuff:
+	// l.initMag() // "Turn on" all axes of the mag. Set up interrupts, etc.
+
+	return &l, nil
 }
 
 func (l *LSM9DS1) checkWhoAmI() error {
-	mTest := make([]byte, 1)
-	agTest := make([]byte, 1)
-
-	err := l.mReadReg(WHO_AM_I_M, mTest)
+	mTest, err := l.mReadByteFromReg(WHO_AM_I_M)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
-	err = l.agReadReg(WHO_AM_I_XG, agTest)
+	agTest, err := l.agReadByteFromReg(WHO_AM_I_XG)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
-	if mTest[0] != WHO_AM_I_M_RSP {
+	if mTest != WHO_AM_I_M_RSP {
 		log.Println("Magnetometer whoam failed!")
 		return MagnetoWhoamiFailed{}
 	}
 
-	if agTest[0] != WHO_AM_I_AG_RSP {
+	if agTest != WHO_AM_I_AG_RSP {
 		log.Println("Accel/Gyro whoam failed!")
 		return AGWhoamiFailed{}
 	}
@@ -53,12 +66,12 @@ func (l *LSM9DS1) setDefaults() {
 	l.settings.gyro.enableY = true
 	l.settings.gyro.enableZ = true
 	// gyro scale can be 245, 500, or 2000
-	l.settings.gyro.scale = 245
+	l.settings.gyro.scale = G_SCALE_245DPS
 	// gyro sample rate: value between 1-6
 	// 1 = 14.9    4 = 238
 	// 2 = 59.5    5 = 476
 	// 3 = 119     6 = 952
-	l.settings.gyro.sampleRate = 6
+	l.settings.gyro.sampleRate = G_ODR_952
 	// gyro cutoff frequency: value between 0-3
 	// Actual value of cutoff frequency depends
 	// on sample rate.
@@ -80,12 +93,12 @@ func (l *LSM9DS1) setDefaults() {
 	l.settings.accel.enableY = true
 	l.settings.accel.enableZ = true
 	// accel scale can be 2, 4, 8, or 16
-	l.settings.accel.scale = 2
+	l.settings.accel.scale = A_SCALE_2G
 	// accel sample rate can be 1-6
 	// 1 = 10 Hz    4 = 238 Hz
 	// 2 = 50 Hz    5 = 476 Hz
 	// 3 = 119 Hz   6 = 952 Hz
-	l.settings.accel.sampleRate = 6
+	l.settings.accel.sampleRate = XL_ODR_952
 	// Accel cutoff freqeuncy can be any value between -1 - 3.
 	// -1 = bandwidth determined by sample rate
 	// 0 = 408 Hz   2 = 105 Hz
@@ -100,13 +113,13 @@ func (l *LSM9DS1) setDefaults() {
 
 	l.settings.mag.enabled = true
 	// mag scale can be 4, 8, 12, or 16
-	l.settings.mag.scale = 4
+	l.settings.mag.scale = M_SCALE_4GS
 	// mag data rate can be 0-7
 	// 0 = 0.625 Hz  4 = 10 Hz
 	// 1 = 1.25 Hz   5 = 20 Hz
 	// 2 = 2.5 Hz    6 = 40 Hz
 	// 3 = 5 Hz      7 = 80 Hz
-	l.settings.mag.sampleRate = 7
+	l.settings.mag.sampleRate = M_ODR_80
 	l.settings.mag.tempCompensationEnable = false
 	// magPerformance can be any value between 0-3
 	// 0 = Low power mode      2 = high performance
@@ -132,11 +145,168 @@ func (l *LSM9DS1) setDefaults() {
 	l._autoCalc = false
 }
 
+func (l *LSM9DS1) initGyro() {
+	var tempRegValue uint16 = 0
+
+	// CTRL_REG1_G (Default value: 0x00)
+	// [ODR_G2][ODR_G1][ODR_G0][FS_G1][FS_G0][0][BW_G1][BW_G0]
+	// ODR_G[2:0] - Output data rate selection
+	// FS_G[1:0] - Gyroscope full-scale selection
+	// BW_G[1:0] - Gyroscope bandwidth selection
+
+	// To disable gyro, set sample rate bits to 0. We'll only set sample
+	// rate if the gyro is enabled.
+	if l.settings.gyro.enabled {
+		tempRegValue = uint16((l.settings.gyro.sampleRate & 0x07) << 5)
+	}
+
+	switch l.settings.gyro.scale {
+	case G_SCALE_500DPS:
+		tempRegValue |= (0x1 << 3)
+	case G_SCALE_2000DPS:
+		tempRegValue |= (0x3 << 3)
+		// Otherwise we'll set it to 245 dps (0x0 << 4)
+	}
+
+	tempRegValue |= (l.settings.gyro.bandwidth & 0x3)
+	l.agWriteWordToReg(CTRL_REG1_G, tempRegValue)
+
+	// CTRL_REG2_G (Default value: 0x00)
+	// [0][0][0][0][INT_SEL1][INT_SEL0][OUT_SEL1][OUT_SEL0]
+	// INT_SEL[1:0] - INT selection configuration
+	// OUT_SEL[1:0] - Out selection configuration
+	l.agWriteWordToReg(CTRL_REG2_G, 0x00)
+
+	// CTRL_REG3_G (Default value: 0x00)
+	// [LP_mode][HP_EN][0][0][HPCF3_G][HPCF2_G][HPCF1_G][HPCF0_G]
+	// LP_mode - Low-power mode enable (0: disabled, 1: enabled)
+	// HP_EN - HPF enable (0:disabled, 1: enabled)
+	// HPCF_G[3:0] - HPF cutoff frequency
+	if l.settings.gyro.lowPowerEnable {
+		tempRegValue = 1 << 7
+	} else {
+		tempRegValue = 0
+	}
+
+	if l.settings.gyro.HPFEnable {
+		tempRegValue |= (1 << 6) | (l.settings.gyro.HPFCutoff & 0x0F)
+	}
+	l.agWriteWordToReg(CTRL_REG3_G, tempRegValue)
+
+	// CTRL_REG4 (Default value: 0x38)
+	// [0][0][Zen_G][Yen_G][Xen_G][0][LIR_XL1][4D_XL1]
+	// Zen_G - Z-axis output enable (0:disable, 1:enable)
+	// Yen_G - Y-axis output enable (0:disable, 1:enable)
+	// Xen_G - X-axis output enable (0:disable, 1:enable)
+	// LIR_XL1 - Latched interrupt (0:not latched, 1:latched)
+	// 4D_XL1 - 4D option on interrupt (0:6D used, 1:4D used)
+	tempRegValue = 0
+	if l.settings.gyro.enableZ {
+		tempRegValue |= (1 << 5)
+	}
+	if l.settings.gyro.enableY {
+		tempRegValue |= (1 << 4)
+	}
+	if l.settings.gyro.enableX {
+		tempRegValue |= (1 << 3)
+	}
+	if l.settings.gyro.latchInterrupt {
+		tempRegValue |= (1 << 1)
+	}
+	l.agWriteWordToReg(CTRL_REG4, tempRegValue)
+
+	// ORIENT_CFG_G (Default value: 0x00)
+	// [0][0][SignX_G][SignY_G][SignZ_G][Orient_2][Orient_1][Orient_0]
+	// SignX_G - Pitch axis (X) angular rate sign (0: positive, 1: negative)
+	// Orient [2:0] - Directional user orientation selection
+	tempRegValue = 0
+	if l.settings.gyro.flipX {
+		tempRegValue |= (1 << 5)
+	}
+	if l.settings.gyro.flipY {
+		tempRegValue |= (1 << 4)
+	}
+	if l.settings.gyro.flipZ {
+		tempRegValue |= (1 << 3)
+	}
+	l.agWriteWordToReg(ORIENT_CFG_G, tempRegValue)
+}
+
+func (l *LSM9DS1) GyroAvailable() bool {
+	status, err := l.agReadByteFromReg(STATUS_REG_1)
+	if err != nil {
+		log.Printf("error reading gyro avaliable register: %v", err)
+		return false
+	}
+
+	spew.Dump(status)
+	// return ((status & (1 << 1)) >> 1)
+	return false
+}
+
+// ReadGyro reads the Gyroscope and stores values in Gx, Gy, Gz
+func (l *LSM9DS1) ReadGyro() error {
+	// Read 6 bytes, beginning at OUT_X_L_G
+	var raw = make([]byte, 6)
+	err := l.agReadFromReg(OUT_X_L_G, raw)
+	if err != nil {
+		log.Printf("error reading gyro values: %v", err)
+		return err
+	}
+
+	l.Gx = (raw[1] << 8) | raw[0] // Store x-axis values into gx
+	l.Gy = (raw[3] << 8) | raw[2] // Store y-axis values into gy
+	l.Gz = (raw[5] << 8) | raw[4] // Store z-axis values into gz
+	if l._autoCalc {
+		l.Gx -= l.gBiasRaw[X_AXIS]
+		l.Gy -= l.gBiasRaw[Y_AXIS]
+		l.Gz -= l.gBiasRaw[Z_AXIS]
+	}
+	return nil
+}
+
+func (l *LSM9DS1) calibrate() {
+	log.Panicln("not implemented!")
+}
+
+// setSensitivities sets the sensitivity (also referred to as resolution) for each sensor
+func (l *LSM9DS1) setSensitivities() {
+	l.aRes = aScaleSensitivity[l.settings.accel.scale]
+	l.gRes = gScaleSensitivity[l.settings.gyro.scale]
+	l.mRes = mScaleSensitivity[l.settings.mag.scale]
+}
+
 // IO
-func (l *LSM9DS1) agReadReg(regAddress byte, dest []byte) error {
+
+// reads len(dest) bytes from register
+func (l *LSM9DS1) agReadFromReg(regAddress byte, dest []byte) error {
 	return l.i2c.ReadFromReg(l.agAddress, regAddress, dest)
 }
 
-func (l *LSM9DS1) mReadReg(regAddress byte, dest []byte) error {
+// reads a byte from register
+func (l *LSM9DS1) agReadByteFromReg(regAddress byte) (byte, error) {
+	return l.i2c.ReadByteFromReg(l.agAddress, regAddress)
+}
+
+// func (l *LSM9DS1) agReadBytes(regAddress byte, count int) ([]byte, error) {
+// 	// have to write to device the register we want to read from
+// 	// 0x80 indicates a "multiread"
+// 	l.i2c.WriteByte(l.agAddress, regAddress|0x80)
+// 	return l.i2c.ReadBytes(l.agAddress, count)
+// }
+
+func (l *LSM9DS1) mReadFromReg(regAddress byte, dest []byte) error {
 	return l.i2c.ReadFromReg(l.mAddress, regAddress, dest)
+}
+
+func (l *LSM9DS1) mReadByteFromReg(regAddress byte) (byte, error) {
+	return l.i2c.ReadByteFromReg(l.mAddress, regAddress)
+}
+
+func (l *LSM9DS1) agWriteToReg(regAddress byte, data []byte) error {
+	return l.i2c.WriteToReg(l.agAddress, regAddress, data)
+}
+
+func (l *LSM9DS1) agWriteWordToReg(regAddress byte, data uint16) error {
+	return l.i2c.WriteWordToReg(l.agAddress, regAddress, data)
 }
