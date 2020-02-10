@@ -3,8 +3,6 @@ package lsm9ds1
 import (
 	"log"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/kidoman/embd"
 )
 
@@ -146,7 +144,7 @@ func (l *LSM9DS1) setDefaults() {
 }
 
 func (l *LSM9DS1) initGyro() {
-	var tempRegValue uint16 = 0
+	var tempRegValue byte = 0
 
 	// CTRL_REG1_G (Default value: 0x00)
 	// [ODR_G2][ODR_G1][ODR_G0][FS_G1][FS_G0][0][BW_G1][BW_G0]
@@ -157,7 +155,7 @@ func (l *LSM9DS1) initGyro() {
 	// To disable gyro, set sample rate bits to 0. We'll only set sample
 	// rate if the gyro is enabled.
 	if l.settings.gyro.enabled {
-		tempRegValue = uint16((l.settings.gyro.sampleRate & 0x07) << 5)
+		tempRegValue = (byte(l.settings.gyro.sampleRate) & 0x07) << 5
 	}
 
 	switch l.settings.gyro.scale {
@@ -168,14 +166,14 @@ func (l *LSM9DS1) initGyro() {
 		// Otherwise we'll set it to 245 dps (0x0 << 4)
 	}
 
-	tempRegValue |= (l.settings.gyro.bandwidth & 0x3)
-	l.agWriteWordToReg(CTRL_REG1_G, tempRegValue)
+	tempRegValue |= (byte(l.settings.gyro.bandwidth) & 0x3)
+	l.agWriteToReg(CTRL_REG1_G, []byte{tempRegValue})
 
 	// CTRL_REG2_G (Default value: 0x00)
 	// [0][0][0][0][INT_SEL1][INT_SEL0][OUT_SEL1][OUT_SEL0]
 	// INT_SEL[1:0] - INT selection configuration
 	// OUT_SEL[1:0] - Out selection configuration
-	l.agWriteWordToReg(CTRL_REG2_G, 0x00)
+	l.agWriteToReg(CTRL_REG2_G, []byte{0x00})
 
 	// CTRL_REG3_G (Default value: 0x00)
 	// [LP_mode][HP_EN][0][0][HPCF3_G][HPCF2_G][HPCF1_G][HPCF0_G]
@@ -191,7 +189,7 @@ func (l *LSM9DS1) initGyro() {
 	if l.settings.gyro.HPFEnable {
 		tempRegValue |= (1 << 6) | (l.settings.gyro.HPFCutoff & 0x0F)
 	}
-	l.agWriteWordToReg(CTRL_REG3_G, tempRegValue)
+	l.agWriteToReg(CTRL_REG3_G, []byte{tempRegValue})
 
 	// CTRL_REG4 (Default value: 0x38)
 	// [0][0][Zen_G][Yen_G][Xen_G][0][LIR_XL1][4D_XL1]
@@ -213,7 +211,7 @@ func (l *LSM9DS1) initGyro() {
 	if l.settings.gyro.latchInterrupt {
 		tempRegValue |= (1 << 1)
 	}
-	l.agWriteWordToReg(CTRL_REG4, tempRegValue)
+	l.agWriteToReg(CTRL_REG4, []byte{tempRegValue})
 
 	// ORIENT_CFG_G (Default value: 0x00)
 	// [0][0][SignX_G][SignY_G][SignZ_G][Orient_2][Orient_1][Orient_0]
@@ -229,7 +227,7 @@ func (l *LSM9DS1) initGyro() {
 	if l.settings.gyro.flipZ {
 		tempRegValue |= (1 << 3)
 	}
-	l.agWriteWordToReg(ORIENT_CFG_G, tempRegValue)
+	l.agWriteToReg(ORIENT_CFG_G, []byte{tempRegValue})
 }
 
 func (l *LSM9DS1) GyroAvailable() bool {
@@ -239,9 +237,7 @@ func (l *LSM9DS1) GyroAvailable() bool {
 		return false
 	}
 
-	spew.Dump(status)
-	// return ((status & (1 << 1)) >> 1)
-	return false
+	return ((status & (1 << 1)) >> 1) == 1
 }
 
 // ReadGyro reads the Gyroscope and stores values in Gx, Gy, Gz

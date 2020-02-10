@@ -200,7 +200,7 @@ type gyroSettings struct {
 	bandwidth      uint16
 	lowPowerEnable bool
 	HPFEnable      bool
-	HPFCutoff      uint16
+	HPFCutoff      byte
 	flipX          bool
 	flipY          bool
 	flipZ          bool

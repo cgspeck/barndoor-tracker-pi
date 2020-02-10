@@ -1,11 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	"./lsm9ds1"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/kidoman/embd"
 	_ "github.com/kidoman/embd/host/rpi" // This loads the RPi driver
 )
@@ -16,9 +17,14 @@ func main() {
 	defer bus.Close()
 
 	l, err := lsm9ds1.New(bus)
-	spew.Dump(err, l)
-
-	l.GyroAvailable()
-	l.ReadGyro()
-	spew.Dump(l)
+	if err != nil {
+		fmt.Printf("Error instantiating driver: %v", err)
+		os.Exit(1)
+	}
+	for true {
+		if l.GyroAvailable() {
+			l.ReadGyro()
+			fmt.Printf("Gyro read: x=%v y=%v z=%v\n", l.Gx, l.Gy, l.Gz)
+		}
+	}
 }
