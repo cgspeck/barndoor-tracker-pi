@@ -26,5 +26,9 @@ func main() {
 			l.ReadGyro()
 			fmt.Printf("Gyro read: x=%v y=%v z=%v\n", l.Gx, l.Gy, l.Gz)
 		}
+
+		if l.AccelAvailable() {
+			fmt.Printf("Accel read: x=%v y=%v z=%v\n", l.Ax, l.Ay, l.Az)
+		}
 	}
 }

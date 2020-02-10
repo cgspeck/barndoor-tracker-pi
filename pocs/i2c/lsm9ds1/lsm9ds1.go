@@ -24,7 +24,7 @@ func New(i2c embd.I2CBus) (*LSM9DS1, error) {
 	l.initGyro() // This will "turn on" the gyro. Setting up interrupts, etc.
 
 	// // Accelerometer initialization stuff:
-	// l.initAccel() // "Turn on" all axes of the accel. Set up interrupts, etc.
+	l.initAccel() // "Turn on" all axes of the accel. Set up interrupts, etc.
 
 	// // Magnetometer initialization stuff:
 	// l.initMag() // "Turn on" all axes of the mag. Set up interrupts, etc.
@@ -167,6 +167,7 @@ func (l *LSM9DS1) initGyro() {
 	}
 
 	tempRegValue |= (byte(l.settings.gyro.bandwidth) & 0x3)
+	// spew.Dump(tempRegValue)
 	l.agWriteToReg(CTRL_REG1_G, []byte{tempRegValue})
 
 	// CTRL_REG2_G (Default value: 0x00)
@@ -230,6 +231,69 @@ func (l *LSM9DS1) initGyro() {
 	l.agWriteToReg(ORIENT_CFG_G, []byte{tempRegValue})
 }
 
+func (l *LSM9DS1) initAccel() {
+	var tempRegValue byte = 0
+
+	//	CTRL_REG5_XL (0x1F) (Default value: 0x38)
+	//	[DEC_1][DEC_0][Zen_XL][Yen_XL][Zen_XL][0][0][0]
+	//	DEC[0:1] - Decimation of accel data on OUT REG and FIFO.
+	//		00: None, 01: 2 samples, 10: 4 samples 11: 8 samples
+	//	Zen_XL - Z-axis output enabled
+	//	Yen_XL - Y-axis output enabled
+	//	Xen_XL - X-axis output enabled
+	if l.settings.accel.enableZ {
+		tempRegValue |= (1 << 5)
+	}
+	if l.settings.accel.enableY {
+		tempRegValue |= (1 << 4)
+	}
+	if l.settings.accel.enableX {
+		tempRegValue |= (1 << 3)
+	}
+
+	l.agWriteToReg(CTRL_REG5_XL, []byte{tempRegValue})
+
+	// CTRL_REG6_XL (0x20) (Default value: 0x00)
+	// [ODR_XL2][ODR_XL1][ODR_XL0][FS1_XL][FS0_XL][BW_SCAL_ODR][BW_XL1][BW_XL0]
+	// ODR_XL[2:0] - Output data rate & power mode selection
+	// FS_XL[1:0] - Full-scale selection
+	// BW_SCAL_ODR - Bandwidth selection
+	// BW_XL[1:0] - Anti-aliasing filter bandwidth selection
+	tempRegValue = 0
+	// To disable the accel, set the sampleRate bits to 0.
+	if l.settings.accel.enabled {
+		tempRegValue |= (byte(l.settings.accel.sampleRate) & 0x07) << 5
+	}
+	switch l.settings.accel.scale {
+	case 4:
+		tempRegValue |= (0x2 << 3)
+	case 8:
+		tempRegValue |= (0x3 << 3)
+	case 16:
+		tempRegValue |= (0x1 << 3)
+		// Otherwise it'll be set to 2g (0x0 << 3)
+	}
+
+	if l.settings.accel.bandwidth >= 0 {
+		tempRegValue |= (1 << 2) // Set BW_SCAL_ODR
+		tempRegValue |= byte(l.settings.accel.bandwidth) & 0x03
+	}
+	l.agWriteToReg(CTRL_REG6_XL, []byte{tempRegValue})
+
+	// CTRL_REG7_XL (0x21) (Default value: 0x00)
+	// [HR][DCF1][DCF0][0][0][FDS][0][HPIS1]
+	// HR - High resolution mode (0: disable, 1: enable)
+	// DCF[1:0] - Digital filter cutoff frequency
+	// FDS - Filtered data selection
+	// HPIS1 - HPF enabled for interrupt function
+	tempRegValue = 0
+	if l.settings.accel.highResEnable {
+		tempRegValue |= (1 << 7) // Set HR bit
+		tempRegValue |= (byte(l.settings.accel.highResBandwidth) & 0x3) << 5
+	}
+	l.agWriteToReg(CTRL_REG7_XL, []byte{tempRegValue})
+}
+
 func (l *LSM9DS1) GyroAvailable() bool {
 	status, err := l.agReadByteFromReg(STATUS_REG_1)
 	if err != nil {
@@ -238,6 +302,16 @@ func (l *LSM9DS1) GyroAvailable() bool {
 	}
 
 	return ((status & (1 << 1)) >> 1) == 1
+}
+
+func (l *LSM9DS1) AccelAvailable() bool {
+	status, err := l.agReadByteFromReg(STATUS_REG_1)
+
+	if err != nil {
+		log.Printf("error reading gyro avaliable register: %v", err)
+		return false
+	}
+	return (status & (1 << 0)) == 1
 }
 
 // ReadGyro reads the Gyroscope and stores values in Gx, Gy, Gz
@@ -257,6 +331,29 @@ func (l *LSM9DS1) ReadGyro() error {
 		l.Gx -= l.gBiasRaw[X_AXIS]
 		l.Gy -= l.gBiasRaw[Y_AXIS]
 		l.Gz -= l.gBiasRaw[Z_AXIS]
+	}
+	return nil
+}
+
+func (l *LSM9DS1) readAccel() error {
+	// We'll read six bytes from the accelerometer into temp
+	var raw = make([]byte, 6)
+
+	// Read 6 bytes, beginning at OUT_X_L_XL
+
+	err := l.agReadFromReg(OUT_X_L_XL, raw)
+	if err != nil {
+		log.Printf("error reading accelerometer values: %v", err)
+		return err
+	}
+
+	l.Ax = (raw[1] << 8) | raw[0] // Store x-axis values into ax
+	l.Ay = (raw[3] << 8) | raw[2] // Store y-axis values into ay
+	l.Az = (raw[5] << 8) | raw[4] // Store z-axis values into az
+	if l._autoCalc {
+		l.Ax -= l.aBiasRaw[X_AXIS]
+		l.Ay -= l.aBiasRaw[Y_AXIS]
+		l.Az -= l.aBiasRaw[Z_AXIS]
 	}
 	return nil
 }
