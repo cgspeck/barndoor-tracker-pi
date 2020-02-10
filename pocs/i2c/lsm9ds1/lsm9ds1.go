@@ -395,6 +395,21 @@ func (l *LSM9DS1) MagAvailable(axis Axis) bool {
 	return ((status & (1 << byte(axis))) >> byte(axis)) == 1
 }
 
+/*
+ n.b. not supported by chip/board, see https://github.com/sparkfun/SparkFun_LSM9DS1_Arduino_Library/issues/20
+
+func (l *LSM9DS1) TempAvailable() bool {
+	status, err := l.agReadByteFromReg(STATUS_REG_1)
+
+	if err != nil {
+		log.Printf("error reading temp avaliable register: %v", err)
+		return false
+	}
+
+	return ((status & (1 << 2)) >> 2) == 1
+}
+*/
+
 // ReadGyro reads the Gyroscope and stores values in Gx, Gy, Gz
 func (l *LSM9DS1) ReadGyro() error {
 	// Read 6 bytes, beginning at OUT_X_L_G
@@ -454,6 +469,21 @@ func (l *LSM9DS1) ReadMag() error {
 	l.Mz = (raw[5] << 8) | raw[4] // Store z-axis values into mz
 	return nil
 }
+
+/*
+ n.b. not supported by chip/board, see https://github.com/sparkfun/SparkFun_LSM9DS1_Arduino_Library/issues/20
+
+func (l *LSM9DS1) ReadTemp() {
+	var raw = make([]byte, 2)
+	spew.Dump(raw)
+	err := l.mReadFromReg(OUT_TEMP_L, raw)
+	if err != nil {
+		log.Printf("Error reading temp value: %v", err)
+	}
+	var offset int = 25 // Per datasheet sensor outputs 0 typically @ 25 degrees centigrade
+	l.Temperature = offset + int(((raw[1]<<8)|raw[0])>>8)
+}
+*/
 
 func (l *LSM9DS1) calibrate() {
 	log.Panicln("not implemented!")

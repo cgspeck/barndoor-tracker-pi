@@ -258,11 +258,11 @@ type IMUSettings struct {
 }
 
 type LSM9DS1 struct {
-	settings                     IMUSettings
-	Gx, Gy, Gz                   byte // x, y, and z axis readings of the gyroscope
-	Ax, Ay, Az                   byte // x, y, and z axis readings of the accelerometer
-	Mx, My, Mz                   byte // x, y, and z axis readings of the magnetometer
-	Temperature                  byte // Chip temperature
+	settings   IMUSettings
+	Gx, Gy, Gz byte // x, y, and z axis readings of the gyroscope
+	Ax, Ay, Az byte // x, y, and z axis readings of the accelerometer
+	Mx, My, Mz byte // x, y, and z axis readings of the magnetometer
+	// Temperature                  int  // Chip temperature
 	gBias, aBias, mBias          [3]float32
 	gBiasRaw, aBiasRaw, mBiasRaw [3]byte
 
