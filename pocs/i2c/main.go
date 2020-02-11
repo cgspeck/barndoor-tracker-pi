@@ -21,6 +21,15 @@ func main() {
 		fmt.Printf("Error instantiating driver: %v", err)
 		os.Exit(1)
 	}
+
+	fmt.Println("Begin calibration")
+	l.Calibrate(true)
+	fmt.Println("End calibration")
+
+	fmt.Println("Begin Magneto calibration")
+	l.CalibrateMag(true)
+	fmt.Println("End Magneto calibration")
+
 	for true {
 		if l.GyroAvailable() {
 			l.ReadGyro()

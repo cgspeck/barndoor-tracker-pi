@@ -174,12 +174,14 @@ const (
 	INT_OPEN_DRAIN
 )
 
+type FIFOMode byte
+
 const (
-	FIFO_OFF          = 0
-	FIFO_THS          = 1
-	FIFO_CONT_TRIGGER = 3
-	FIFO_OFF_TRIGGER  = 4
-	FIFO_CONT         = 6
+	FIFO_OFF          FIFOMode = 0
+	FIFO_THS                   = 1
+	FIFO_CONT_TRIGGER          = 3
+	FIFO_OFF_TRIGGER           = 4
+	FIFO_CONT                  = 6
 )
 
 // enum lsm9ds1_axis {

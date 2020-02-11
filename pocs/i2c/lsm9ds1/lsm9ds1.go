@@ -1,6 +1,7 @@
 package lsm9ds1
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/kidoman/embd"
@@ -485,8 +486,157 @@ func (l *LSM9DS1) ReadTemp() {
 }
 */
 
-func (l *LSM9DS1) calibrate() {
-	log.Panicln("not implemented!")
+// This is a function that uses the FIFO to accumulate sample of accelerometer and gyro data, average
+// them, scales them to  gs and deg/s, respectively, and then passes the biases to the main sketch
+// for subtraction from all subsequent data. There are no gyro and accelerometer bias registers to store
+// the data as there are in the ADXL345, a precursor to the LSM9DS0, or the MPU-9150, so we have to
+// subtract the biases ourselves. This results in a more accurate measurement in general and can
+// remove errors due to imprecise or varying initial placement. Calibration of sensor data in this manner
+// is good practice.
+
+func (l *LSM9DS1) Calibrate(autoCalc bool) {
+	var samples int = 0
+	var i int
+
+	aBiasRawTemp := [3]int{0, 0, 0}
+	gBiasRawTemp := [3]int{0, 0, 0}
+
+	// Turn on FIFO and set threshold to 32 samples
+	l.enableFIFO(true)
+	l.setFIFO(FIFO_THS, 0x1F)
+	for samples < 31 {
+		// samples = (l.xgReadByte(FIFO_SRC) & 0x3F) // Read number of stored samples
+		l.agReadByteFromReg(FIFO_SRC)
+		samples += 1
+	}
+	for i = 0; i < samples; i++ {
+		// Read the gyro data stored in the FIFO
+		l.ReadGyro()
+		gBiasRawTemp[0] += int(l.Gx)
+		gBiasRawTemp[1] += int(l.Gy)
+		gBiasRawTemp[2] += int(l.Gz)
+		l.ReadAccel()
+		aBiasRawTemp[0] += int(l.Ax)
+		aBiasRawTemp[1] += int(l.Ay)
+		aBiasRawTemp[2] += int(l.Az) - int(1./l.aRes) // Assumes sensor facing up!
+	}
+
+	for i = 0; i < 3; i++ {
+		l.gBiasRaw[i] = byte(gBiasRawTemp[i] / int(samples))
+		l.gBias[i] = l.calcGyro(l.gBiasRaw[i])
+		l.aBiasRaw[i] = byte(aBiasRawTemp[i] / int(samples))
+		l.aBias[i] = l.calcAccel(l.aBiasRaw[i])
+	}
+
+	l.enableFIFO(false)
+	l.setFIFO(FIFO_OFF, 0x00)
+
+	fmt.Printf("Calibration gBias: %v\n", l.gBias)
+	fmt.Printf("Calibration aBias: %v\n", l.aBias)
+
+	if autoCalc {
+		fmt.Print("Calibration will be accounted for in calculations\n")
+		l._autoCalc = true
+	}
+}
+
+func (l *LSM9DS1) CalibrateMag(loadIn bool) {
+	var i, j int
+	magMin := [3]byte{0, 0, 0}
+	magMax := [3]byte{0, 0, 0} // The road warrior
+
+	for i = 0; i < 128; i++ {
+		for l.MagAvailable(ALL_AXIS) == false {
+		}
+		l.ReadMag()
+		magTemp := [3]byte{0, 0, 0}
+		magTemp[0] = l.Mx
+		magTemp[1] = l.My
+		magTemp[2] = l.Mz
+		for j = 0; j < 3; j++ {
+			if magTemp[j] > magMax[j] {
+				magMax[j] = magTemp[j]
+			}
+			if magTemp[j] < magMin[j] {
+				magMin[j] = magTemp[j]
+			}
+		}
+	}
+	for j = 0; j < 3; j++ {
+		l.mBiasRaw[j] = (magMax[j] + magMin[j]) / 2
+		l.mBias[j] = l.calcMag(l.mBiasRaw[j])
+		if loadIn {
+			l.magOffset(Axis(j), l.mBiasRaw[j])
+		}
+	}
+	log.Printf("CalibrateMag mBias: %v", l.mBias)
+}
+
+func (l *LSM9DS1) calcMag(mag byte) float32 {
+	// Return the mag raw reading times our pre-calculated Gs / (ADC tick):
+	return l.mRes * float32(mag)
+}
+
+func (l *LSM9DS1) magOffset(axis Axis, offset byte) {
+	if axis > 2 {
+		return
+	}
+	bAxis := byte(axis)
+	log.Printf("magOffset axis: %v bias: %v", axis, offset)
+	l.mWriteWordToReg(OFFSET_X_REG_L_M+2*bAxis, uint16(offset))
+}
+
+func (l *LSM9DS1) enableFIFO(enable bool) error {
+	temp, err := l.agReadByteFromReg(CTRL_REG9)
+	if err != nil {
+		log.Printf("Error reading CTRL_REG9 while enabling/disabling FIFO! desired state: %v, error: %v\n", enable, err)
+		return err
+	}
+
+	iTemp := int(temp)
+
+	if enable {
+		iTemp |= (1 << 1)
+	} else {
+		iTemp &= ^(1 << 1)
+	}
+
+	var res byte = 0
+	if iTemp < 0 {
+		res = 1 - byte(iTemp)
+	} else {
+		res = byte(iTemp)
+	}
+
+	err = l.agWriteToReg(CTRL_REG9, []byte{res})
+	if err != nil {
+		log.Printf("Error writing CTRL_REG9 while enabling/disabling FIFO! desired state: %v, error: %v\n", enable, err)
+		return err
+	}
+	return err
+}
+
+func (l *LSM9DS1) setFIFO(fifoMode FIFOMode, fifoThs byte) {
+	// Limit threshold - 0x1F (31) is the maximum. If more than that was asked
+	// limit it to the maximum.
+	var threshold byte
+	if fifoThs <= 0x1F {
+		threshold = fifoThs
+	} else {
+		threshold = 0x1F
+	}
+	val := ((byte(fifoMode) & 0x7) << 5) | (threshold & 0x1F)
+	l.agWriteToReg(FIFO_CTRL, []byte{val})
+}
+
+func (l *LSM9DS1) calcGyro(gyro byte) float32 {
+	// Return the gyro raw reading times our pre-calculated DPS / (ADC tick):
+	return l.gRes * float32(gyro)
+}
+
+func (l *LSM9DS1) calcAccel(accel byte) float32 {
+	// Return the accel raw reading times our pre-calculated g's / (ADC tick):
+	return l.aRes * float32(accel)
 }
 
 // setSensitivities sets the sensitivity (also referred to as resolution) for each sensor
@@ -533,6 +683,10 @@ func (l *LSM9DS1) agWriteToReg(regAddress byte, data []byte) error {
 
 func (l *LSM9DS1) mWriteToReg(regAddress byte, data []byte) error {
 	return l.i2c.WriteToReg(l.mAddress, regAddress, data)
+}
+
+func (l *LSM9DS1) mWriteWordToReg(regAddress byte, data uint16) error {
+	return l.i2c.WriteWordToReg(l.mAddress, regAddress, data)
 }
 
 func (l *LSM9DS1) agWriteWordToReg(regAddress byte, data uint16) error {
