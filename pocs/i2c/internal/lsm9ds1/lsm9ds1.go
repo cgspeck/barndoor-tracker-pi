@@ -523,9 +523,9 @@ func (l *LSM9DS1) Calibrate(autoCalc bool) {
 
 	for i = 0; i < 3; i++ {
 		l.gBiasRaw[i] = byte(gBiasRawTemp[i] / int(samples))
-		l.gBias[i] = l.calcGyro(l.gBiasRaw[i])
+		l.gBias[i] = l.CalcGyro(l.gBiasRaw[i])
 		l.aBiasRaw[i] = byte(aBiasRawTemp[i] / int(samples))
-		l.aBias[i] = l.calcAccel(l.aBiasRaw[i])
+		l.aBias[i] = l.CalcAccel(l.aBiasRaw[i])
 	}
 
 	l.enableFIFO(false)
@@ -564,7 +564,7 @@ func (l *LSM9DS1) CalibrateMag(loadIn bool) {
 	}
 	for j = 0; j < 3; j++ {
 		l.mBiasRaw[j] = (magMax[j] + magMin[j]) / 2
-		l.mBias[j] = l.calcMag(l.mBiasRaw[j])
+		l.mBias[j] = l.CalcMag(l.mBiasRaw[j])
 		if loadIn {
 			l.magOffset(Axis(j), l.mBiasRaw[j])
 		}
@@ -572,7 +572,7 @@ func (l *LSM9DS1) CalibrateMag(loadIn bool) {
 	log.Printf("CalibrateMag mBias: %v", l.mBias)
 }
 
-func (l *LSM9DS1) calcMag(mag byte) float32 {
+func (l *LSM9DS1) CalcMag(mag byte) float32 {
 	// Return the mag raw reading times our pre-calculated Gs / (ADC tick):
 	return l.mRes * float32(mag)
 }
@@ -629,12 +629,12 @@ func (l *LSM9DS1) setFIFO(fifoMode FIFOMode, fifoThs byte) {
 	l.agWriteToReg(FIFO_CTRL, []byte{val})
 }
 
-func (l *LSM9DS1) calcGyro(gyro byte) float32 {
+func (l *LSM9DS1) CalcGyro(gyro byte) float32 {
 	// Return the gyro raw reading times our pre-calculated DPS / (ADC tick):
 	return l.gRes * float32(gyro)
 }
 
-func (l *LSM9DS1) calcAccel(accel byte) float32 {
+func (l *LSM9DS1) CalcAccel(accel byte) float32 {
 	// Return the accel raw reading times our pre-calculated g's / (ADC tick):
 	return l.aRes * float32(accel)
 }
