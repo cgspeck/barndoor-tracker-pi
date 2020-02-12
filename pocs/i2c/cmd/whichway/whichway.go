@@ -81,28 +81,12 @@ func printAttitude(ax int16, ay int16, az int16, mx int16, my int16, mz int16, d
 	roll := math.Atan2(fay, faz)
 	pitch := math.Atan2(-fax, math.Sqrt(fay*fay+faz*faz))
 
-	var heading float64
-
-	if my == 0 {
-		if mx < 0 {
-			heading = math.Pi
-		} else {
-			heading = 0
-		}
-	} else {
-		heading = math.Atan2(fmx, fmy)
+	heading := math.Atan2(float64(y), float64(x)) / math.Pi * 180
+	if heading < 0 {
+		heading += 360
 	}
-
-	heading -= declination * math.Pi / 180
-
-	if heading > math.Pi {
-		heading -= 2 * math.Pi
-	} else if heading < -math.Pi {
-		heading += (2 * math.Pi)
-	}
-
+	
 	// Convert everything from radians to degrees:
-	heading *= 180.0 / math.Pi
 	pitch *= 180.0 / math.Pi
 	roll *= 180.0 / math.Pi
 
