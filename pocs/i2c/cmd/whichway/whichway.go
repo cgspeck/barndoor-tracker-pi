@@ -75,13 +75,10 @@ func printAttitude(ax int16, ay int16, az int16, mx int16, my int16, mz int16, d
 	fay := float64(ay)
 	faz := float64(az)
 
-	fmx := float64(mx)
-	fmy := float64(my)
-
 	roll := math.Atan2(fay, faz)
 	pitch := math.Atan2(-fax, math.Sqrt(fay*fay+faz*faz))
 
-	heading := math.Atan2(float64(y), float64(x)) / math.Pi * 180
+	heading := math.Atan2(float64(my), float64(mx)) / math.Pi * 180
 	if heading < 0 {
 		heading += 360
 	}
