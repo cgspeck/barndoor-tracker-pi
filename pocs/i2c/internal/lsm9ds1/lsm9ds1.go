@@ -420,10 +420,9 @@ func (l *LSM9DS1) ReadGyro() error {
 		log.Printf("error reading gyro values: %v", err)
 		return err
 	}
-
-	l.Gx = (raw[1] << 8) | raw[0] // Store x-axis values into gx
-	l.Gy = (raw[3] << 8) | raw[2] // Store y-axis values into gy
-	l.Gz = (raw[5] << 8) | raw[4] // Store z-axis values into gz
+	l.Gx = int16(raw[0])<<8 | int16(raw[1]) // Store x-axis values into gx
+	l.Gy = int16(raw[2])<<8 | int16(raw[3]) // Store y-axis values into gy
+	l.Gz = int16(raw[4])<<8 | int16(raw[5]) // Store z-axis values into gz
 	if l._autoCalc {
 		l.Gx -= l.gBiasRaw[X_AXIS]
 		l.Gy -= l.gBiasRaw[Y_AXIS]
@@ -443,10 +442,9 @@ func (l *LSM9DS1) ReadAccel() error {
 		log.Printf("error reading accelerometer values: %v", err)
 		return err
 	}
-
-	l.Ax = (raw[1] << 8) | raw[0] // Store x-axis values into ax
-	l.Ay = (raw[3] << 8) | raw[2] // Store y-axis values into ay
-	l.Az = (raw[5] << 8) | raw[4] // Store z-axis values into az
+	l.Ax = int16(raw[0])<<8 | int16(raw[1]) // Store x-axis values into ax
+	l.Ay = int16(raw[2])<<8 | int16(raw[3]) // Store y-axis values into ay
+	l.Az = int16(raw[4])<<8 | int16(raw[5]) // Store z-axis values into az
 	if l._autoCalc {
 		l.Ax -= l.aBiasRaw[X_AXIS]
 		l.Ay -= l.aBiasRaw[Y_AXIS]
@@ -506,11 +504,11 @@ func (l *LSM9DS1) ReadTemp() {
 // is good practice.
 
 func (l *LSM9DS1) Calibrate(autoCalc bool) {
-	var samples int = 0
-	var i int
+	var samples int16 = 0
+	var i int16
 
-	aBiasRawTemp := [3]int{0, 0, 0}
-	gBiasRawTemp := [3]int{0, 0, 0}
+	aBiasRawTemp := [3]int16{0, 0, 0}
+	gBiasRawTemp := [3]int16{0, 0, 0}
 
 	// Turn on FIFO and set threshold to 32 samples
 	l.enableFIFO(true)
@@ -523,19 +521,19 @@ func (l *LSM9DS1) Calibrate(autoCalc bool) {
 	for i = 0; i < samples; i++ {
 		// Read the gyro data stored in the FIFO
 		l.ReadGyro()
-		gBiasRawTemp[0] += int(l.Gx)
-		gBiasRawTemp[1] += int(l.Gy)
-		gBiasRawTemp[2] += int(l.Gz)
+		gBiasRawTemp[0] += l.Gx
+		gBiasRawTemp[1] += l.Gy
+		gBiasRawTemp[2] += l.Gz
 		l.ReadAccel()
-		aBiasRawTemp[0] += int(l.Ax)
-		aBiasRawTemp[1] += int(l.Ay)
-		aBiasRawTemp[2] += int(l.Az) - int(1./l.aRes) // Assumes sensor facing up!
+		aBiasRawTemp[0] += l.Ax
+		aBiasRawTemp[1] += l.Ay
+		aBiasRawTemp[2] += l.Az - int16(1./l.aRes) // Assumes sensor facing up!
 	}
 
 	for i = 0; i < 3; i++ {
-		l.gBiasRaw[i] = byte(gBiasRawTemp[i] / int(samples))
+		l.gBiasRaw[i] = gBiasRawTemp[i] / samples
 		l.gBias[i] = l.CalcGyro(l.gBiasRaw[i])
-		l.aBiasRaw[i] = byte(aBiasRawTemp[i] / int(samples))
+		l.aBiasRaw[i] = aBiasRawTemp[i] / samples
 		l.aBias[i] = l.CalcAccel(l.aBiasRaw[i])
 	}
 
@@ -640,12 +638,12 @@ func (l *LSM9DS1) setFIFO(fifoMode FIFOMode, fifoThs byte) {
 	l.agWriteToReg(FIFO_CTRL, []byte{val})
 }
 
-func (l *LSM9DS1) CalcGyro(gyro byte) float32 {
+func (l *LSM9DS1) CalcGyro(gyro int16) float32 {
 	// Return the gyro raw reading times our pre-calculated DPS / (ADC tick):
 	return l.gRes * float32(gyro)
 }
 
-func (l *LSM9DS1) CalcAccel(accel byte) float32 {
+func (l *LSM9DS1) CalcAccel(accel int16) float32 {
 	// Return the accel raw reading times our pre-calculated g's / (ADC tick):
 	return l.aRes * float32(accel)
 }

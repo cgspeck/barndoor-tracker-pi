@@ -70,7 +70,7 @@ func main() {
 	}
 }
 
-func printAttitude(ax byte, ay byte, az byte, mx int16, my int16, mz int16, declination float64) {
+func printAttitude(ax int16, ay int16, az int16, mx int16, my int16, mz int16, declination float64) {
 	fax := float64(ax)
 	fay := float64(ay)
 	faz := float64(az)
