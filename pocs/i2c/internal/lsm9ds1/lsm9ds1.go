@@ -464,10 +464,21 @@ func (l *LSM9DS1) ReadMag() error {
 		log.Printf("error reading magnetometer values: %v", err)
 		return err
 	}
+	//
+	//  first attempt to decode the 2's complement based on c code
+	//
 	// Read 6 bytes, beginning at OUT_X_L_M
-	l.Mx = (raw[1] << 8) | raw[0] // Store x-axis values into mx
-	l.My = (raw[3] << 8) | raw[2] // Store y-axis values into my
-	l.Mz = (raw[5] << 8) | raw[4] // Store z-axis values into mz
+	// l.Mx = (raw[1] << 8) | raw[0] // Store x-axis values into mx
+	// l.My = (raw[3] << 8) | raw[2] // Store y-axis values into my
+	// l.Mz = (raw[5] << 8) | raw[4] // Store z-axis values into mz
+	//
+	//  try to follow example from embd library for other magnetometer sensor:
+	//
+	// https://github.com/kidoman/embd/blob/master/sensor/lsm303/lsm303.go#L102
+
+	l.Mx = int16(raw[0])<<8 | int16(raw[1]) // Store x-axis values into mx
+	l.My = int16(raw[2])<<8 | int16(raw[3]) // Store y-axis values into my
+	l.Mz = int16(raw[4])<<8 | int16(raw[5]) // Store z-axis values into mz
 	return nil
 }
 
@@ -542,14 +553,14 @@ func (l *LSM9DS1) Calibrate(autoCalc bool) {
 
 func (l *LSM9DS1) CalibrateMag(loadIn bool) {
 	var i, j int
-	magMin := [3]byte{0, 0, 0}
-	magMax := [3]byte{0, 0, 0} // The road warrior
+	magMin := [3]int16{0, 0, 0}
+	magMax := [3]int16{0, 0, 0} // The road warrior
 
 	for i = 0; i < 128; i++ {
 		for l.MagAvailable(ALL_AXIS) == false {
 		}
 		l.ReadMag()
-		magTemp := [3]byte{0, 0, 0}
+		magTemp := [3]int16{0, 0, 0}
 		magTemp[0] = l.Mx
 		magTemp[1] = l.My
 		magTemp[2] = l.Mz
@@ -572,12 +583,12 @@ func (l *LSM9DS1) CalibrateMag(loadIn bool) {
 	log.Printf("CalibrateMag mBias: %v", l.mBias)
 }
 
-func (l *LSM9DS1) CalcMag(mag byte) float32 {
+func (l *LSM9DS1) CalcMag(mag int16) float32 {
 	// Return the mag raw reading times our pre-calculated Gs / (ADC tick):
 	return l.mRes * float32(mag)
 }
 
-func (l *LSM9DS1) magOffset(axis Axis, offset byte) {
+func (l *LSM9DS1) magOffset(axis Axis, offset int16) {
 	if axis > 2 {
 		return
 	}
