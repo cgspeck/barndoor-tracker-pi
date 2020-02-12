@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -13,7 +12,6 @@ import (
 )
 
 func main() {
-	log.Println("hello world")
 	bus := embd.NewI2CBus(1)
 	defer bus.Close()
 
@@ -23,35 +21,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println("Begin calibration")
-	l.Calibrate(true)
-	fmt.Println("End calibration")
-
-	fmt.Println("Begin Magneto calibration")
-	l.CalibrateMag(true)
-	fmt.Println("End Magneto calibration")
-
 	printInterval := time.Millisecond * 250
 	lastPrint := time.Now()
 
 	for true {
 		current := time.Now()
 		if current.Sub(lastPrint) >= printInterval {
-			if l.GyroAvailable() {
-				l.ReadGyro()
-				fmt.Printf("Gyro read: x=%v y=%v z=%v\n", l.Gx, l.Gy, l.Gz)
-			}
-
 			if l.AccelAvailable() {
 				l.ReadAccel()
-				fmt.Printf("Accel read: x=%v y=%v z=%v\n", l.Ax, l.Ay, l.Az)
+				fmt.Printf("Accel read (g's): x=%v y=%v z=%v\n",
+					l.CalcAccel(l.Ax),
+					l.CalcAccel(l.Ay),
+					l.CalcAccel(l.Az),
+				)
 			}
-
-			if l.MagAvailable(lsm9ds1.ALL_AXIS) {
-				l.ReadMag()
-				fmt.Printf("Magneto read: x=%v y=%v z=%v\n", l.Mx, l.My, l.Mz)
-			}
-
 			lastPrint = current
 		}
 	}
