@@ -420,9 +420,9 @@ func (l *LSM9DS1) ReadGyro() error {
 		log.Printf("error reading gyro values: %v", err)
 		return err
 	}
-	l.Gx = int16(raw[0])<<8 | int16(raw[1]) // Store x-axis values into gx
-	l.Gy = int16(raw[2])<<8 | int16(raw[3]) // Store y-axis values into gy
-	l.Gz = int16(raw[4])<<8 | int16(raw[5]) // Store z-axis values into gz
+	l.Gx = int16(raw[1])<<8 | int16(raw[0]) // Store x-axis values into gx
+	l.Gy = int16(raw[3])<<8 | int16(raw[2]) // Store y-axis values into gy
+	l.Gz = int16(raw[5])<<8 | int16(raw[4]) // Store z-axis values into gz
 	if l._autoCalc {
 		l.Gx -= l.gBiasRaw[X_AXIS]
 		l.Gy -= l.gBiasRaw[Y_AXIS]
@@ -442,9 +442,9 @@ func (l *LSM9DS1) ReadAccel() error {
 		log.Printf("error reading accelerometer values: %v", err)
 		return err
 	}
-	l.Ax = int16(raw[0])<<8 | int16(raw[1]) // Store x-axis values into ax
-	l.Ay = int16(raw[2])<<8 | int16(raw[3]) // Store y-axis values into ay
-	l.Az = int16(raw[4])<<8 | int16(raw[5]) // Store z-axis values into az
+	l.Ax = int16(raw[1])<<8 | int16(raw[0]) // Store x-axis values into ax
+	l.Ay = int16(raw[3])<<8 | int16(raw[2]) // Store y-axis values into ay
+	l.Az = int16(raw[5])<<8 | int16(raw[4]) // Store z-axis values into az
 	if l._autoCalc {
 		l.Ax -= l.aBiasRaw[X_AXIS]
 		l.Ay -= l.aBiasRaw[Y_AXIS]
@@ -474,9 +474,9 @@ func (l *LSM9DS1) ReadMag() error {
 	//
 	// https://github.com/kidoman/embd/blob/master/sensor/lsm303/lsm303.go#L102
 
-	l.Mx = int16(raw[0])<<8 | int16(raw[1]) // Store x-axis values into mx
-	l.My = int16(raw[2])<<8 | int16(raw[3]) // Store y-axis values into my
-	l.Mz = int16(raw[4])<<8 | int16(raw[5]) // Store z-axis values into mz
+	l.Mx = int16(raw[1])<<8 | int16(raw[0]) // Store x-axis values into mx
+	l.My = int16(raw[3])<<8 | int16(raw[2]) // Store y-axis values into my
+	l.Mz = int16(raw[5])<<8 | int16(raw[4]) // Store z-axis values into mz
 	return nil
 }
 
