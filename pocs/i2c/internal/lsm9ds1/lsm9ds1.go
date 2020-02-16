@@ -373,7 +373,7 @@ func (l *LSM9DS1) GyroAvailable() bool {
 		return false
 	}
 
-	return ((status & (1 << 1)) >> 1) == 1
+	return gyroAvailable(status)
 }
 
 func (l *LSM9DS1) AccelAvailable() bool {
@@ -383,7 +383,7 @@ func (l *LSM9DS1) AccelAvailable() bool {
 		log.Printf("error reading gyro avaliable register: %v", err)
 		return false
 	}
-	return (status & (1 << 0)) == 1
+	return accelAvailable(status)
 }
 
 func (l *LSM9DS1) MagAvailable(axis Axis) bool {
@@ -393,7 +393,7 @@ func (l *LSM9DS1) MagAvailable(axis Axis) bool {
 		return false
 	}
 
-	return ((status & (1 << byte(axis))) >> byte(axis)) == 1
+	return magAvailable(axis, status)
 }
 
 /*
