@@ -21,6 +21,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	l.Calibrate(true)
+
 	printInterval := time.Millisecond * 250
 	lastPrint := time.Now()
 

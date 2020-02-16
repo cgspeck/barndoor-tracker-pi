@@ -21,7 +21,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	l.CalibrateMag(true)
+	l.Calibrate(true)
 
 	printInterval := time.Millisecond * 250
 	lastPrint := time.Now()
@@ -29,12 +29,10 @@ func main() {
 	for true {
 		current := time.Now()
 		if current.Sub(lastPrint) >= printInterval {
-			if l.MagAvailable(lsm9ds1.ALL_AXIS) {
-				l.ReadMag()
-				fmt.Printf("Magneto read (gauss): x=%v y=%v z=%v\n",
-					l.CalcMag(l.Mx),
-					l.CalcMag(l.My),
-					l.CalcMag(l.Mz),
+			if l.AccelAvailable() {
+				l.ReadTemp()
+				fmt.Printf("Temperature: %v\n",
+					l.Temperature,
 				)
 			}
 

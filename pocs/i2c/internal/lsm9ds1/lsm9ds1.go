@@ -480,29 +480,25 @@ func (l *LSM9DS1) ReadMag() error {
 	return nil
 }
 
-/*
- n.b. not supported by chip/board, see https://github.com/sparkfun/SparkFun_LSM9DS1_Arduino_Library/issues/20
+//  n.b. not supported by chip/board? see https://github.com/sparkfun/SparkFun_LSM9DS1_Arduino_Library/issues/20
 
 func (l *LSM9DS1) ReadTemp() {
 	var raw = make([]byte, 2)
-	spew.Dump(raw)
 	err := l.mReadFromReg(OUT_TEMP_L, raw)
 	if err != nil {
 		log.Printf("Error reading temp value: %v", err)
 	}
-	var offset int = 25 // Per datasheet sensor outputs 0 typically @ 25 degrees centigrade
-	l.Temperature = offset + int(((raw[1]<<8)|raw[0])>>8)
+	var offset int16 = 25 // Per datasheet sensor outputs 0 typically @ 25 degrees centigrade
+	l.Temperature = offset + (int16(raw[1])<<8 | int16(raw[0]))
 }
-*/
 
-// This is a function that uses the FIFO to accumulate sample of accelerometer and gyro data, average
+// Calibrate uses the FIFO to accumulate sample of accelerometer and gyro data, average
 // them, scales them to  gs and deg/s, respectively, and then passes the biases to the main sketch
 // for subtraction from all subsequent data. There are no gyro and accelerometer bias registers to store
 // the data as there are in the ADXL345, a precursor to the LSM9DS0, or the MPU-9150, so we have to
 // subtract the biases ourselves. This results in a more accurate measurement in general and can
 // remove errors due to imprecise or varying initial placement. Calibration of sensor data in this manner
 // is good practice.
-
 func (l *LSM9DS1) Calibrate(autoCalc bool) {
 	var samples int16 = 0
 	var i int16
@@ -549,6 +545,8 @@ func (l *LSM9DS1) Calibrate(autoCalc bool) {
 	}
 }
 
+// CalibrateMag takes readings from the Magnetometer and optionally
+// loads the calculated bias into the chip.
 func (l *LSM9DS1) CalibrateMag(loadIn bool) {
 	var i, j int
 	magMin := [3]int16{0, 0, 0}
