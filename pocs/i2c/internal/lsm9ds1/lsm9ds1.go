@@ -3,11 +3,9 @@ package lsm9ds1
 import (
 	"fmt"
 	"log"
-
-	"github.com/kidoman/embd"
 )
 
-func New(i2c embd.I2CBus) (*LSM9DS1, error) {
+func New(i2c I2CBus) (*LSM9DS1, error) {
 	l := LSM9DS1{
 		agAddress: byte(0x6b),
 		mAddress:  byte(0x1e),

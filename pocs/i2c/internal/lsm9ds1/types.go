@@ -1,6 +1,8 @@
 package lsm9ds1
 
-import "github.com/kidoman/embd"
+import (
+	"github.com/kidoman/embd"
+)
 
 /******************************************************************************
 SFE_LSM9DS1 Library - LSM9DS1 Types and Enumerations
@@ -272,7 +274,7 @@ type LSM9DS1 struct {
 	// x_mAddress and gAddress store the I2C address or SPI chip select pin
 	// for each sensor.
 	mAddress, agAddress byte
-	i2c                 embd.I2CBus
+	i2c                 I2CBus
 
 	// gRes, aRes, and mRes store the current resolution for each sensor.
 	// Units of these values would be DPS (or g's or Gs's) per ADC tick.
