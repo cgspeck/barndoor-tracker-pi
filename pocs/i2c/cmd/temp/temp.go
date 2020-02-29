@@ -7,15 +7,14 @@ import (
 
 	"github.com/cgspeck/bdt/pocs/i2c/internal/lsm9ds1"
 
-	"github.com/kidoman/embd"
 	_ "github.com/kidoman/embd/host/rpi" // This loads the RPi driver
 )
 
 func main() {
-	bus := embd.NewI2CBus(1)
+	bus := lsm9ds1.NewMutexI2cBus(1)
 	defer bus.Close()
 
-	l, err := lsm9ds1.New(bus)
+	l, err := lsm9ds1.New(&bus)
 	if err != nil {
 		fmt.Printf("Error instantiating driver: %v", err)
 		os.Exit(1)

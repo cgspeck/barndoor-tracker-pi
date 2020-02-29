@@ -8,15 +8,14 @@ import (
 
 	"github.com/cgspeck/bdt/pocs/i2c/internal/lsm9ds1"
 
-	"github.com/kidoman/embd"
 	_ "github.com/kidoman/embd/host/rpi" // This loads the RPi driver
 )
 
 func main() {
-	bus := embd.NewI2CBus(1)
+	bus := lsm9ds1.NewMutexI2cBus(1)
 	defer bus.Close()
 
-	l, err := lsm9ds1.New(bus)
+	l, err := lsm9ds1.New(&bus)
 	if err != nil {
 		fmt.Printf("Error instantiating driver: %v", err)
 		os.Exit(1)
@@ -82,7 +81,7 @@ func printAttitude(ax int16, ay int16, az int16, mx int16, my int16, mz int16, d
 	if heading < 0 {
 		heading += 360
 	}
-	
+
 	// Convert everything from radians to degrees:
 	pitch *= 180.0 / math.Pi
 	roll *= 180.0 / math.Pi

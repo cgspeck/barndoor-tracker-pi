@@ -11,10 +11,10 @@ import (
 )
 
 func main() {
-	bus := lsm9ds1.MutexI2cBus(1)
+	bus := lsm9ds1.NewMutexI2cBus(1)
 	defer bus.Close()
 
-	l, err := lsm9ds1.New(bus)
+	l, err := lsm9ds1.New(&bus)
 	if err != nil {
 		fmt.Printf("Error instantiating driver: %v", err)
 		os.Exit(1)
