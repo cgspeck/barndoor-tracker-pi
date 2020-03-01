@@ -487,6 +487,7 @@ func (l *LSM9DS1) ReadMag() error {
 	return nil
 }
 
+/*
 //  n.b. not supported by chip/board? see https://github.com/sparkfun/SparkFun_LSM9DS1_Arduino_Library/issues/20
 
 func (l *LSM9DS1) ReadTemp() {
@@ -498,6 +499,7 @@ func (l *LSM9DS1) ReadTemp() {
 	var offset int16 = 25 // Per datasheet sensor outputs 0 typically @ 25 degrees centigrade
 	l.Temperature = offset + (int16(raw[1])<<8 | int16(raw[0]))
 }
+*/
 
 // Calibrate uses the FIFO to accumulate sample of accelerometer and gyro data, average
 // them, scales them to  gs and deg/s, respectively, and then passes the biases to the main sketch

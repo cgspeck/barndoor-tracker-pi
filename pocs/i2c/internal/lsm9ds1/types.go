@@ -284,7 +284,7 @@ type LSM9DS1 struct {
 	// This value is calculated as (sensor scale) / (2^15).
 	gRes, aRes, mRes float32
 
-	Temperature int16
+	// Temperature int16
 
 	// _autoCalc keeps track of whether we're automatically subtracting off
 	// accelerometer and gyroscope bias calculated in calibrate().
