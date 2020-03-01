@@ -10,6 +10,9 @@ func New(i2c I2CBus) (*LSM9DS1, error) {
 		agAddress: byte(0x6b),
 		mAddress:  byte(0x1e),
 		i2c:       i2c,
+		A:         &MutexReading{},
+		G:         &MutexReading{},
+		M:         &MutexReading{},
 	}
 	l.setDefaults()
 	l.setSensitivities()
@@ -418,14 +421,15 @@ func (l *LSM9DS1) ReadGyro() error {
 		log.Printf("error reading gyro values: %v", err)
 		return err
 	}
-	l.Gx = int16(raw[1])<<8 | int16(raw[0]) // Store x-axis values into gx
-	l.Gy = int16(raw[3])<<8 | int16(raw[2]) // Store y-axis values into gy
-	l.Gz = int16(raw[5])<<8 | int16(raw[4]) // Store z-axis values into gz
+	x := int16(raw[1])<<8 | int16(raw[0]) // Store x-axis values into gx
+	y := int16(raw[3])<<8 | int16(raw[2]) // Store y-axis values into gy
+	z := int16(raw[5])<<8 | int16(raw[4]) // Store z-axis values into gz
 	if l._autoCalc {
-		l.Gx -= l.gBiasRaw[X_AXIS]
-		l.Gy -= l.gBiasRaw[Y_AXIS]
-		l.Gz -= l.gBiasRaw[Z_AXIS]
+		x -= l.gBiasRaw[X_AXIS]
+		y -= l.gBiasRaw[Y_AXIS]
+		z -= l.gBiasRaw[Z_AXIS]
 	}
+	l.G.SetReading(x, y, z)
 	return nil
 }
 
@@ -440,14 +444,15 @@ func (l *LSM9DS1) ReadAccel() error {
 		log.Printf("error reading accelerometer values: %v", err)
 		return err
 	}
-	l.Ax = int16(raw[1])<<8 | int16(raw[0]) // Store x-axis values into ax
-	l.Ay = int16(raw[3])<<8 | int16(raw[2]) // Store y-axis values into ay
-	l.Az = int16(raw[5])<<8 | int16(raw[4]) // Store z-axis values into az
+	x := int16(raw[1])<<8 | int16(raw[0]) // Store x-axis values into ax
+	y := int16(raw[3])<<8 | int16(raw[2]) // Store y-axis values into ay
+	z := int16(raw[5])<<8 | int16(raw[4]) // Store z-axis values into az
 	if l._autoCalc {
-		l.Ax -= l.aBiasRaw[X_AXIS]
-		l.Ay -= l.aBiasRaw[Y_AXIS]
-		l.Az -= l.aBiasRaw[Z_AXIS]
+		x -= l.aBiasRaw[X_AXIS]
+		y -= l.aBiasRaw[Y_AXIS]
+		z -= l.aBiasRaw[Z_AXIS]
 	}
+	l.A.SetReading(x, y, z)
 	return nil
 }
 
@@ -472,9 +477,11 @@ func (l *LSM9DS1) ReadMag() error {
 	//
 	// https://github.com/kidoman/embd/blob/master/sensor/lsm303/lsm303.go#L102
 
-	l.Mx = int16(raw[1])<<8 | int16(raw[0]) // Store x-axis values into mx
-	l.My = int16(raw[3])<<8 | int16(raw[2]) // Store y-axis values into my
-	l.Mz = int16(raw[5])<<8 | int16(raw[4]) // Store z-axis values into mz
+	x := int16(raw[1])<<8 | int16(raw[0]) // Store x-axis values into mx
+	y := int16(raw[3])<<8 | int16(raw[2]) // Store y-axis values into my
+	z := int16(raw[5])<<8 | int16(raw[4]) // Store z-axis values into mz
+
+	l.M.SetReading(x, y, z)
 	return nil
 }
 
@@ -515,13 +522,15 @@ func (l *LSM9DS1) Calibrate(autoCalc bool) {
 	for i = 0; i < samples; i++ {
 		// Read the gyro data stored in the FIFO
 		l.ReadGyro()
-		gBiasRawTemp[0] += l.Gx
-		gBiasRawTemp[1] += l.Gy
-		gBiasRawTemp[2] += l.Gz
+		gx, gy, gz := l.G.GetReading()
+		gBiasRawTemp[0] += gx
+		gBiasRawTemp[1] += gy
+		gBiasRawTemp[2] += gz
 		l.ReadAccel()
-		aBiasRawTemp[0] += l.Ax
-		aBiasRawTemp[1] += l.Ay
-		aBiasRawTemp[2] += l.Az - int16(1./l.aRes) // Assumes sensor facing up!
+		ax, ay, az := l.A.GetReading()
+		aBiasRawTemp[0] += ax
+		aBiasRawTemp[1] += ay
+		aBiasRawTemp[2] += az - int16(1./l.aRes) // Assumes sensor facing up!
 	}
 
 	for i = 0; i < 3; i++ {
@@ -554,10 +563,12 @@ func (l *LSM9DS1) CalibrateMag(loadIn bool) {
 		for l.MagAvailable(ALL_AXIS) == false {
 		}
 		l.ReadMag()
+		mx, my, mz := l.M.GetReading()
+
 		magTemp := [3]int16{0, 0, 0}
-		magTemp[0] = l.Mx
-		magTemp[1] = l.My
-		magTemp[2] = l.Mz
+		magTemp[0] = mx
+		magTemp[1] = my
+		magTemp[2] = mz
 		for j = 0; j < 3; j++ {
 			if magTemp[j] > magMax[j] {
 				magMax[j] = magTemp[j]

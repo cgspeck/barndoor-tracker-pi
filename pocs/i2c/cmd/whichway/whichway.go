@@ -38,32 +38,33 @@ func main() {
 		if current.Sub(lastPrint) >= printInterval {
 			if l.GyroAvailable() {
 				l.ReadGyro()
+				gx, gy, gz := l.G.GetReading()
 				fmt.Printf("Gyro read (deg/s): x=%v y=%v z=%v\n",
-					l.CalcGyro(l.Gx),
-					l.CalcGyro(l.Gy),
-					l.CalcGyro(l.Gz),
+					l.CalcGyro(gx),
+					l.CalcGyro(gy),
+					l.CalcGyro(gz),
 				)
 			}
 
-			if l.AccelAvailable() {
+			if l.AccelAvailable() && l.MagAvailable(lsm9ds1.ALL_AXIS) {
 				l.ReadAccel()
+				ax, ay, az := l.A.GetReading()
 				fmt.Printf("Accel read (g's): x=%v y=%v z=%v\n",
-					l.CalcAccel(l.Ax),
-					l.CalcAccel(l.Ay),
-					l.CalcAccel(l.Az),
+					l.CalcAccel(ax),
+					l.CalcAccel(ay),
+					l.CalcAccel(az),
 				)
-			}
 
-			if l.MagAvailable(lsm9ds1.ALL_AXIS) {
 				l.ReadMag()
+				mx, my, mz := l.M.GetReading()
 				fmt.Printf("Magneto read (gauss): x=%v y=%v z=%v\n",
-					l.CalcMag(l.Mx),
-					l.CalcMag(l.My),
-					l.CalcMag(l.Mz),
+					l.CalcMag(mx),
+					l.CalcMag(my),
+					l.CalcMag(mz),
 				)
+				printAttitude(ax, ay, az, -my, -mx, mz, declination)
 			}
 
-			printAttitude(l.Ax, l.Ay, l.Az, -l.My, -l.Mx, l.Mz, declination)
 			lastPrint = current
 		}
 	}

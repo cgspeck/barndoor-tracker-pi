@@ -30,10 +30,12 @@ func main() {
 		if current.Sub(lastPrint) >= printInterval {
 			if l.AccelAvailable() {
 				l.ReadAccel()
+				ax, ay, az := l.A.GetReading()
+
 				fmt.Printf("Accel read (g's): x=%v y=%v z=%v\n",
-					l.CalcAccel(l.Ax),
-					l.CalcAccel(l.Ay),
-					l.CalcAccel(l.Az),
+					l.CalcAccel(ax),
+					l.CalcAccel(ay),
+					l.CalcAccel(az),
 				)
 			}
 			lastPrint = current

@@ -39,17 +39,20 @@ func main() {
 		if current.Sub(lastPrint) >= printInterval {
 			if l.GyroAvailable() {
 				l.ReadGyro()
-				fmt.Printf("Gyro read: x=%v y=%v z=%v\n", l.Gx, l.Gy, l.Gz)
+				gx, gy, gz := l.G.GetReading()
+				fmt.Printf("Gyro read: x=%v y=%v z=%v\n", gx, gy, gz)
 			}
 
 			if l.AccelAvailable() {
 				l.ReadAccel()
-				fmt.Printf("Accel read: x=%v y=%v z=%v\n", l.Ax, l.Ay, l.Az)
+				ax, ay, az := l.A.GetReading()
+				fmt.Printf("Accel read: x=%v y=%v z=%v\n", ax, ay, az)
 			}
 
 			if l.MagAvailable(lsm9ds1.ALL_AXIS) {
 				l.ReadMag()
-				fmt.Printf("Magneto read: x=%v y=%v z=%v\n", l.Mx, l.My, l.Mz)
+				mx, my, mz := l.M.GetReading()
+				fmt.Printf("Magneto read: x=%v y=%v z=%v\n", mx, my, mz)
 			}
 
 			lastPrint = current

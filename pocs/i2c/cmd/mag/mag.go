@@ -30,10 +30,11 @@ func main() {
 		if current.Sub(lastPrint) >= printInterval {
 			if l.MagAvailable(lsm9ds1.ALL_AXIS) {
 				l.ReadMag()
-				fmt.Printf("Magneto read (gauss): x=%v y=%v z=%v\n",
-					l.CalcMag(l.Mx),
-					l.CalcMag(l.My),
-					l.CalcMag(l.Mz),
+				mx, my, mz := l.M.GetReading()
+				fmt.Printf("Magneto calc (gauss): x=%v y=%v z=%v\n",
+					l.CalcMag(mx),
+					l.CalcMag(my),
+					l.CalcMag(mz),
 				)
 			}
 
