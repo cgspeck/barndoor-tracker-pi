@@ -28,7 +28,7 @@ func main() {
 	fmt.Println("Begin Magneto calibration")
 	// the next two lines can be called repeatedly until calibration looks good
 	l.CalibrateMag()
-	fmt.Printf("Mag range: %v\n", l.MagRange)
+	fmt.Printf("Mag range: %v\n", l.MagRange())
 	l.LoadMagBias()
 	fmt.Println("End Magneto calibration")
 
