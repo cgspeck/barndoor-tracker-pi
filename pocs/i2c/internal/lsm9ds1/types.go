@@ -270,6 +270,9 @@ type LSM9DS1 struct {
 	gBias, aBias, mBias          [3]float32
 	aBiasRaw, gBiasRaw, mBiasRaw [3]int16
 
+	// To allow calibration to be re-run
+	magMin, magMax Reading
+
 	// protected
 	// x_mAddress and gAddress store the I2C address or SPI chip select pin
 	// for each sensor.

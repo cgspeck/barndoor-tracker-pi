@@ -13,6 +13,8 @@ func New(i2c I2CBus) (*LSM9DS1, error) {
 		A:         &MutexReading{},
 		G:         &MutexReading{},
 		M:         &MutexReading{},
+		magMax:    &MutexReading{},
+		magMin:    &MutexReading{},
 	}
 	l.setDefaults()
 	l.setSensitivities()
@@ -554,10 +556,10 @@ func (l *LSM9DS1) Calibrate(autoCalc bool) {
 
 // CalibrateMag takes readings from the Magnetometer and optionally
 // loads the calculated bias into the chip.
-func (l *LSM9DS1) CalibrateMag(loadIn bool) {
+func (l *LSM9DS1) CalibrateMag() {
 	var i, j int
-	magMin := [3]int16{0, 0, 0}
-	magMax := [3]int16{0, 0, 0} // The road warrior
+	magMin := l.magMin.ToList()
+	magMax := l.magMax.ToList() // The road warrior
 
 	for i = 0; i < 128; i++ {
 		for l.MagAvailable(ALL_AXIS) == false {
@@ -578,14 +580,38 @@ func (l *LSM9DS1) CalibrateMag(loadIn bool) {
 			}
 		}
 	}
+	l.magMin.FromList(magMin)
+	l.magMax.FromList(magMax)
+}
+
+// Returns difference between min and max values
+func (l *LSM9DS1) MagRange() []int16 {
+	magMin := l.magMin.ToList()
+	magMax := l.magMax.ToList()
+	diff := []int16{
+		magMax[0] - magMin[0],
+		magMax[1] - magMin[1],
+		magMax[2] - magMin[2],
+	}
+
+	return diff
+}
+
+func (l *LSM9DS1) LoadMagBias() error {
+	var j int
+	magMin := l.magMin.ToList()
+	magMax := l.magMax.ToList() // The road warrior
+
 	for j = 0; j < 3; j++ {
 		l.mBiasRaw[j] = (magMax[j] + magMin[j]) / 2
 		l.mBias[j] = l.CalcMag(l.mBiasRaw[j])
-		if loadIn {
-			l.magOffset(Axis(j), l.mBiasRaw[j])
+		err := l.magOffset(Axis(j), l.mBiasRaw[j])
+		if err != nil {
+			return err
 		}
 	}
 	log.Printf("CalibrateMag mBias: %v", l.mBias)
+	return nil
 }
 
 func (l *LSM9DS1) CalcMag(mag int16) float32 {
@@ -593,13 +619,13 @@ func (l *LSM9DS1) CalcMag(mag int16) float32 {
 	return l.mRes * float32(mag)
 }
 
-func (l *LSM9DS1) magOffset(axis Axis, offset int16) {
+func (l *LSM9DS1) magOffset(axis Axis, offset int16) error {
 	if axis > 2 {
-		return
+		return nil
 	}
 	bAxis := byte(axis)
 	log.Printf("magOffset axis: %v bias: %v", axis, offset)
-	l.mWriteWordToReg(OFFSET_X_REG_L_M+2*bAxis, uint16(offset))
+	return l.mWriteWordToReg(OFFSET_X_REG_L_M+2*bAxis, uint16(offset))
 }
 
 func (l *LSM9DS1) enableFIFO(enable bool) error {

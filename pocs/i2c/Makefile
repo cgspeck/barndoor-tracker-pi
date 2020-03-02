@@ -11,3 +11,6 @@ build:
 deps:
 	go get "github.com/davecgh/go-spew/spew"
 	go get "github.com/kidoman/embd"
+
+test:
+	go test ./internal/lsm9ds1
