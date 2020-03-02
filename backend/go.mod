@@ -6,6 +6,8 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-ini/ini v1.52.0 // indirect
+	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
+	github.com/kidoman/embd v0.0.0-20170508013040-d3d8c0c5c68d
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/pyros2097/cupaloy v2.3.0+incompatible
 	github.com/smartystreets/goconvey v1.6.4 // indirect
