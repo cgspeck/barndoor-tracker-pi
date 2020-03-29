@@ -10,7 +10,6 @@ import (
 func TestDebugHandler(t *testing.T) {
 
 	handler := newTestAppHandler()
-	handler.H = DebugHandler
 
 	handler.NetworkSettings = &models.NetworkSettings{
 		AccessPointMode: true,
@@ -24,6 +23,10 @@ func TestDebugHandler(t *testing.T) {
 		WirelessProfiles:  make([]*models.WirelessProfile, 0),
 	}
 
+	handler.AlignStatus = &models.AlignStatus{}
+	handler.Flags = &models.Flags{}
+
+	handler.H = DebugHandler
 	rr := doRequest(&handler, 200, t)
 
 	// Check the response body is what we expect.

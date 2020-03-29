@@ -92,6 +92,7 @@ type AppContextProvider interface {
 
 // the app context!
 type AppContext struct {
+	sync.RWMutex
 	AlignStatus      *AlignStatus      `json:"alignStatus"`
 	Flags            *Flags            `json:"flags"`
 	LocationSettings *LocationSettings `json:"location"`

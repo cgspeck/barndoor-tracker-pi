@@ -1,4 +1,14 @@
 (*models.AppContext)({
+  RWMutex: (sync.RWMutex) {
+    w: (sync.Mutex) {
+      state: (int32) 0,
+      sema: (uint32) 0
+    },
+    writerSem: (uint32) 0,
+    readerSem: (uint32) 0,
+    readerCount: (int32) 0,
+    readerWait: (int32) 0
+  },
   AlignStatus: (*models.AlignStatus)({
     RWMutex: (sync.RWMutex) {
       w: (sync.Mutex) {

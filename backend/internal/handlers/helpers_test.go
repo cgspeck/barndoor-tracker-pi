@@ -46,7 +46,10 @@ type testAppHandler struct {
 func (ah testAppHandler) GetContext() *models.AppContext {
 	v := time.Time{}
 	return &models.AppContext{
-		Time: &v,
+		Time:            &v,
+		AlignStatus:     ah.AlignStatus,
+		Flags:           ah.Flags,
+		NetworkSettings: ah.NetworkSettings,
 	}
 }
 
