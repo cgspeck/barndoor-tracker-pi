@@ -25,6 +25,7 @@ type LocationSettings struct {
 	YOffset        int     `json:"yOffset"`
 	ZOffset        int     `json:"zOffset"`
 	IgnoreAz       bool    `json:"IgnoreAz"`
+	IgnoreAlt      bool    `json:"IgnoreAlt"`
 }
 
 func (l LocationSettings) Equals(o LocationSettings) bool {

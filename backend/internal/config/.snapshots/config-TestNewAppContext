@@ -58,7 +58,8 @@
     XOffset: (int) 7,
     YOffset: (int) 8,
     ZOffset: (int) 9,
-    IgnoreAz: (bool) false
+    IgnoreAz: (bool) false,
+    IgnoreAlt: (bool) false
   }),
   Time: (*time.Time)(0001-01-01 00:00:00 +0000 UTC),
   NetworkSettings: (*models.NetworkSettings)({
