@@ -15,6 +15,7 @@ type Flags struct {
 
 // configuration
 type LocationSettings struct {
+	sync.RWMutex
 	Latitude          float64 `json:"latitude"`
 	MagDeclination    float64 `json:"magDeclination"`
 	AzError           float64 `json:"azError"`
