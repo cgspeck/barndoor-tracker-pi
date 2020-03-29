@@ -15,37 +15,45 @@ func (NetworkManagementDisabledError) Error() string {
 }
 
 func NetworkSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, error) {
-	if r.Method == "GET" {
-		err := writeJson(ah.GetNetworkSettings(), w)
-		if err != nil {
-			return 500, err
-		}
-
-		return 200, nil
-	}
+	networkSettings := ah.GetNetworkSettings()
 
 	if r.Method == "POST" {
-		if ah.GetNetworkSettings().ManagementEnabled {
+		networkSettings.RLock()
+		managementEnabled := networkSettings.ManagementEnabled
+		accessPointMode := networkSettings.AccessPointMode
+		networkSettings.RUnlock()
+
+		if managementEnabled {
 			body, err := ioutil.ReadAll(r.Body)
 			if err != nil {
 				return 500, err
 			}
-			var networkSettings models.NetworkSettings
-			err = json.Unmarshal(body, &networkSettings)
+			var newNetworkSettings models.NetworkSettings
+			err = json.Unmarshal(body, &newNetworkSettings)
 			if err != nil {
 				return 500, err
 			}
 
-			if ah.GetNetworkSettings().AccessPointMode != networkSettings.AccessPointMode {
-				ah.SetAPMode(networkSettings.AccessPointMode)
+			if newNetworkSettings.AccessPointMode != accessPointMode {
+				networkSettings.Lock()
+				ah.SetAPMode(newNetworkSettings.AccessPointMode)
+				networkSettings.AccessPointMode = newNetworkSettings.AccessPointMode
+				networkSettings.Unlock()
 			}
-			err = writeJson(ah.GetNetworkSettings(), w)
-			if err != nil {
-				return 500, err
-			}
+
 		} else {
 			return 400, NetworkManagementDisabledError{}
 		}
+	}
+
+	if r.Method == "GET" || r.Method == "POST" {
+		networkSettings.RLock()
+		defer networkSettings.RUnlock()
+		err := writeJson(networkSettings, w)
+		if err != nil {
+			return 500, err
+		}
+		return 200, nil
 	}
 
 	return 501, nil

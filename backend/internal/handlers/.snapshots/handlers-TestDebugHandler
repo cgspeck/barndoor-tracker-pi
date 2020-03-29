@@ -6,11 +6,31 @@
     }
   },
   Body: (*bytes.Buffer)({
-  "alignStatus": null,
-  "flags": null,
+  "alignStatus": {
+    "azAligned": false,
+    "altAligned": false,
+    "currentAz": 0,
+    "currentAlt": 0
+  },
+  "flags": {
+    "needsAPSettings": false,
+    "needsLocationSettings": false,
+    "runningAsRoot": false
+  },
   "location": null,
   "time": "0001-01-01T00:00:00Z",
-  "networkSettings": null,
+  "networkSettings": {
+    "accessPointMode": true,
+    "aPSettings": {
+      "channel": 11,
+      "key": "",
+      "ssid": "barndoor-tracker"
+    },
+    "AvailableNetworks": null,
+    "managementEnabled": false,
+    "WirelessInterface": "wlan0",
+    "WirelessProfiles": []
+  },
   "os": "",
   "arch": ""
 }),

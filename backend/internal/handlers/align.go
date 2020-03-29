@@ -5,7 +5,11 @@ import (
 )
 
 func AlignHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, error) {
-	err := writeJson(ah.GetAlignStatus(), w)
+	alignStatus := ah.GetAlignStatus()
+	alignStatus.RLock()
+	defer alignStatus.RUnlock()
+
+	err := writeJson(alignStatus, w)
 	if err != nil {
 		return 500, err
 	}

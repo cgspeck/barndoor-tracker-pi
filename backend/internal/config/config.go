@@ -136,6 +136,18 @@ func loadConfig() *configSettings {
 }
 
 func SaveConfig(a *models.AppContext) error {
+	a.AlignStatus.RLock()
+	a.Flags.RLock()
+	a.NetworkSettings.APSettings.RLock()
+	a.NetworkSettings.RLock()
+	a.RLock()
+
+	defer a.RUnlock()
+	defer a.NetworkSettings.RUnlock()
+	defer a.NetworkSettings.APSettings.RUnlock()
+	defer a.AlignStatus.RUnlock()
+	defer a.Flags.RUnlock()
+
 	fh, err := os.Create(configFilename)
 	if err != nil {
 		log.Printf("Unable to create %v:%v", configFilename, err)

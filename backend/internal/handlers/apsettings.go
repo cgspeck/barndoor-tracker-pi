@@ -13,17 +13,13 @@ func (APManagementDisabledError) Error() string {
 }
 
 func APSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, error) {
-	if r.Method == "GET" {
-		err := writeJson(ah.GetAPSettings(), w)
-		if err != nil {
-			return 500, err
-		}
-
-		return 200, nil
-	}
-
 	if r.Method == "POST" {
-		if ah.GetNetworkSettings().ManagementEnabled {
+		networkSettings := ah.GetNetworkSettings()
+		networkSettings.RLock()
+		managementEnabled := networkSettings.ManagementEnabled
+		networkSettings.RUnlock()
+
+		if managementEnabled {
 			body, err := ioutil.ReadAll(r.Body)
 			if err != nil {
 				return 500, err
@@ -34,17 +30,30 @@ func APSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (
 			if err != nil {
 				return 500, err
 			}
+
+			apSettings := ah.GetAPSettings()
+			apSettings.Lock()
 			err = ah.SetAPSettings(input)
-			if err != nil {
-				return 500, err
-			}
-			err = writeJson(ah.GetAPSettings(), w)
+			apSettings.Unlock()
+
 			if err != nil {
 				return 500, err
 			}
 		} else {
 			return 400, APManagementDisabledError{}
 		}
+	}
+
+	if r.Method == "GET" || r.Method == "POST" {
+		apSettings := ah.GetAPSettings()
+		apSettings.RLock()
+		defer apSettings.RUnlock()
+		err := writeJson(apSettings, w)
+		if err != nil {
+			return 500, err
+		}
+
+		return 200, nil
 	}
 
 	return 501, nil

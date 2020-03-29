@@ -2,11 +2,13 @@ package models
 
 import (
 	"reflect"
+	"sync"
 	"time"
 )
 
 // global config flags for frontend
 type Flags struct {
+	sync.RWMutex
 	NeedsNetworkSettings  bool `json:"needsAPSettings"`
 	NeedsLocationSettings bool `json:"needsLocationSettings"`
 	RunningAsRoot         bool `json:"runningAsRoot"`
@@ -14,6 +16,7 @@ type Flags struct {
 
 // configuration
 type LocationSettings struct {
+	sync.RWMutex
 	Latitude          float64 `json:"latitude"`
 	MagDeclination    float64 `json:"magDeclination"`
 	AzError           float64 `json:"azError"`
@@ -30,6 +33,7 @@ func (l LocationSettings) Equals(o LocationSettings) bool {
 }
 
 type APSettings struct {
+	sync.RWMutex
 	Channel int    `json:"channel"`
 	Key     string `json:"key"`
 	SSID    string `json:"ssid"`
@@ -48,6 +52,7 @@ type AvailableNetwork struct {
 }
 
 type NetworkSettings struct {
+	sync.RWMutex
 	AccessPointMode   bool        `json:"accessPointMode"`
 	APSettings        *APSettings `json:"aPSettings"`
 	AvailableNetworks []*AvailableNetwork
@@ -58,6 +63,7 @@ type NetworkSettings struct {
 
 // statuses
 type AlignStatus struct {
+	sync.RWMutex
 	AzAligned  bool    `json:"azAligned"`
 	AltAligned bool    `json:"altAligned"`
 	CurrentAz  float64 `json:"currentAz"`
@@ -81,11 +87,11 @@ type AppContextProvider interface {
 	GetNetworkSettings() *NetworkSettings
 	SetAPMode(bool)
 	GetContext() *AppContext
-	// WriteConfig() error
 }
 
 // the app context!
 type AppContext struct {
+	sync.RWMutex
 	AlignStatus      *AlignStatus      `json:"alignStatus"`
 	Flags            *Flags            `json:"flags"`
 	LocationSettings *LocationSettings `json:"location"`
