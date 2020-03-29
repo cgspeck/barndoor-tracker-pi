@@ -13,7 +13,7 @@
   "xOffset": 7,
   "yOffset": 8,
   "zOffset": 9,
-  "ignoreAlignment": false
+  "IgnoreAz": false
 }),
   Flushed: (bool) false,
   result: (*http.Response)(<nil>),

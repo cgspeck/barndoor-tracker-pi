@@ -16,7 +16,7 @@ func TestIsLocationConfigChangedEmptyInput(t *testing.T) {
 		XOffset:         7,
 		YOffset:         8,
 		ZOffset:         9,
-		IgnoreAlignment: false,
+		IgnoreAz: false,
 	}
 	input := make(map[string]interface{}, 0)
 
@@ -37,7 +37,7 @@ func TestIsLocationConfigChangedIrrelevantKeys(t *testing.T) {
 		XOffset:         7,
 		YOffset:         8,
 		ZOffset:         9,
-		IgnoreAlignment: false,
+		IgnoreAz: false,
 	}
 	input := make(map[string]interface{}, 0)
 	input["foo"] = "bar"
@@ -59,7 +59,7 @@ func TestIsLocationConfigChangedSameValue(t *testing.T) {
 		XOffset:         7,
 		YOffset:         8,
 		ZOffset:         9,
-		IgnoreAlignment: false,
+		IgnoreAz: false,
 	}
 	input := make(map[string]interface{}, 0)
 	input["latitude"] = 3.4
@@ -83,7 +83,7 @@ func TestIsLocationConfigChangedValidDifferentValues(t *testing.T) {
 		XOffset:         7,
 		YOffset:         8,
 		ZOffset:         9,
-		IgnoreAlignment: false,
+		IgnoreAz: false,
 	}
 	input := make(map[string]interface{}, 0)
 	input["latitude"] = -37.814
@@ -107,7 +107,7 @@ func TestIsLocationConfigChangedInvalidDifferentValues(t *testing.T) {
 		XOffset:         7,
 		YOffset:         8,
 		ZOffset:         9,
-		IgnoreAlignment: false,
+		IgnoreAz: false,
 	}
 	input := make(map[string]interface{})
 	input["latitude"] = -91.0

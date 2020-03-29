@@ -74,7 +74,7 @@ func TestLocationSettingsHandlerPost(t *testing.T) {
 		XOffset:         7,
 		YOffset:         8,
 		ZOffset:         9,
-		IgnoreAlignment: false,
+		IgnoreAz: false,
 	}
 
 	rr := doLocationSettingsPost(body, &handler, http.StatusOK, t)

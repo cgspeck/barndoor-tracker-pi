@@ -11,7 +11,7 @@ func TestLocationSettingsEqual(t *testing.T) {
 		XOffset:         5,
 		YOffset:         6,
 		ZOffset:         7,
-		IgnoreAlignment: false,
+		IgnoreAz: false,
 	}
 
 	same := LocationSettings{
@@ -22,7 +22,7 @@ func TestLocationSettingsEqual(t *testing.T) {
 		XOffset:         5,
 		YOffset:         6,
 		ZOffset:         7,
-		IgnoreAlignment: false,
+		IgnoreAz: false,
 	}
 
 	if !sub.Equals(same) {
@@ -37,7 +37,7 @@ func TestLocationSettingsEqual(t *testing.T) {
 		XOffset:         5,
 		YOffset:         6,
 		ZOffset:         7,
-		IgnoreAlignment: false,
+		IgnoreAz: false,
 	}
 
 	if sub.Equals(different) {

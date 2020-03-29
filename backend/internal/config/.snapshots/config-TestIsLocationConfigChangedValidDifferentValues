@@ -17,6 +17,6 @@
   XOffset: (int) 7,
   YOffset: (int) 8,
   ZOffset: (int) 9,
-  IgnoreAlignment: (bool) false
+  IgnoreAz: (bool) false
 }
 (interface {}) <nil>
