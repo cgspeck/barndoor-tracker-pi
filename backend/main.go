@@ -63,19 +63,38 @@ func main() {
 	if context.Flags.RunningAsRoot {
 		port = 80
 	}
-	log.Printf("Start server on port %v", port)
-	go http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
+	log.Printf("Starting server on port %v", port)
 
-	for true {
-		currentTime := time.Now()
-		diff := currentTime.Sub(previousTime)
+	// set up periodic callbacks
+	ticker := time.NewTicker(500 * time.Millisecond)
+	done := make(chan bool)
 
-		if diff.Seconds() >= 10.00 {
-			previousTime = currentTime
-			context.Lock()
-			context.Time = &previousTime
-			context.Unlock()
-			log.Println(previousTime)
+	go func() {
+		for {
+			select {
+			case <-done:
+				return
+			case currentTime := <-ticker.C:
+				diff := currentTime.Sub(previousTime)
+
+				if diff.Seconds() >= 10.00 {
+					previousTime = currentTime
+					context.Lock()
+					context.Time = &previousTime
+					context.Unlock()
+					log.Println(previousTime)
+				}
+			}
 		}
+	}()
+
+	defer sendDone(done)
+
+	if err := http.ListenAndServe(fmt.Sprintf(":%v", port), nil); err != http.ErrServerClosed {
+		log.Fatalf("ListenAndServe(): %v", err)
 	}
+}
+
+func sendDone(ch chan<- bool) {
+	ch <- true
 }
