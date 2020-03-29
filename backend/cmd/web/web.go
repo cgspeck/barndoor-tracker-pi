@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/config"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/handlers"
+	"github.com/cgspeck/barndoor-tracker-pi/internal/lsm9ds1"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/wireless"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
@@ -68,6 +70,26 @@ func main() {
 	// set up periodic callbacks
 	ticker := time.NewTicker(500 * time.Millisecond)
 	done := make(chan bool)
+	bus := lsm9ds1.NewMutexI2cBus(1)
+	defer bus.Close()
+
+	l, err := lsm9ds1.New(&bus)
+	if err != nil {
+		fmt.Printf("Error instantiating driver: %v", err)
+		os.Exit(1)
+	}
+
+	if context.Arch == "arm" {
+		log.Println("Begin calibration")
+		l.Calibrate(true)
+		log.Println("End calibration")
+		log.Println("Begin Magneto calibration")
+		// the next two lines can be called repeatedly until calibration looks good
+		l.CalibrateMag()
+		log.Printf("Mag range: %v\n", l.MagRange())
+		l.LoadMagBias()
+		log.Println("End Magneto calibration")
+	}
 
 	go func() {
 		for {
