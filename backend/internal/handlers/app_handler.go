@@ -37,11 +37,6 @@ func (ah AppHandler) GetContext() *models.AppContext {
 	return ah.AppContext
 }
 
-func (ah AppHandler) writeConfig() error {
-	// TODO save configuration file
-	return nil
-}
-
 func (ah *AppHandler) SetAPMode(v bool) error {
 	ah.AppContext.NetworkSettings.AccessPointMode = v
 	ah.AppContext.Flags.NeedsNetworkSettings = false

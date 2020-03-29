@@ -53,8 +53,6 @@ func (ah testAppHandler) GetContext() *models.AppContext {
 	}
 }
 
-func (ah testAppHandler) WriteConfig() {}
-
 func (ah *testAppHandler) SetAPMode(v bool) error {
 	ah.SetAPModeCalls = append(ah.SetAPModeCalls, v)
 	return nil

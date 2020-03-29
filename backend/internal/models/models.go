@@ -87,7 +87,6 @@ type AppContextProvider interface {
 	GetNetworkSettings() *NetworkSettings
 	SetAPMode(bool)
 	GetContext() *AppContext
-	// WriteConfig() error
 }
 
 // the app context!
