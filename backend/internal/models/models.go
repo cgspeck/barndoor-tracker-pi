@@ -31,6 +31,7 @@ func (l LocationSettings) Equals(o LocationSettings) bool {
 }
 
 type APSettings struct {
+	sync.RWMutex
 	Channel int    `json:"channel"`
 	Key     string `json:"key"`
 	SSID    string `json:"ssid"`

@@ -1,5 +1,15 @@
 (bool) false
 (models.APSettings) {
+  RWMutex: (sync.RWMutex) {
+    w: (sync.Mutex) {
+      state: (int32) 0,
+      sema: (uint32) 0
+    },
+    writerSem: (uint32) 0,
+    readerSem: (uint32) 0,
+    readerCount: (int32) 0,
+    readerWait: (int32) 0
+  },
   Channel: (int) 11,
   Key: (string) "",
   SSID: (string) (len=16) "barndoor_tracker"

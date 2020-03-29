@@ -1,5 +1,15 @@
 (bool) true
 (models.APSettings) {
+  RWMutex: (sync.RWMutex) {
+    w: (sync.Mutex) {
+      state: (int32) 0,
+      sema: (uint32) 0
+    },
+    writerSem: (uint32) 0,
+    readerSem: (uint32) 0,
+    readerCount: (int32) 0,
+    readerWait: (int32) 0
+  },
   Channel: (int) 2,
   Key: (string) (len=8) "somekey1",
   SSID: (string) (len=8) "someSSID"

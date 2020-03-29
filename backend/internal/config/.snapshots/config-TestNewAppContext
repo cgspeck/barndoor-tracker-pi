@@ -34,6 +34,16 @@
     },
     AccessPointMode: (bool) true,
     APSettings: (*models.APSettings)({
+      RWMutex: (sync.RWMutex) {
+        w: (sync.Mutex) {
+          state: (int32) 0,
+          sema: (uint32) 0
+        },
+        writerSem: (uint32) 0,
+        readerSem: (uint32) 0,
+        readerCount: (int32) 0,
+        readerWait: (int32) 0
+      },
       Channel: (int) 11,
       Key: (string) (len=8) "some key",
       SSID: (string) (len=18) "my amazing hotspot"
