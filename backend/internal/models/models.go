@@ -17,18 +17,17 @@ type Flags struct {
 // configuration
 type LocationSettings struct {
 	sync.RWMutex
-	Latitude          float64 `json:"latitude"`
-	MagDeclination    float64 `json:"magDeclination"`
-	AzError           float64 `json:"azError"`
-	AltError          float64 `json:"altError"`
-	XOffset           int     `json:"xOffset"`
-	YOffset           int     `json:"yOffset"`
-	ZOffset           int     `json:"zOffset"`
-	ManagementEnabled bool    `json:"managementEnabled"`
+	Latitude        float64 `json:"latitude"`
+	MagDeclination  float64 `json:"magDeclination"`
+	AzError         float64 `json:"azError"`
+	AltError        float64 `json:"altError"`
+	XOffset         int     `json:"xOffset"`
+	YOffset         int     `json:"yOffset"`
+	ZOffset         int     `json:"zOffset"`
+	IgnoreAlignment bool    `json:"ignoreAlignment"`
 }
 
 func (l LocationSettings) Equals(o LocationSettings) bool {
-	o.ManagementEnabled = l.ManagementEnabled
 	return reflect.DeepEqual(l, o)
 }
 

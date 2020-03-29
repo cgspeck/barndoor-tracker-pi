@@ -9,14 +9,14 @@ import (
 
 func TestIsLocationConfigChangedEmptyInput(t *testing.T) {
 	current := models.LocationSettings{
-		AltError:          1,
-		AzError:           2,
-		Latitude:          3.4,
-		MagDeclination:    -5.6,
-		XOffset:           7,
-		YOffset:           8,
-		ZOffset:           9,
-		ManagementEnabled: true,
+		AltError:        1,
+		AzError:         2,
+		Latitude:        3.4,
+		MagDeclination:  -5.6,
+		XOffset:         7,
+		YOffset:         8,
+		ZOffset:         9,
+		IgnoreAlignment: false,
 	}
 	input := make(map[string]interface{}, 0)
 
@@ -30,14 +30,14 @@ func TestIsLocationConfigChangedEmptyInput(t *testing.T) {
 
 func TestIsLocationConfigChangedIrrelevantKeys(t *testing.T) {
 	current := models.LocationSettings{
-		AltError:          1,
-		AzError:           2,
-		Latitude:          3.4,
-		MagDeclination:    -5.6,
-		XOffset:           7,
-		YOffset:           8,
-		ZOffset:           9,
-		ManagementEnabled: true,
+		AltError:        1,
+		AzError:         2,
+		Latitude:        3.4,
+		MagDeclination:  -5.6,
+		XOffset:         7,
+		YOffset:         8,
+		ZOffset:         9,
+		IgnoreAlignment: false,
 	}
 	input := make(map[string]interface{}, 0)
 	input["foo"] = "bar"
@@ -52,14 +52,14 @@ func TestIsLocationConfigChangedIrrelevantKeys(t *testing.T) {
 
 func TestIsLocationConfigChangedSameValue(t *testing.T) {
 	current := models.LocationSettings{
-		AltError:          1,
-		AzError:           2,
-		Latitude:          3.4,
-		MagDeclination:    -5.6,
-		XOffset:           7,
-		YOffset:           8,
-		ZOffset:           9,
-		ManagementEnabled: true,
+		AltError:        1,
+		AzError:         2,
+		Latitude:        3.4,
+		MagDeclination:  -5.6,
+		XOffset:         7,
+		YOffset:         8,
+		ZOffset:         9,
+		IgnoreAlignment: false,
 	}
 	input := make(map[string]interface{}, 0)
 	input["latitude"] = 3.4
@@ -76,14 +76,14 @@ func TestIsLocationConfigChangedSameValue(t *testing.T) {
 
 func TestIsLocationConfigChangedValidDifferentValues(t *testing.T) {
 	current := models.LocationSettings{
-		AltError:          1,
-		AzError:           2,
-		Latitude:          3.4,
-		MagDeclination:    -5.6,
-		XOffset:           7,
-		YOffset:           8,
-		ZOffset:           9,
-		ManagementEnabled: true,
+		AltError:        1,
+		AzError:         2,
+		Latitude:        3.4,
+		MagDeclination:  -5.6,
+		XOffset:         7,
+		YOffset:         8,
+		ZOffset:         9,
+		IgnoreAlignment: false,
 	}
 	input := make(map[string]interface{}, 0)
 	input["latitude"] = -37.814
@@ -100,14 +100,14 @@ func TestIsLocationConfigChangedValidDifferentValues(t *testing.T) {
 
 func TestIsLocationConfigChangedInvalidDifferentValues(t *testing.T) {
 	current := models.LocationSettings{
-		AltError:          1,
-		AzError:           2,
-		Latitude:          3.4,
-		MagDeclination:    -5.6,
-		XOffset:           7,
-		YOffset:           8,
-		ZOffset:           9,
-		ManagementEnabled: true,
+		AltError:        1,
+		AzError:         2,
+		Latitude:        3.4,
+		MagDeclination:  -5.6,
+		XOffset:         7,
+		YOffset:         8,
+		ZOffset:         9,
+		IgnoreAlignment: false,
 	}
 	input := make(map[string]interface{})
 	input["latitude"] = -91.0

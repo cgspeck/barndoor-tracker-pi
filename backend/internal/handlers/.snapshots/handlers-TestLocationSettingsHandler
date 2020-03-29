@@ -13,7 +13,7 @@
   "xOffset": 7,
   "yOffset": 8,
   "zOffset": 9,
-  "managementEnabled": false
+  "ignoreAlignment": false
 }),
   Flushed: (bool) false,
   result: (*http.Response)(<nil>),

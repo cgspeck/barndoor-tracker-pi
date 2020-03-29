@@ -317,6 +317,6 @@ func NewAppContext(
 		OS:               goOS,
 		Arch:             goArch,
 	}
-	res.LocationSettings.ManagementEnabled = true
+	res.LocationSettings.IgnoreAlignment = false
 	return res, nil
 }

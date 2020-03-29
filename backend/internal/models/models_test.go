@@ -4,25 +4,25 @@ import "testing"
 
 func TestLocationSettingsEqual(t *testing.T) {
 	sub := LocationSettings{
-		AltError:          1,
-		AzError:           2,
-		Latitude:          3,
-		MagDeclination:    4,
-		XOffset:           5,
-		YOffset:           6,
-		ZOffset:           7,
-		ManagementEnabled: true,
+		AltError:        1,
+		AzError:         2,
+		Latitude:        3,
+		MagDeclination:  4,
+		XOffset:         5,
+		YOffset:         6,
+		ZOffset:         7,
+		IgnoreAlignment: false,
 	}
 
 	same := LocationSettings{
-		AltError:          1,
-		AzError:           2,
-		Latitude:          3,
-		MagDeclination:    4,
-		XOffset:           5,
-		YOffset:           6,
-		ZOffset:           7,
-		ManagementEnabled: false,
+		AltError:        1,
+		AzError:         2,
+		Latitude:        3,
+		MagDeclination:  4,
+		XOffset:         5,
+		YOffset:         6,
+		ZOffset:         7,
+		IgnoreAlignment: false,
 	}
 
 	if !sub.Equals(same) {
@@ -30,14 +30,14 @@ func TestLocationSettingsEqual(t *testing.T) {
 	}
 
 	different := LocationSettings{
-		AltError:          2,
-		AzError:           2,
-		Latitude:          3,
-		MagDeclination:    4,
-		XOffset:           5,
-		YOffset:           6,
-		ZOffset:           7,
-		ManagementEnabled: true,
+		AltError:        2,
+		AzError:         2,
+		Latitude:        3,
+		MagDeclination:  4,
+		XOffset:         5,
+		YOffset:         6,
+		ZOffset:         7,
+		IgnoreAlignment: false,
 	}
 
 	if sub.Equals(different) {

@@ -67,14 +67,14 @@ func TestLocationSettingsHandlerPost(t *testing.T) {
 	handler := newTestAppHandler()
 	handler.H = LocationSettingsHandler
 	handler.LocationSettings = &models.LocationSettings{
-		AltError:          1,
-		AzError:           2,
-		Latitude:          3.4,
-		MagDeclination:    -5.6,
-		XOffset:           7,
-		YOffset:           8,
-		ZOffset:           9,
-		ManagementEnabled: true,
+		AltError:        1,
+		AzError:         2,
+		Latitude:        3.4,
+		MagDeclination:  -5.6,
+		XOffset:         7,
+		YOffset:         8,
+		ZOffset:         9,
+		IgnoreAlignment: false,
 	}
 
 	rr := doLocationSettingsPost(body, &handler, http.StatusOK, t)
@@ -87,37 +87,5 @@ func TestLocationSettingsHandlerPost(t *testing.T) {
 	err := cupaloy.Snapshot(rr, handler.SetLocationSettingsCalls[0])
 	if err != nil {
 		t.Error(err)
-	}
-}
-
-func TestLocationSettingsHandlerPostManagementDisabled(t *testing.T) {
-	body := `{
-	"latitude": -37.4
-}
-`
-
-	handler := newTestAppHandler()
-	handler.H = LocationSettingsHandler
-	handler.LocationSettings = &models.LocationSettings{
-		AltError:          1,
-		AzError:           2,
-		Latitude:          3.4,
-		MagDeclination:    -5.6,
-		XOffset:           7,
-		YOffset:           8,
-		ZOffset:           9,
-		ManagementEnabled: false,
-	}
-
-	rr := doLocationSettingsPost(body, &handler, http.StatusBadRequest, t)
-
-	// Check the response body is what we expect.
-	err := cupaloy.Snapshot(rr)
-	if err != nil {
-		t.Error(err)
-	}
-
-	if len(handler.SetLocationSettingsCalls) != 0 {
-		t.Errorf("Expected no calls to SetLocationSetting")
 	}
 }
