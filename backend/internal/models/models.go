@@ -63,6 +63,7 @@ type NetworkSettings struct {
 
 // statuses
 type AlignStatus struct {
+	sync.RWMutex
 	AzAligned  bool    `json:"azAligned"`
 	AltAligned bool    `json:"altAligned"`
 	CurrentAz  float64 `json:"currentAz"`
