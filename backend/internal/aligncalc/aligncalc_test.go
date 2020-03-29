@@ -6,7 +6,7 @@ import (
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 )
 
-func TestAlignCalc(t *testing.T) {
+func TestAlignCalcIgnoreModes(t *testing.T) {
 
 	type TestCase struct {
 		ignoreAz           bool
@@ -56,6 +56,41 @@ func TestAlignCalc(t *testing.T) {
 		if a != e {
 			t.Errorf("unexpected status: got: %v, want: %v", a, e)
 		}
+	}
+}
 
+func TestAlignCalcAltitude(t *testing.T) {
+	type TestCase struct {
+		ignoreAlt          bool
+		altErrorSetting    float64
+		latitudeSetting    float64
+		calcLatitude       float64
+		expectedAltAligned bool
+	}
+
+	testCases := []TestCase{
+		TestCase{
+			ignoreAlt:          true,
+			expectedAltAligned: true,
+		},
+		TestCase{
+			ignoreAlt:          false,
+			expectedAltAligned: false,
+		},
+	}
+
+	for _, tt := range testCases {
+		align := models.AlignStatus{}
+		locationSettings := models.LocationSettings{
+			IgnoreAlt: tt.ignoreAlt,
+		}
+
+		CalculateAlignment(&align, &locationSettings)
+
+		e := tt.expectedAltAligned
+		a := align.AltAligned
+		if a != e {
+			t.Errorf("unexpected status: got: %v, want: %v", a, e)
+		}
 	}
 }
