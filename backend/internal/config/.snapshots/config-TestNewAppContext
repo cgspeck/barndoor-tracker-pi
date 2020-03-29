@@ -22,6 +22,16 @@
   }),
   Time: (*time.Time)(0001-01-01 00:00:00 +0000 UTC),
   NetworkSettings: (*models.NetworkSettings)({
+    RWMutex: (sync.RWMutex) {
+      w: (sync.Mutex) {
+        state: (int32) 0,
+        sema: (uint32) 0
+      },
+      writerSem: (uint32) 0,
+      readerSem: (uint32) 0,
+      readerCount: (int32) 0,
+      readerWait: (int32) 0
+    },
     AccessPointMode: (bool) true,
     APSettings: (*models.APSettings)({
       Channel: (int) 11,

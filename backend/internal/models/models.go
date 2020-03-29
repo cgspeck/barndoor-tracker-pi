@@ -2,6 +2,7 @@ package models
 
 import (
 	"reflect"
+	"sync"
 	"time"
 )
 
@@ -48,6 +49,7 @@ type AvailableNetwork struct {
 }
 
 type NetworkSettings struct {
+	sync.RWMutex
 	AccessPointMode   bool        `json:"accessPointMode"`
 	APSettings        *APSettings `json:"aPSettings"`
 	AvailableNetworks []*AvailableNetwork

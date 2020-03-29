@@ -6,7 +6,7 @@
     }
   },
   Body: (*bytes.Buffer)({
-  "accessPointMode": false,
+  "accessPointMode": true,
   "aPSettings": null,
   "AvailableNetworks": null,
   "managementEnabled": true,

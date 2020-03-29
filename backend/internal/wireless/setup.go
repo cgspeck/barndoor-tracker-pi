@@ -44,6 +44,9 @@ func fallbackApCheck(interfaceName string, networkSettings *models.NetworkSettin
 }
 
 func ApplyDesiredConfiguration(networkSettings *models.NetworkSettings) error {
+	networkSettings.Lock()
+	defer networkSettings.Unlock()
+
 	if networkSettings.ManagementEnabled {
 		interfaceName := networkSettings.WirelessInterface
 		if networkSettings.AccessPointMode {
