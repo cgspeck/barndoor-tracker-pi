@@ -89,6 +89,10 @@ func main() {
 		log.Printf("Mag range: %v\n", l.MagRange())
 		l.LoadMagBias()
 		log.Println("End Magneto calibration")
+	} else {
+		log.Println("Will ignore alignment")
+		context.LocationSettings.IgnoreAz = true
+		context.LocationSettings.IgnoreAlt = true
 	}
 
 	go func() {
@@ -98,6 +102,10 @@ func main() {
 				return
 			case currentTime := <-ticker.C:
 				diff := currentTime.Sub(previousTime)
+
+				// if diff.Milliseconds >= 200 {
+
+				// }
 
 				if diff.Seconds() >= 10.00 {
 					previousTime = currentTime

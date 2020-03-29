@@ -6,14 +6,21 @@ import "github.com/cgspeck/barndoor-tracker-pi/internal/models"
 func CalculateAlignment(a *models.AlignStatus, l *models.LocationSettings) {
 	l.RLock()
 	IgnoreAz := l.IgnoreAz
+	IgnoreAlt := l.IgnoreAlt
 	l.RUnlock()
 
 	a.Lock()
 	defer a.Unlock()
 
 	if IgnoreAz {
-		a.AltAligned = true
 		a.AzAligned = true
+	}
+
+	if IgnoreAlt {
+		a.AltAligned = true
+	}
+
+	if IgnoreAlt && IgnoreAz {
 		return
 	}
 }
