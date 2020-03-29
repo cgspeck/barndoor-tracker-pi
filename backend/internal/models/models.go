@@ -8,6 +8,7 @@ import (
 
 // global config flags for frontend
 type Flags struct {
+	sync.RWMutex
 	NeedsNetworkSettings  bool `json:"needsAPSettings"`
 	NeedsLocationSettings bool `json:"needsLocationSettings"`
 	RunningAsRoot         bool `json:"runningAsRoot"`

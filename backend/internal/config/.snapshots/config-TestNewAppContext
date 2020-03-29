@@ -6,11 +6,31 @@
     CurrentAlt: (float64) -37.4
   }),
   Flags: (*models.Flags)({
+    RWMutex: (sync.RWMutex) {
+      w: (sync.Mutex) {
+        state: (int32) 0,
+        sema: (uint32) 0
+      },
+      writerSem: (uint32) 0,
+      readerSem: (uint32) 0,
+      readerCount: (int32) 0,
+      readerWait: (int32) 0
+    },
     NeedsNetworkSettings: (bool) false,
     NeedsLocationSettings: (bool) true,
     RunningAsRoot: (bool) false
   }),
   LocationSettings: (*models.LocationSettings)({
+    RWMutex: (sync.RWMutex) {
+      w: (sync.Mutex) {
+        state: (int32) 0,
+        sema: (uint32) 0
+      },
+      writerSem: (uint32) 0,
+      readerSem: (uint32) 0,
+      readerCount: (int32) 0,
+      readerWait: (int32) 0
+    },
     Latitude: (float64) 3.4,
     MagDeclination: (float64) -5.6,
     AzError: (float64) 2,
