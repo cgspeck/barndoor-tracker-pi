@@ -5,7 +5,6 @@ import (
 )
 
 func DebugHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, error) {
-
 	context := ah.GetContext()
 	context.AlignStatus.RLock()
 	context.Flags.RLock()
