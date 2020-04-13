@@ -2,14 +2,6 @@ package lsm9ds1
 
 import "sync"
 
-type Reading interface {
-	SetReading(x, y, z int16)
-	FromList([]int16)
-
-	GetReading() (x, y, z int16)
-	ToList() []int16
-}
-
 type MutexReading struct {
 	mu      sync.Mutex
 	x, y, z int16
