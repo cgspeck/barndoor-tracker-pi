@@ -736,3 +736,19 @@ func (l *LSM9DS1) mWriteWordToReg(regAddress byte, data uint16) error {
 func (l *LSM9DS1) agWriteWordToReg(regAddress byte, data uint16) error {
 	return l.i2c.WriteWordToReg(l.agAddress, regAddress, data)
 }
+
+func (l *LSM9DS1) GetAccel() ([]float32, error) {
+	if l.AccelAvailable() {
+		err := l.ReadAccel()
+		if err != nil {
+			return nil, err
+		}
+	}
+	accInts := l.A.ToList()
+
+	return []float32{
+		l.CalcAccel(accInts[0]),
+		l.CalcAccel(accInts[1]),
+		l.CalcAccel(accInts[2]),
+	}, nil
+}

@@ -16,7 +16,6 @@ type I2CBus interface {
 }
 
 type ILSM9DS1 interface {
-	New(I2CBus)
 	Calibrate(bool)
 	CalibrateMag()
 	LoadMagBias() error
@@ -26,6 +25,7 @@ type ILSM9DS1 interface {
 	MagAvailable(axis Axis) bool
 	ReadGyro() error
 	ReadAccel() error
+	GetAccel() ([]float32, error)
 	ReadMag() error
 	CalcGyro(gyro int16) float32
 	CalcAccel(accel int16) float32
