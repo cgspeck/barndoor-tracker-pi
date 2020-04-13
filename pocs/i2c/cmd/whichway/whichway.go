@@ -74,6 +74,10 @@ func main() {
 }
 
 func printAttitude(ax int16, ay int16, az int16, mx int16, my int16, mz int16, declination float64) {
+	fmt.Printf(
+		"printAttitude called with: ax: %v ay: %v az: %v mx: %v my: %v mz: %v \n",
+		ax, ay, az, mx, my, mz,
+	)
 	fax := float64(ax)
 	fay := float64(ay)
 	faz := float64(az)

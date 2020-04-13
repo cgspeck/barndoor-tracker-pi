@@ -7,7 +7,7 @@ import (
 )
 
 // CalculateAlignment returns true or false to indicate if the unit is polar aligned
-func CalculateAlignment(a *models.AlignStatus, l *models.LocationSettings, accelVal []float32) {
+func CalculateAlignment(a *models.AlignStatus, l *models.LocationSettings, accelVal []float32, magVal []float32) {
 	l.RLock()
 	IgnoreAz := l.IgnoreAz
 	IgnoreAlt := l.IgnoreAlt
