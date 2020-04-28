@@ -81,18 +81,23 @@ func printAttitude(ax int16, ay int16, az int16, mx int16, my int16, mz int16, d
 	fax := float64(ax)
 	fay := float64(ay)
 	faz := float64(az)
-
-	roll := math.Atan2(fay, faz)
+	fmt.Printf(
+		"floatVals: x: %v y: %v z: %v\n",
+		fax, fay, faz,
+	)
+	// roll := math.Atan2(fay, faz)
 	pitch := math.Atan2(-fax, math.Sqrt(fay*fay+faz*faz))
+	fmt.Printf("\n\nPitch (radians): %v\n\n", pitch)
 
-	heading := math.Atan2(float64(my), float64(mx)) / math.Pi * 180
-	if heading < 0 {
-		heading += 360
-	}
+	// heading := math.Atan2(float64(my), float64(mx)) / math.Pi * 180
+	// if heading < 0 {
+	// 	heading += 360
+	// }
 
 	// Convert everything from radians to degrees:
 	pitch *= 180.0 / math.Pi
-	roll *= 180.0 / math.Pi
+	// roll *= 180.0 / math.Pi
 
-	fmt.Printf("\n\nPitch, Roll: %v, %v				Heading: %v\n\n", pitch, roll, heading)
+	// fmt.Printf("\n\nPitch, Roll: %v, %v				Heading: %v\n\n", pitch, roll, heading)
+	fmt.Printf("\n\nPitch (defrees): %v\n\n", pitch)
 }
