@@ -1,6 +1,7 @@
 package aligncalc
 
 import (
+	"fmt"
 	"math"
 	"testing"
 
@@ -135,55 +136,78 @@ func TestAlignCalcAltitude(t *testing.T) {
 	}
 }
 
-// func TestAlignCalcAzimuth(t *testing.T) {
-// 	nilReading := []int16{0, 0, 0}
+func TestAlignCalcAzimuthSouthernHemisphere(t *testing.T) {
+	nilReading := []int16{0, 0, 0}
 
-// 	type TestCase struct {
-// 		azErrorSetting      float64
-// 		declinationSetting  float64
-// 		expectedAzAligned   bool
-// 		expectedCalcHeading float64
-// 		ignoreAz            bool
-// 		latitudeSetting     float64
-// 		magVal              []int16
-// 	}
+	locationSettings := models.LocationSettings{
+		AzError:        0.1,
+		IgnoreAz:       false,
+		Latitude:       -44.35,
+		MagDeclination: 0,
+	}
 
-// 	testCases := []TestCase{
-// 		TestCase{
-// 			ignoreAz:          true,
-// 			expectedAzAligned: true,
-// 		},
-// 		TestCase{
-// 			azErrorSetting:      0.1,
-// 			declinationSetting:  0.0,
-// 			expectedAzAligned:   true,
-// 			expectedCalcHeading: 10,
-// 			ignoreAz:            false,
-// 			latitudeSetting:     -37,
-// 			magVal:              []int16{},
-// 		},
-// 	}
+	type TestCase struct {
+		desc                string
+		expectedAzAligned   bool
+		expectedCalcHeading float64
+		magVal              []int16
+	}
 
-// 	for _, tt := range testCases {
-// 		align := models.AlignStatus{}
-// 		locationSettings := models.LocationSettings{
-// 			AzError:  tt.azErrorSetting,
-// 			IgnoreAz: tt.ignoreAz,
-// 			Latitude: tt.latitudeSetting,
-// 		}
+	testCases := []TestCase{
+		TestCase{
+			desc:                "on target",
+			expectedAzAligned:   true,
+			expectedCalcHeading: 180,
+			magVal:              []int16{},
+		},
+	}
 
-// 		CalculateAlignment(&align, &locationSettings, nilReading, tt.magVal)
+	for _, tt := range testCases {
+		align := models.AlignStatus{}
+		CalculateAlignment(&align, &locationSettings, nilReading, tt.magVal)
 
-// 		eStatus := tt.expectedAzAligned
-// 		aStatus := align.AzAligned
-// 		if aStatus != eStatus {
-// 			t.Errorf("unexpected status: got: %v, want: %v", aStatus, eStatus)
-// 		}
+		eStatus := tt.expectedAzAligned
+		aStatus := align.AzAligned
+		if aStatus != eStatus {
+			t.Errorf("unexpected status: got: %v, want: %v, case: %q", aStatus, eStatus, tt.desc)
+		}
 
-// 		eVal := tt.expectedCalcHeading
-// 		aVal := align.CurrentAz
-// 		if aVal != eVal {
-// 			t.Errorf("unexpected calculation: got: %v, want: %v", aVal, eVal)
-// 		}
-// 	}
-// }
+		eVal := tt.expectedCalcHeading
+		aVal := align.CurrentAz
+		if aVal != eVal {
+			t.Errorf("unexpected calculation: got: %v, want: %v, case: %q", aVal, eVal, tt.desc)
+		}
+	}
+}
+
+func TestAlignCalcAzimuthNorthernHemisphere(t *testing.T) {}
+
+func TestAlignCalcAzimuthWithDeclination(t *testing.T) {}
+
+func TestCalculateHeading(t *testing.T) {
+	var minX int16 = -100
+	var maxX int16 = 100
+	var minY int16 = -100
+	var maxY int16 = 100
+
+	fmt.Printf("res,mx,my\n")
+	for mx := minX; mx <= maxX; mx++ {
+		for my := minY; my <= maxY; my++ {
+			res := calculateHeading([]int16{mx, my, 0}, 0)
+
+			printRes := false
+
+			if res >= 178 && res <= 182 {
+				printRes = true
+			}
+
+			if res >= 358 && res <= 360 || res <= 2 && res >= 0 {
+				printRes = true
+			}
+
+			if printRes {
+				fmt.Printf("%v, %v, %v\n", res, mx, my)
+			}
+		}
+	}
+}
