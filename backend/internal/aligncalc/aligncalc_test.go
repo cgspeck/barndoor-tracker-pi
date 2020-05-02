@@ -216,6 +216,18 @@ func TestCalculateHeading(t *testing.T) {
 			declination: 10,
 			expected:    190,
 		},
+		{
+			mx:          -60,
+			my:          0,
+			declination: -10,
+			expected:    170,
+		},
+		{
+			mx:          60,
+			my:          0,
+			declination: -10,
+			expected:    350,
+		},
 	}
 
 	for _, tt := range testCases {

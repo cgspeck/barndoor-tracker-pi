@@ -35,8 +35,6 @@ func calculateHeading(magVal []int16, declination float64) float64 {
 		heading = math.Atan2(my, mx)
 	}
 
-	heading -= declination * math.Pi / 180
-
 	if heading > math.Pi {
 		heading -= (2 * math.Pi)
 	} else if heading < -math.Pi {
@@ -44,6 +42,11 @@ func calculateHeading(magVal []int16, declination float64) float64 {
 	}
 
 	heading *= 180.0 / math.Pi
+	heading += declination
+
+	if heading < 0 {
+		heading += 360
+	}
 
 	return heading
 }
