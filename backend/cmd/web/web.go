@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/cgspeck/barndoor-tracker-pi/internal/aligncalc"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/config"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/handlers"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/lsm9ds1"
@@ -103,9 +104,24 @@ func main() {
 			case currentTime := <-ticker.C:
 				diff := currentTime.Sub(previousTime)
 
-				// if diff.Milliseconds >= 200 {
-
-				// }
+				if diff.Milliseconds() >= 200.0 {
+					if l.AccelAvailable() || l.MagAvailable(lsm9ds1.ALL_AXIS) {
+						l.ReadAccel()
+						l.ReadMag()
+						mx, my, mz := l.M.GetReading()
+						magVal := []int16{mx, my, mz}
+						ax, ay, az := l.A.GetReading()
+						accelVal := []int16{ax, ay, az}
+						context.Lock()
+						aligncalc.CalculateAlignment(
+							context.AlignStatus,
+							context.LocationSettings,
+							accelVal,
+							magVal,
+						)
+						context.Unlock()
+					}
+				}
 
 				if diff.Seconds() >= 10.00 {
 					previousTime = currentTime
