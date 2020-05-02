@@ -1,7 +1,6 @@
 package aligncalc
 
 import (
-	"fmt"
 	"math"
 	"testing"
 
@@ -185,29 +184,46 @@ func TestAlignCalcAzimuthNorthernHemisphere(t *testing.T) {}
 func TestAlignCalcAzimuthWithDeclination(t *testing.T) {}
 
 func TestCalculateHeading(t *testing.T) {
-	var minX int16 = -100
-	var maxX int16 = 100
-	var minY int16 = -100
-	var maxY int16 = 100
+	testCases := []struct {
+		mx          int16
+		my          int16
+		declination float64
+		expected    float64
+	}{
+		{
+			mx:       60,
+			my:       0,
+			expected: 0,
+		},
+		{
+			mx:       47,
+			my:       1,
+			expected: 1.2188752351312977,
+		},
+		{
+			mx:       -65,
+			my:       1,
+			expected: 179.11859600341788,
+		},
+		{
+			mx:       -60,
+			my:       0,
+			expected: 180,
+		},
+		{
+			mx:          -60,
+			my:          0,
+			declination: 10,
+			expected:    190,
+		},
+	}
 
-	fmt.Printf("res,mx,my\n")
-	for mx := minX; mx <= maxX; mx++ {
-		for my := minY; my <= maxY; my++ {
-			res := calculateHeading([]int16{mx, my, 0}, 0)
-
-			printRes := false
-
-			if res >= 178 && res <= 182 {
-				printRes = true
-			}
-
-			if res >= 358 && res <= 360 || res <= 2 && res >= 0 {
-				printRes = true
-			}
-
-			if printRes {
-				fmt.Printf("%v, %v, %v\n", res, mx, my)
-			}
+	for _, tt := range testCases {
+		a := calculateHeading([]int16{tt.mx, tt.my, 0}, tt.declination)
+		if !floatEquals(tt.expected, a) {
+			t.Errorf("unexpected result: got: %v want: %v x: %v y: %v",
+				a, tt.expected, tt.mx, tt.my,
+			)
 		}
 	}
 }
