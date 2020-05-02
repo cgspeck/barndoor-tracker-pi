@@ -50,12 +50,12 @@ func (l *LSM9DS1) checkWhoAmI() error {
 	}
 
 	if mTest != WHO_AM_I_M_RSP {
-		log.Println("Magnetometer whoam failed!")
+		log.Println("Magnetometer whoami failed!")
 		return MagnetoWhoamiFailed{}
 	}
 
 	if agTest != WHO_AM_I_AG_RSP {
-		log.Println("Accel/Gyro whoam failed!")
+		log.Println("Accel/Gyro whoami failed!")
 		return AGWhoamiFailed{}
 	}
 	log.Println("whoami check pass")
@@ -735,4 +735,20 @@ func (l *LSM9DS1) mWriteWordToReg(regAddress byte, data uint16) error {
 
 func (l *LSM9DS1) agWriteWordToReg(regAddress byte, data uint16) error {
 	return l.i2c.WriteWordToReg(l.agAddress, regAddress, data)
+}
+
+func (l *LSM9DS1) GetAccel() ([]float32, error) {
+	if l.AccelAvailable() {
+		err := l.ReadAccel()
+		if err != nil {
+			return nil, err
+		}
+	}
+	accInts := l.A.ToList()
+
+	return []float32{
+		l.CalcAccel(accInts[0]),
+		l.CalcAccel(accInts[1]),
+		l.CalcAccel(accInts[2]),
+	}, nil
 }

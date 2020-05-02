@@ -15,30 +15,23 @@ func (LocationManagementDisabledError) Error() string {
 func LocationSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, error) {
 	if r.Method == "POST" {
 		locationSettings := ah.GetLocationSettings()
-		locationSettings.RLock()
-		managementEnabled := locationSettings.ManagementEnabled
-		locationSettings.RUnlock()
 
-		if managementEnabled {
-			body, err := ioutil.ReadAll(r.Body)
-			if err != nil {
-				return 500, err
-			}
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			return 500, err
+		}
 
-			input := make(map[string]interface{})
-			err = json.Unmarshal(body, &input)
-			if err != nil {
-				return 500, err
-			}
+		input := make(map[string]interface{})
+		err = json.Unmarshal(body, &input)
+		if err != nil {
+			return 500, err
+		}
 
-			locationSettings.Lock()
-			err = ah.SetLocationSettings(input)
-			locationSettings.Unlock()
-			if err != nil {
-				return 500, err
-			}
-		} else {
-			return 400, LocationManagementDisabledError{}
+		locationSettings.Lock()
+		err = ah.SetLocationSettings(input)
+		locationSettings.Unlock()
+		if err != nil {
+			return 500, err
 		}
 	}
 

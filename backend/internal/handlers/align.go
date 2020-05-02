@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+// AlignHandler call for frontend to know if we are polar aligned
 func AlignHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, error) {
 	alignStatus := ah.GetAlignStatus()
 	alignStatus.RLock()
