@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/kidoman/embd"
+	_ "github.com/kidoman/embd/host/rpi"
 )
 
 type MutexI2cBus struct {
