@@ -157,7 +157,13 @@ func TestAlignCalcAzimuthSouthernHemisphere(t *testing.T) {
 			desc:                "on target",
 			expectedAzAligned:   true,
 			expectedCalcHeading: 180,
-			magVal:              []int16{},
+			magVal:              []int16{-60, 0, 0},
+		},
+		TestCase{
+			desc:                "off target",
+			expectedAzAligned:   false,
+			expectedCalcHeading: 0,
+			magVal:              []int16{60, 0, 0},
 		},
 	}
 
@@ -179,9 +185,55 @@ func TestAlignCalcAzimuthSouthernHemisphere(t *testing.T) {
 	}
 }
 
-func TestAlignCalcAzimuthNorthernHemisphere(t *testing.T) {}
+func TestAlignCalcAzimuthNorthernHemisphere(t *testing.T) {
+	nilReading := []int16{0, 0, 0}
 
-func TestAlignCalcAzimuthWithDeclination(t *testing.T) {}
+	locationSettings := models.LocationSettings{
+		AzError:        0.1,
+		IgnoreAz:       false,
+		Latitude:       44.35,
+		MagDeclination: 0,
+	}
+
+	type TestCase struct {
+		desc                string
+		expectedAzAligned   bool
+		expectedCalcHeading float64
+		magVal              []int16
+	}
+
+	testCases := []TestCase{
+		TestCase{
+			desc:                "on target",
+			expectedAzAligned:   true,
+			expectedCalcHeading: 0,
+			magVal:              []int16{60, 0, 0},
+		},
+		TestCase{
+			desc:                "off target",
+			expectedAzAligned:   false,
+			expectedCalcHeading: 180,
+			magVal:              []int16{-60, 0, 0},
+		},
+	}
+
+	for _, tt := range testCases {
+		align := models.AlignStatus{}
+		CalculateAlignment(&align, &locationSettings, nilReading, tt.magVal)
+
+		eStatus := tt.expectedAzAligned
+		aStatus := align.AzAligned
+		if aStatus != eStatus {
+			t.Errorf("unexpected status: got: %v, want: %v, case: %q", aStatus, eStatus, tt.desc)
+		}
+
+		eVal := tt.expectedCalcHeading
+		aVal := align.CurrentAz
+		if aVal != eVal {
+			t.Errorf("unexpected calculation: got: %v, want: %v, case: %q", aVal, eVal, tt.desc)
+		}
+	}
+}
 
 func TestCalculateHeading(t *testing.T) {
 	testCases := []struct {

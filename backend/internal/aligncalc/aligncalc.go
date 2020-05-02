@@ -84,4 +84,21 @@ func CalculateAlignment(a *models.AlignStatus, l *models.LocationSettings, accel
 		maxAlt := absLat + l.AltError
 		a.AltAligned = (altVal >= minAlt && altVal <= maxAlt)
 	}
+
+	if !IgnoreAz {
+		currentAz := calculateHeading(magVal, l.MagDeclination)
+		a.CurrentAz = currentAz
+		azAligned := false
+
+		if l.Latitude > 0 {
+			//
+			azAligned = (currentAz >= 360-l.AzError) || (currentAz <= l.AzError)
+		} else {
+			// southern hemisphere
+			minAz := 180 - l.AzError
+			maxAx := 180 + l.AzError
+			azAligned = currentAz >= minAz && currentAz <= maxAx
+		}
+		a.AzAligned = azAligned
+	}
 }
