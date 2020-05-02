@@ -22,6 +22,7 @@ func TestAlignCalcIgnoreModes(t *testing.T) {
 	nilReading := []int16{0, 0, 0}
 
 	type TestCase struct {
+		desc               string
 		ignoreAz           bool
 		ignoreAlt          bool
 		expectedAzAligned  bool
@@ -30,18 +31,21 @@ func TestAlignCalcIgnoreModes(t *testing.T) {
 
 	testCases := []TestCase{
 		TestCase{
+			desc:               "ignore both",
 			ignoreAlt:          true,
 			ignoreAz:           true,
 			expectedAltAligned: true,
 			expectedAzAligned:  true,
 		},
 		TestCase{
+			desc:               "ignore Alt",
 			ignoreAlt:          false,
 			ignoreAz:           true,
 			expectedAltAligned: false,
 			expectedAzAligned:  true,
 		},
 		TestCase{
+			desc:               "ignore AZ",
 			ignoreAlt:          true,
 			ignoreAz:           false,
 			expectedAltAligned: true,
@@ -54,6 +58,7 @@ func TestAlignCalcIgnoreModes(t *testing.T) {
 		locationSettings := models.LocationSettings{
 			IgnoreAlt: tt.ignoreAlt,
 			IgnoreAz:  tt.ignoreAz,
+			Latitude:  -37.813,
 		}
 
 		CalculateAlignment(&align, &locationSettings, nilReading, nilReading)
@@ -61,13 +66,13 @@ func TestAlignCalcIgnoreModes(t *testing.T) {
 		e := tt.expectedAltAligned
 		a := align.AltAligned
 		if a != e {
-			t.Errorf("unexpected status: got: %v, want: %v", a, e)
+			t.Errorf("unexpected status: got: %v, want: %v, case: %q", a, e, tt.desc)
 		}
 
 		e = tt.expectedAzAligned
 		a = align.AzAligned
 		if a != e {
-			t.Errorf("unexpected status: got: %v, want: %v", a, e)
+			t.Errorf("unexpected status: got: %v, want: %v, case: %q", a, e, tt.desc)
 		}
 	}
 }
