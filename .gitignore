@@ -9,3 +9,10 @@ backend/config.json
 pocs/ghoami/ghoami
 backend/barndoor-tracker-pi
 pi/config.json
+backend/magCalcResults.csv
+import.csv
+magCalcResults.ods
+pocs/i2c/accel
+pocs/i2c/basic
+pocs/i2c/mag
+pocs/i2c/whichway
