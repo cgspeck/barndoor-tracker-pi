@@ -19,7 +19,9 @@
                     "/usr/share/arduino/hardware/archlinux-arduino/avr/variants/standard/"
                 ]
             },
-            "defines": [],
+            "defines": [
+                "ARDUINO=189"
+            ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",

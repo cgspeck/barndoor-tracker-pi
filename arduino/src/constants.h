@@ -14,4 +14,10 @@ enum mode {
 
 #define SLAVE_ADDRESS 0x04
 
+#define STEPS_PER_REVOLUTION 200
+#define REVS_PER_CM 10
+
+// home at a rate of 1cm / second
+#define HOME_SPEED -1000
+
 #endif
