@@ -3,7 +3,7 @@
 USER_LIB_PATH = ../vendor
 BOARD_TAG = nano
 BOARD_SUB = atmega328
-MONITOR_PORT=/dev/ttyACM3
+# MONITOR_PORT=/dev/ttyACM3
 OBJDIR = ../bin
 # TARGET = foo
 

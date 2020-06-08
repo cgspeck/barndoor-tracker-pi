@@ -1,4 +1,4 @@
-package lsm9ds1
+package mutexi2cbus
 
 import (
 	"sync"
@@ -17,6 +17,13 @@ func NewMutexI2cBus(bus int) MutexI2cBus {
 		embd.NewI2CBus(byte(bus)),
 		sync.Mutex{},
 	}
+}
+
+func (p *MutexI2cBus) ReadByte(addr byte, value byte) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	return p.bus.ReadByte(addr, value)
 }
 
 // ReadFromReg reads n (len(value)) bytes from the given address and register.

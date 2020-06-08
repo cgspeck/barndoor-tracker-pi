@@ -12,6 +12,7 @@ import (
 	"github.com/cgspeck/barndoor-tracker-pi/internal/config"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/handlers"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/lsm9ds1"
+	"github.com/cgspeck/barndoor-tracker-pi/internal/mutexi2cbus"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/wireless"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
@@ -71,7 +72,7 @@ func main() {
 	// set up periodic callbacks
 	ticker := time.NewTicker(500 * time.Millisecond)
 	done := make(chan bool)
-	bus := lsm9ds1.NewMutexI2cBus(1)
+	bus := mutexi2cbus.NewMutexI2cBus(1)
 	defer bus.Close()
 
 	l, err := lsm9ds1.New(&bus)

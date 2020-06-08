@@ -11,7 +11,12 @@
 #include "lookupTable.h"
 
 // uncomment for debug info via serial console
-// #define SERIAL_DEBUG
+#define SERIAL_DEBUG
+
+#ifdef SERIAL_DEBUG
+  #define SERIAL_REPORT_INTERVAL_MILLIS 1000
+  unsigned long previous_serial_report_millis = 0;
+#endif
 
 // used by Wiring library for i2c Slave - implied, but declared here so I can track them
 #define I2C_SDA A4
@@ -90,17 +95,29 @@ void setupIdleState(int prev) {
   {
   case mode::HOMING:
   case mode::TRACKING:
+    #ifdef SERIAL_DEBUG
+      Serial.println("Setting Up Idle State");
+    #endif
     stepper.stop();
     break;
   }
+
+  #ifdef SERIAL_DEBUG
+    Serial.println("Finished setting Up Idle State");
+  #endif
 }
 
 bool setupHomingState(int prev) {
   if (prev == mode::HOMED) { return false; }
+  #ifdef SERIAL_DEBUG
+    Serial.println("Setting Up Homing State");
+  #endif
   stepper.stop();
   stepper.setSpeed(HOME_SPEED);
   stepper.runSpeed();
-
+  #ifdef SERIAL_DEBUG
+    Serial.println("Finished Setting Up Homing State");
+  #endif
   return true;
 }
 
@@ -109,11 +126,18 @@ int previous_minute;
 
 bool setupTrackingState(int prev) {
   if (prev != mode::HOMED) { return false; }
+  #ifdef SERIAL_DEBUG
+    Serial.println("Setting Up Tracking State");
+  #endif
   turnOffHomeIndicator();
   trackingStartedAtMillis = millis();
   previous_minute = 0;
   stepper.setSpeed(MINUTE_TO_STEPS_PER_SECOND[0]);
   stepper.runSpeed();
+  #ifdef SERIAL_DEBUG
+    Serial.println("Finished setting Up Tracking State");
+  #endif
+
   return true;
 }
 
@@ -142,9 +166,11 @@ void loop() {
   }
 
   bool success;
+  int current_minute = 0;
   float new_speed = 0;
-  unsigned long elapsedMillis;
-  unsigned long elapsedSeconds = 0;
+  unsigned long elapsed_millis;
+  unsigned long elapsed_seconds = 0;
+  unsigned long current_millis = millis();
 
   switch (current_mode)
   {
@@ -169,17 +195,21 @@ void loop() {
     current_mode = success ? current_mode : previous_mode;
     break;
   case mode::TRACKING:
-    elapsedMillis = millis() - trackingStartedAtMillis;
-    elapsedSeconds = elapsedMillis / 1000;
+    elapsed_millis = current_millis - trackingStartedAtMillis;
+    elapsed_seconds = elapsed_millis / 1000;
 
-    if (elapsedSeconds >= MAX_TRACKING_DURATION_SECONDS) {
+    if (elapsed_seconds >= MAX_TRACKING_DURATION_SECONDS) {
       stepper.stop();
       current_mode = mode::FINISHED;
     } else {
-      int current_minute = elapsedMillis / 1000 / 60;
+      current_minute = elapsed_millis / 1000 / 60;
 
       if (current_minute != previous_minute) {
         new_speed = MINUTE_TO_STEPS_PER_SECOND[current_minute];
+        #ifdef SERIAL_DEBUG
+          Serial.print("Changing speed to ");
+          Serial.println(new_speed);
+        #endif
         stepper.setSpeed(new_speed);
         previous_minute = current_minute;
       }
@@ -191,14 +221,16 @@ void loop() {
   }
 
   #ifdef SERIAL_DEBUG
-    // Serial.print("PREVIOUS ENCODER VAL: ");
-    // Serial.println(PREVIOUS_ENCODER_VAL);
-    // Serial.print("JS_AXIS_VAL: ");
-    // Serial.println(JS_AXIS_VAL);
-    // Serial.print("SCALED VAL: ");
-    // Serial.println(scaledVal);
-    // Serial.print("ARMED: ");
-    // Serial.println(armed);
+    if ((unsigned long)(current_millis - previous_serial_report_millis) >= SERIAL_REPORT_INTERVAL_MILLIS) {
+      Serial.print("PREVIOUS MODE: ");
+      Serial.print(previous_mode);
+      Serial.print(" CURRENT MODE: ");
+      Serial.print(current_mode);
+      Serial.print(" CURRENT MINUTE:");
+      Serial.print(current_minute);
+      Serial.print(" ELAPSED SECONDS: ");
+      Serial.println(elapsed_seconds);
+    }
   #endif
 
   previous_mode = current_mode;
