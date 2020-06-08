@@ -35,8 +35,8 @@
 unsigned int inputHomeButtonHistory = 0;
 unsigned int inputRunButtonHistory = 0;
 
-int previousMode = mode::IDLE;
-int currentMode = mode::IDLE;
+int previous_mode = mode::IDLE;
+int current_mode = mode::IDLE;
 
 AccelStepper stepper(AccelStepper::DRIVER);
 Trinamic_TMC2130 stepperConfig(CS_PIN);
@@ -49,14 +49,14 @@ void handleI2CRecieve(int numBytes) {
   case mode::IDLE_REQUESTED:
   case mode::HOME_REQUESTED:
   case mode::TRACK_REQUESTED:
-    currentMode = requested_mode;
+    current_mode = requested_mode;
   }
 
   Wire.flush();
 }
 
 void handleI2CRequest() {
-  Wire.write(currentMode);
+  Wire.write(current_mode);
 }
 
 void setup() {
@@ -98,19 +98,31 @@ bool setupHomingState(int prev) {
   return true;
 }
 
+unsigned long trackingStartedAtMillis;
+int previous_minute;
+
+bool setupTrackingState(int prev) {
+  if (prev != mode::HOMED) { return false; }
+  trackingStartedAtMillis = millis();
+  previous_minute = 0;
+  stepper.setSpeed(MINUTE_TO_STEPS_PER_SECOND[0]);
+  stepper.runSpeed();
+  return true;
+}
+
 void loop() {
   updateButton(&inputHomeButtonHistory, PIN_IN_HOME);
   updateButton(&inputRunButtonHistory, PIN_IN_RUN);
-  int currentMode = previousMode;
+  int current_mode = previous_mode;
 
   if (isButtonPressed(&inputRunButtonHistory)) {
-    switch (currentMode)
+    switch (current_mode)
     {
     case mode::HOMED:
-      currentMode = mode::TRACK_REQUESTED;
+      current_mode = mode::TRACK_REQUESTED;
       break;
     case mode::TRACKING:
-      currentMode = mode::IDLE_REQUESTED;
+      current_mode = mode::IDLE_REQUESTED;
       break;
     default:
       break;
@@ -118,26 +130,51 @@ void loop() {
   }
 
   if (isButtonPressed(&inputHomeButtonHistory)) {
-    currentMode = mode::HOME_REQUESTED;
+    current_mode = mode::HOME_REQUESTED;
   }
 
   // unsigned long currentMillis = millis();
   bool success;
+  float new_speed;
+  unsigned long elapsedMillis;
+  unsigned long elapsedSeconds;
 
-  switch (currentMode)
+  switch (current_mode)
   {
   case mode::IDLE_REQUESTED:
-    setupIdleState(previousMode);
-    currentMode = mode::IDLE;
+    setupIdleState(previous_mode);
+    current_mode = mode::IDLE;
     break;
   case mode::HOME_REQUESTED:
-    success = setupHomingState(previousMode);
-    currentMode = success ? currentMode : previousMode;
+    success = setupHomingState(previous_mode);
+    current_mode = success ? current_mode : previous_mode;
     break;
   case mode::HOMING:
     if (stepperConfig.isStallguard()) {
-      currentMode = mode::HOMED;
+      current_mode = mode::HOMED;
     } else {
+      stepper.runSpeed();
+    }
+    break;
+  case mode::TRACK_REQUESTED:
+    success = setupTrackingState(previous_mode);
+    current_mode = success ? current_mode : previous_mode;
+    break;
+  case mode::TRACKING:
+    elapsedMillis = millis() - trackingStartedAtMillis;
+    elapsedSeconds = elapsedMillis / 1000;
+
+    if (elapsedSeconds >= MAX_TRACKING_DURATION_SECONDS) {
+      stepper.stop();
+      current_mode = mode::FINISHED;
+    } else {
+      int current_minute = elapsedMillis / 1000 / 60;
+
+      if (current_minute != previous_minute) {
+        new_speed = MINUTE_TO_STEPS_PER_SECOND[current_minute];
+        stepper.setSpeed(new_speed);
+        previous_minute = current_minute;
+      }
       stepper.runSpeed();
     }
     break;
@@ -145,7 +182,7 @@ void loop() {
     break;
   }
 
-  previousMode = currentMode;
+  previous_mode = current_mode;
 
   stepper.run();
   #ifdef SERIAL_DEBUG

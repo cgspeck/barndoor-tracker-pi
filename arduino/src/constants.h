@@ -20,4 +20,7 @@ enum mode {
 // home at a rate of 1cm / second
 #define HOME_SPEED -1000
 
+// #define MAX_TRACKING_DURATION_MILLIS 3 * 60 * 60 * 1000
+#define MAX_TRACKING_DURATION_SECONDS 3 * 60 * 60
+// int MAX_TRACKING_DURATION_SECONDS=3 * 60 * 60;
 #endif
