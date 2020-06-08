@@ -28,11 +28,9 @@
 #define SPI_MISO 12 // digital
 
 // used for basic hardware interface
-#define PIN_IN_HOME 7  // Digital
-#define PIN_IN_RUN 8  // Digital
+#define PIN_IN_HOME_RUN_STOP 7  // Digital
 
-unsigned int inputHomeButtonHistory = 0;
-unsigned int inputRunButtonHistory = 0;
+unsigned int inputHomeRunStopButtonHistory = 0;
 
 int previous_mode = mode::IDLE;
 int current_mode = mode::IDLE;
@@ -59,8 +57,7 @@ void handleI2CRequest() {
 }
 
 void setup() {
-  pinMode(PIN_IN_HOME, INPUT_PULLUP);
-  pinMode(PIN_IN_RUN, INPUT_PULLUP);
+  pinMode(PIN_IN_HOME_RUN_STOP, INPUT_PULLUP);
 
   #ifdef SERIAL_DEBUG
     Serial.begin(9600);
@@ -109,26 +106,27 @@ bool setupTrackingState(int prev) {
 }
 
 void loop() {
-  updateButton(&inputHomeButtonHistory, PIN_IN_HOME);
-  updateButton(&inputRunButtonHistory, PIN_IN_RUN);
+  updateButton(&inputHomeRunStopButtonHistory, PIN_IN_HOME_RUN_STOP);
   int current_mode = previous_mode;
 
-  if (isButtonPressed(&inputRunButtonHistory)) {
+  if (isButtonPressed(&inputHomeRunStopButtonHistory)) {
     switch (current_mode)
     {
+    case mode::IDLE:
+      current_mode = mode::HOME_REQUESTED;
+      break;
     case mode::HOMED:
       current_mode = mode::TRACK_REQUESTED;
       break;
     case mode::TRACKING:
       current_mode = mode::IDLE_REQUESTED;
       break;
+    case mode::FINISHED:
+      current_mode = mode::HOME_REQUESTED;
+      break;
     default:
       break;
     }
-  }
-
-  if (isButtonPressed(&inputHomeButtonHistory)) {
-    current_mode = mode::HOME_REQUESTED;
   }
 
   bool success;
