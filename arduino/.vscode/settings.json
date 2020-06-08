@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "joystick.h": "c",
+        "dynamichid.h": "c",
+        "stdint.h": "c",
+        "arduino.h": "c",
+        "pluggableusb.h": "c",
+        "usbapi.h": "c"
+    }
+}
