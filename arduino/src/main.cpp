@@ -29,6 +29,7 @@
 
 // used for basic hardware interface
 #define PIN_IN_HOME_RUN_STOP 7  // Digital
+#define PIN_OUT_HOME_INDICATOR 8 // Digital, indicator LED
 
 unsigned int inputHomeRunStopButtonHistory = 0;
 
@@ -56,8 +57,18 @@ void handleI2CRequest() {
   Wire.write(current_mode);
 }
 
+void turnOffHomeIndicator() {
+    digitalWrite(PIN_OUT_HOME_INDICATOR, LOW);
+}
+
+void turnOnHomeIndicator() {
+    digitalWrite(PIN_OUT_HOME_INDICATOR, HIGH);
+}
+
 void setup() {
   pinMode(PIN_IN_HOME_RUN_STOP, INPUT_PULLUP);
+  pinMode(PIN_OUT_HOME_INDICATOR, OUTPUT);
+  turnOffHomeIndicator();
 
   #ifdef SERIAL_DEBUG
     Serial.begin(9600);
@@ -98,6 +109,7 @@ int previous_minute;
 
 bool setupTrackingState(int prev) {
   if (prev != mode::HOMED) { return false; }
+  turnOffHomeIndicator();
   trackingStartedAtMillis = millis();
   previous_minute = 0;
   stepper.setSpeed(MINUTE_TO_STEPS_PER_SECOND[0]);
@@ -147,6 +159,7 @@ void loop() {
   case mode::HOMING:
     if (stepperConfig.isStallguard()) {
       current_mode = mode::HOMED;
+      turnOnHomeIndicator();
     } else {
       stepper.runSpeed();
     }
