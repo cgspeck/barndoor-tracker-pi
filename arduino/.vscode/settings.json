@@ -5,6 +5,8 @@
         "stdint.h": "c",
         "arduino.h": "c",
         "pluggableusb.h": "c",
-        "usbapi.h": "c"
+        "usbapi.h": "c",
+        "chrono": "cpp",
+        "cmath": "cpp"
     }
 }

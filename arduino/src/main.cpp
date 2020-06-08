@@ -7,8 +7,8 @@
 #include <Arduino.h>
 #undef round
 #include <math.h>
+#include <Wire.h>
 
-// #include <SPI.h>
 #include <AccelStepper.h>
 #include "constants.h"
 #include "debounce.h"
@@ -24,10 +24,28 @@
 unsigned int inputHomeButtonHistory = 0;
 unsigned int inputRunButtonHistory = 0;
 
-int previousMode = mode::IDLE; 
+int previousMode = mode::IDLE;
 int currentMode = mode::IDLE;
 
 AccelStepper stepper(AccelStepper::DRIVER);
+
+void handleI2CRecieve(int numBytes) {
+  int requested_mode = Wire.read();
+
+  switch (requested_mode)
+  {
+  case mode::IDLE_REQUESTED:
+  case mode::HOME_REQUESTED:
+  case mode::TRACK_REQUESTED:
+    currentMode = requested_mode;
+  }
+
+  Wire.flush();
+}
+
+void handleI2CRequest() {
+  Wire.write(currentMode);
+}
 
 void setup() {
   pinMode(PIN_IN_HOME, INPUT_PULLUP);
@@ -37,6 +55,10 @@ void setup() {
   #ifdef SERIAL_DEBUG
     Serial.begin(9600);
   #endif
+
+  Wire.begin(SLAVE_ADDRESS);
+  Wire.onReceive(handleI2CRecieve);
+  Wire.onRequest(handleI2CRequest);
 
   // SPI.setBitOrder(MSBFIRST);
   // SPI.begin();

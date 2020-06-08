@@ -5,14 +5,18 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/usr/avr/include/",
-                "/usr/share/arduino/hardware/archlinux-arduino/avr/cores/arduino"
+                "/usr/share/arduino/hardware/archlinux-arduino/avr/cores/arduino",
+                "/usr/share/arduino/hardware/archlinux-arduino/avr/libraries/**",
+                "/usr/share/arduino/hardware/archlinux-arduino/avr/variants/standard/"
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": false,
                 "path": [
                     "/usr/share/arduino/hardware/archlinux-arduino/avr/cores/arduino",
                     "/usr/avr/include/",
-                    "${workspaceRoot}"
+                    "${workspaceRoot}",
+                    "/usr/share/arduino/hardware/archlinux-arduino/avr/libraries/**",
+                    "/usr/share/arduino/hardware/archlinux-arduino/avr/variants/standard/"
                 ]
             },
             "defines": [],
