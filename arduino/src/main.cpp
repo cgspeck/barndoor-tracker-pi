@@ -31,7 +31,6 @@
 #define PIN_IN_HOME 7  // Digital
 #define PIN_IN_RUN 8  // Digital
 
-
 unsigned int inputHomeButtonHistory = 0;
 unsigned int inputRunButtonHistory = 0;
 
@@ -63,7 +62,6 @@ void setup() {
   pinMode(PIN_IN_HOME, INPUT_PULLUP);
   pinMode(PIN_IN_RUN, INPUT_PULLUP);
 
-  // attachInterrupt(digitalPinToInterrupt(PIN_IN_RESET), resetVals, RISING);
   #ifdef SERIAL_DEBUG
     Serial.begin(9600);
   #endif
@@ -133,11 +131,10 @@ void loop() {
     current_mode = mode::HOME_REQUESTED;
   }
 
-  // unsigned long currentMillis = millis();
   bool success;
-  float new_speed;
+  float new_speed = 0;
   unsigned long elapsedMillis;
-  unsigned long elapsedSeconds;
+  unsigned long elapsedSeconds = 0;
 
   switch (current_mode)
   {
@@ -182,9 +179,6 @@ void loop() {
     break;
   }
 
-  previous_mode = current_mode;
-
-  stepper.run();
   #ifdef SERIAL_DEBUG
     // Serial.print("PREVIOUS ENCODER VAL: ");
     // Serial.println(PREVIOUS_ENCODER_VAL);
@@ -195,4 +189,6 @@ void loop() {
     // Serial.print("ARMED: ");
     // Serial.println(armed);
   #endif
+
+  previous_mode = current_mode;
 }
