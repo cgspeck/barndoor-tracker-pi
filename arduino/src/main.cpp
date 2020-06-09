@@ -36,22 +36,29 @@
 #define PIN_IN_HOME_RUN_STOP 7  // Digital
 #define PIN_OUT_HOME_INDICATOR 8 // Digital, indicator LED
 
-unsigned int inputHomeRunStopButtonHistory = 0;
+unsigned int inputHomeRunStopButtonHistory = 0b00000000;
 
-int previous_mode = mode::IDLE;
-int current_mode = mode::IDLE;
+int previous_mode;
+int current_mode;
 
 AccelStepper stepper(AccelStepper::DRIVER);
 Trinamic_TMC2130 stepperConfig(CS_PIN);
 
 void handleI2CRecieve(int numBytes) {
   int requested_mode = Wire.read();
+  #ifdef SERIAL_DEBUG
+    Serial.print("I2C recieved ");
+    Serial.println(requested_mode);
+  #endif
 
   switch (requested_mode)
   {
   case mode::IDLE_REQUESTED:
   case mode::HOME_REQUESTED:
   case mode::TRACK_REQUESTED:
+    #ifdef SERIAL_DEBUG
+      Serial.print("I2C recieved is valid");
+    #endif
     current_mode = requested_mode;
   }
 
@@ -59,21 +66,31 @@ void handleI2CRecieve(int numBytes) {
 }
 
 void handleI2CRequest() {
+  #ifdef SERIAL_DEBUG
+    Serial.println("I2C send current mode");
+  #endif
   Wire.write(current_mode);
 }
 
 void turnOffHomeIndicator() {
-    digitalWrite(PIN_OUT_HOME_INDICATOR, LOW);
+  #ifdef SERIAL_DEBUG
+    Serial.println("Turning off home indicator");
+  #endif
+  digitalWrite(PIN_OUT_HOME_INDICATOR, LOW);
 }
 
 void turnOnHomeIndicator() {
-    digitalWrite(PIN_OUT_HOME_INDICATOR, HIGH);
+  #ifdef SERIAL_DEBUG
+    Serial.println("Turning on home indicator");
+  #endif
+  digitalWrite(PIN_OUT_HOME_INDICATOR, HIGH);
 }
 
 void setup() {
   pinMode(PIN_IN_HOME_RUN_STOP, INPUT_PULLUP);
   pinMode(PIN_OUT_HOME_INDICATOR, OUTPUT);
   turnOffHomeIndicator();
+  previous_mode = mode::IDLE;
 
   #ifdef SERIAL_DEBUG
     Serial.begin(9600);
@@ -146,6 +163,9 @@ void loop() {
   int current_mode = previous_mode;
 
   if (isButtonPressed(&inputHomeRunStopButtonHistory)) {
+    #ifdef SERIAL_DEBUG
+      Serial.println("Button was pressed");
+    #endif
     switch (current_mode)
     {
     case mode::IDLE:
@@ -174,16 +194,15 @@ void loop() {
 
   switch (current_mode)
   {
-  case mode::IDLE_REQUESTED:
-    setupIdleState(previous_mode);
-    current_mode = mode::IDLE;
-    break;
   case mode::HOME_REQUESTED:
     success = setupHomingState(previous_mode);
-    current_mode = success ? current_mode : previous_mode;
+    current_mode = success ? mode::HOMING : previous_mode;
     break;
   case mode::HOMING:
     if (stepperConfig.isStallguard()) {
+      #ifdef SERIAL_DEBUG
+        Serial.println("Homing complete");
+      #endif
       current_mode = mode::HOMED;
       turnOnHomeIndicator();
     } else {
@@ -192,7 +211,7 @@ void loop() {
     break;
   case mode::TRACK_REQUESTED:
     success = setupTrackingState(previous_mode);
-    current_mode = success ? current_mode : previous_mode;
+    current_mode = success ? mode::TRACKING : previous_mode;
     break;
   case mode::TRACKING:
     elapsed_millis = current_millis - trackingStartedAtMillis;
@@ -215,6 +234,10 @@ void loop() {
       }
       stepper.runSpeed();
     }
+    break;
+  case mode::IDLE_REQUESTED:
+    setupIdleState(previous_mode);
+    current_mode = mode::IDLE;
     break;
   default:
     break;
