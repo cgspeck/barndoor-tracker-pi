@@ -12,7 +12,7 @@ import { getInitialTrackStatus, getTrackState } from '../../lib/settings';
 import { startHoming, startTracking, stopTracking, toggleIntervalometer, toggleDewController } from '../../lib/commands';
 import { setInterval } from "timers";
 
-export default class Track extends Component {
+export default class IntervalometerSettings extends Component {
   state = {
     trackingState: 'Idle',
     intervalometerEnabled: null,
@@ -28,8 +28,6 @@ export default class Track extends Component {
           intervalometerEnabled: r.intervalometerEnabled,
           dewControllerEnabled: r.dewControllerEnabled
         })
-        console.log("Starting Refresh Interval");
-        this.timer = setInterval(this.refreshAlignmentStatus.bind(this), 1000);
       })
 			.catch(e => this.handleError(e));
 	}
@@ -37,19 +35,6 @@ export default class Track extends Component {
   handleError = e => {
 		console.error('problem', e)
 		this.setState({error: e});
-  }
-
-  async refreshAlignmentStatus() {
-    getTrackState()
-      .then(r => {
-        this.setState({ trackingState: r })
-      })
-      .catch(e => this.handleError(e));
-  }
-
-  componentWillUnmount() {
-    console.log("Cancelling timer");
-    clearInterval(this.timer._id);
   }
 
   errorToast() {
@@ -139,22 +124,18 @@ export default class Track extends Component {
 
   render({}, { trackingState, intervalometerEnabled, dewControllerEnabled }) {
     return(
-      <div class={style.track}>
-        <h1>Track</h1>
+      <div class={style.main}>
+        <h1>Intervalometer Settings</h1>
         <div>
-          {this.errorToast()}
           <p>
-            <TextField label={trackingState} disabled="true"></TextField>
-          </p>
-          { this.homeButton() }
-          { this.trackButton() }
-          { this.stopButton() }
-          <p>
-            Intervalometer: <Switch onChange={this.onIntervalometerToggled.bind(this)} checked={intervalometerEnabled === true}></Switch>
+            <TextField label="Bulb (seconds)" value="30"></TextField>
           </p>
           <p>
-            Dew Controller: <Switch onChange={this.onDewControllerEnabled.bind(this)} checked={dewControllerEnabled === true}></Switch>
+            <TextField label="Rest (seconds)" value="30"></TextField>
           </p>
+          <Button raised ripple onClick={e => e.prevent_default}>
+            Update
+          </Button>
         </div>
       </div>
     )

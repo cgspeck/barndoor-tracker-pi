@@ -10,6 +10,7 @@ import Align from "../routes/align";
 import Track from "../routes/track";
 import APSettings from "../routes/ap_settings";
 import LocationSettings from "../routes/location_settings";
+import IntervalometerSettings from '../routes/intervalometer_settings';
 
 export default class App extends Component {
   state = {
@@ -75,6 +76,7 @@ export default class App extends Component {
           <Track path="/" />
           <APSettings path="/ap_settings" />
           <LocationSettings path="/location_settings" />
+          <IntervalometerSettings path="/intervalometer_settings" />
         </Router>
       </div>
     );
