@@ -51,11 +51,51 @@
       file: responses/status_align.json
       headers:
         Content-Type: application/json
-# -  request:
-#       url: ^/settings/ap$
-#       method: OPTIONS
-#    response:
-#       status: 204
-#       headers:
-#          content-type: application/json
-#          Allow: OPTIONS, GET, POST
+
+- request:
+    url: ^/track$
+    method: GET
+  response:
+    - status: 200
+      file: responses/status_track.json
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/track/all$
+    method: GET
+  response:
+    - status: 200
+      file: responses/status_track_all.json
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/track$
+    method: POST
+    json: '{"command":"home"}'
+  response:
+    - status: 200
+      body: '{"state": "Homing"}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/track$
+    method: POST
+    json: '{"command":"track"}'
+  response:
+    - status: 200
+      body: '{"state": "Tracking"}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/track$
+    method: POST
+    json: '{"command":"stop"}'
+  response:
+    - status: 200
+      body: '{"state": "Idle"}'
+      headers:
+        Content-Type: application/json

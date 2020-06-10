@@ -1,54 +1,152 @@
-import { h } from "preact";
+import { h, Component } from "preact";
 import style from "./style";
 
 import Button from "preact-material-components/Button";
 import "preact-material-components/Button/style.css";
 import Switch from "preact-material-components/Switch";
 import "preact-material-components/Switch/style.css";
-import TextField from "preact-material-components/TextField";
+import TextField from 'preact-material-components/TextField';
 import "preact-material-components/TextField/style.css";
 
-const Track = () => (
-  <div class={style.track}>
-    <h1>Track</h1>
-    <div>
-      <h2>Control</h2>
-      <p>
-        <Button raised ripple onClick={e => e.prevent_default}>
-          Track
-        </Button>
-      </p>
-      <p>
-        <Button raised ripple onClick={e => e.prevent_default}>
-          Start
-        </Button>
-      </p>
-      <p>
-        <TextField label="Tracking time (minutes)" value="300"></TextField>
-      </p>
-      <p>
-        <Button raised ripple onClick={e => e.prevent_default}>
-          Stop
-        </Button>
-      </p>
-    </div>
-    <div>
-      <h2>Intervalometer</h2>
-      <p>
-        Enabled: <Switch></Switch>
-      </p>
-      <p>
-        <TextField label="Bulb (seconds)" value="15"></TextField>
-      </p>
-      <p>
-        <TextField label="Rest (seconds)" value="15"></TextField>
-      </p>
-    </div>
-    <div>
-      <h2>Dew Heater</h2>
-      Enabled: <Switch></Switch>
-    </div>
-  </div>
-);
+import { getInitialTrackStatus, getTrackState } from '../../lib/settings';
+import { startHoming, startTracking, stopTracking } from '../../lib/commands';
+import { setInterval } from "timers";
 
-export default Track;
+export default class Track extends Component {
+  state = {
+    trackingState: 'Idle',
+    intervalometerEnabled: null,
+    dewControllerEnabled: null,
+    error: null
+  };
+
+  async componentDidMount() {
+		getInitialTrackStatus()
+			.then(r => {
+        this.setState({
+          trackingState: r.trackingState,
+          intervalometerEnabled: r.intervalometerEnabled,
+          dewControllerEnabled: r.dewControllerEnabled
+        })
+        console.log("Starting Refresh Interval");
+        this.timer = setInterval(this.refreshAlignmentStatus.bind(this), 1000);
+      })
+			.catch(e => this.handleError(e));
+	}
+
+  handleError = e => {
+		console.error('problem', e)
+		this.setState({error: e});
+  }
+
+  async refreshAlignmentStatus() {
+    getTrackState()
+      .then(r => {
+        this.setState({ trackingState: r })
+      })
+      .catch(e => this.handleError(e));
+  }
+
+  componentWillUnmount() {
+    console.log("Cancelling timer");
+    clearInterval(this.timer._id);
+  }
+
+  errorToast() {
+		if (this.state.error != null) {
+			return(
+				<p>
+					{ this.state.error.toString() }
+				</p>
+			)
+		}
+  }
+
+  onHomePressed = e => {
+    e.preventDefault();
+    startHoming()
+      .then(r => this.setState({ trackingState: r }))
+      .catch(e => this.handleError(e));
+  }
+
+  onTrackPressed = e => {
+    e.preventDefault();
+    startTracking()
+      .then(r => this.setState({ trackingState: r }))
+      .catch(e => this.handleError(e));
+  }
+
+  onStopPressed = e => {
+    e.preventDefault();
+    stopTracking()
+      .then(r => this.setState({ trackingState: r }))
+      .catch(e => this.handleError(e));
+  }
+
+  onIntervalometerToggled = e => {
+    // e.preventDefault();
+    console.log(e);
+
+    console.log(e.checked);
+    // console.log(e.checked);
+  }
+
+  homeButton() {
+    if (this.state.trackingState == 'Idle') {
+      return(
+        <p>
+          <Button raised ripple onClick={this.onHomePressed.bind(this)}>
+            Home
+          </Button>
+        </p>
+      )
+    }
+  }
+
+  trackButton() {
+    if (this.state.trackingState == 'Homed') {
+      return(
+        <p>
+          <Button raised ripple onClick={this.onTrackPressed.bind(this)}>
+            Track
+          </Button>
+        </p>
+      )
+    }
+  }
+
+  stopButton() {
+    if (this.state.trackingState == 'Tracking') {
+      return(
+        <p>
+          <Button raised ripple onClick={this.onStopPressed.bind(this)}>
+            Stop
+          </Button>
+        </p>
+      )
+    }
+  }
+
+  render({}, { trackingState, intervalometerEnabled, dewControllerEnabled }) {
+    return(
+      <div class={style.track}>
+      <h1>Track</h1>
+      <div>
+        {this.errorToast()}
+        <p>
+          <TextField label={trackingState} disabled="true"></TextField>
+        </p>
+        { this.homeButton() }
+        { this.trackButton() }
+        { this.stopButton() }
+        <p>
+          Intervalometer: <Switch onChange={this.onIntervalometerToggled.bind(this)} checked={intervalometerEnabled === true}></Switch>
+        </p>
+        <p>
+          Dew Controller: <Switch checked={dewControllerEnabled === true}></Switch>
+        </p>
+      </div>
+    </div>
+    )
+  }
+}
