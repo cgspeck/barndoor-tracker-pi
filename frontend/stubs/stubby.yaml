@@ -139,3 +139,21 @@
       body: '{"enabled":false}'
       headers:
         Content-Type: application/json
+
+- request:
+    url: ^/settings/intervalometer$
+    method: [GET]
+  response:
+    - status: 200
+      body: '{"bulbInterval": 30, "restInterval": 31}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/settings/intervalometer$
+    method: [POST]
+  response:
+    - status: 200
+      body: '{"bulbInterval": 60, "restInterval": 61}'
+      headers:
+        Content-Type: application/json

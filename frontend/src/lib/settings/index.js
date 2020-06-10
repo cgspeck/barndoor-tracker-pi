@@ -22,6 +22,19 @@ async function setAPSettings(ssid, key) {
     .then(r => r.data);
 }
 
+async function getIntervalometerSettings() {
+  return axios.get(`${config.endpoint}/settings/intervalometer`).then(r => r.data);
+}
+
+async function setIntervalometerSettings(bulbInterval, restInterval) {
+  return axios
+    .post(`${config.endpoint}/settings/intervalometer`, {
+      bulbInterval,
+      restInterval
+    })
+    .then(r => r.data);
+}
+
 async function getLocationSettings() {
   return axios.get(`${config.endpoint}/settings/location`).then(r => r.data);
 }
@@ -83,22 +96,6 @@ async function getTrackState() {
   return axios.get(`${config.endpoint}/track`).then(r => r.data.state);
 }
 
-async function toggleIntervalometer(enabled) {
-  return axios
-  .post(`${config.endpoint}/track/toggle/intervalometer`, {
-    enabled: enabled
-  })
-  .then(r => r.data);
-}
-
-async function toggleDewController(enabled) {
-  return axios
-  .post(`${config.endpoint}/track/toggle/dewcontroller`, {
-    enabled: enabled
-  })
-  .then(r => r.data);
-}
-
 export {
   getAllSettings,
   getAlignStatus,
@@ -108,5 +105,7 @@ export {
   getInitialTrackStatus,
   getTrackState,
   setAPSettings,
-  setLocationSettings
+  setLocationSettings,
+  getIntervalometerSettings,
+  setIntervalometerSettings
 };
