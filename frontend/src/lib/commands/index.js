@@ -7,7 +7,9 @@ async function toggleIntervalometer(enabled) {
   .post(`${config.endpoint}/track/toggle/intervalometer`, {
     enabled: enabled
   })
-  .then(r => r.data);
+  .then(r => {
+    return r.data.enabled;
+  });
 }
 
 async function toggleDewController(enabled) {
@@ -15,7 +17,9 @@ async function toggleDewController(enabled) {
   .post(`${config.endpoint}/track/toggle/dewcontroller`, {
     enabled: enabled
   })
-  .then(r => r.data);
+  .then(r => {
+    return r.data.enabled;
+  });
 }
 
 async function startHoming() {

@@ -99,3 +99,43 @@
       body: '{"state": "Idle"}'
       headers:
         Content-Type: application/json
+
+- request:
+    url: ^/track/toggle/intervalometer$
+    method: POST
+    json: '{"enabled":true}'
+  response:
+    - status: 200
+      body: '{"enabled":true}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/track/toggle/intervalometer$
+    method: POST
+    json: '{"enabled":false}'
+  response:
+    - status: 200
+      body: '{"enabled":false}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/track/toggle/dewcontroller$
+    method: POST
+    json: '{"enabled":true}'
+  response:
+    - status: 200
+      body: '{"enabled":true}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/track/toggle/dewcontroller$
+    method: POST
+    json: '{"enabled":false}'
+  response:
+    - status: 200
+      body: '{"enabled":false}'
+      headers:
+        Content-Type: application/json

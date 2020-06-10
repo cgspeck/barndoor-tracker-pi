@@ -9,7 +9,7 @@ import TextField from 'preact-material-components/TextField';
 import "preact-material-components/TextField/style.css";
 
 import { getInitialTrackStatus, getTrackState } from '../../lib/settings';
-import { startHoming, startTracking, stopTracking } from '../../lib/commands';
+import { startHoming, startTracking, stopTracking, toggleIntervalometer, toggleDewController } from '../../lib/commands';
 import { setInterval } from "timers";
 
 export default class Track extends Component {
@@ -84,11 +84,21 @@ export default class Track extends Component {
   }
 
   onIntervalometerToggled = e => {
-    // e.preventDefault();
-    console.log(e);
+    const enabled = e.target.checked;
+    console.log(`Intervalometer toggled to: ${enabled ? "enabled" : "disabled"}`);
+    this.setState({intervalometerEnabled: enabled})
+    toggleIntervalometer(enabled)
+      .then(r => this.setState({intervalometerEnabled: r}))
+      .catch(e => this.handleError(e));
+  }
 
-    console.log(e.checked);
-    // console.log(e.checked);
+  onDewControllerEnabled = e => {
+    const enabled = e.target.checked;
+    console.log(`Dew controller toggled to: ${enabled ? "enabled" : "disabled"}`);
+    this.setState({dewControllerEnabled: enabled})
+    toggleDewController(enabled)
+      .then(r => this.setState({dewControllerEnabled: r}))
+      .catch(e => this.handleError(e));
   }
 
   homeButton() {
@@ -143,7 +153,7 @@ export default class Track extends Component {
           Intervalometer: <Switch onChange={this.onIntervalometerToggled.bind(this)} checked={intervalometerEnabled === true}></Switch>
         </p>
         <p>
-          Dew Controller: <Switch checked={dewControllerEnabled === true}></Switch>
+          Dew Controller: <Switch onChange={this.onDewControllerEnabled.bind(this)} checked={dewControllerEnabled === true}></Switch>
         </p>
       </div>
     </div>
