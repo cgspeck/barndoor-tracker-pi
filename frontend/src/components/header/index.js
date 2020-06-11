@@ -27,6 +27,7 @@ export default class Header extends Component {
   goIntervalometerSettings = this.linkTo("/intervalometer_settings");
   goDebug = this.linkTo("/debug");
   goTrack = this.linkTo("/");
+  goDewController = this.linkTo("/dew_controller");
 
 
   render({ selectedRoute }, {}) {
@@ -65,6 +66,13 @@ export default class Header extends Component {
               onClick={this.goIntervalometerSettings}
             >
               Intervalometer Settings
+            </Drawer.DrawerItem>
+
+            <Drawer.DrawerItem
+              selected={selectedRoute == "/dew_controller"}
+              onClick={this.goDewController}
+            >
+              Dew Controller
             </Drawer.DrawerItem>
 
             <Drawer.DrawerItem

@@ -3,15 +3,21 @@ import style from "./style";
 
 import TextField from "preact-material-components/TextField";
 import "preact-material-components/TextField/style.css";
+import Switch from "preact-material-components/Switch";
+import "preact-material-components/Switch/style.css";
 
 import { getAlignStatus, getLocationSettings } from "../../lib/settings";
+import { toggleIgnoreAz, toggleIgnoreAlt } from "../../lib/commands";
+
 import { setInterval } from "timers";
 
 export default class Align extends Component {
   state = {
     locationSettings: {
-      latitude: null
+      latitude: null,
     },
+    ignoreAlt: false,
+    ignoreAz: false,
     alignStatus: {
       azAligned: null,
       altAligned: null,
@@ -23,7 +29,9 @@ export default class Align extends Component {
   async componentDidMount() {
     getLocationSettings()
       .then(r => {
-        this.setState({ locationSettings: { ...r } });
+        this.setState({ locationSettings: { latitude: r.latitude } });
+        this.setState({ ignoreAlt: r.ignoreAlt });
+        this.setState({ ignoreAz: r.ignoreAz });
         console.log("Starting Interval");
         this.timer = setInterval(this.refreshAlignmentStatus.bind(this), 500);
       })
@@ -106,9 +114,27 @@ export default class Align extends Component {
     }
   };
 
-  render({}, { locationSettings, alignStatus }) {
+  onIgnoreAzToggled = e => {
+    const enabled = e.target.checked;
+    console.log(`IgnoreAz toggled to: ${enabled ? "enabled" : "disabled"}`);
+    this.setState({ignoreAz: enabled})
+    toggleIgnoreAz(enabled)
+      .then(r => this.setState({ignoreAz: r}))
+      .catch(e => this.handleError(e));
+  }
+
+  onIgnoreAltToggled = e => {
+    const enabled = e.target.checked;
+    console.log(`IgnoreAlt toggled to: ${enabled ? "enabled" : "disabled"}`);
+    this.setState({ignoreAlt: enabled})
+    toggleIgnoreAlt(enabled)
+      .then(r => this.setState({ignoreAlt: r}))
+      .catch(e => this.handleError(e));
+  }
+
+  render({}, { locationSettings, alignStatus, ignoreAz, ignoreAlt }) {
     const { azAligned, altAligned, currentAz, currentAlt } = alignStatus;
-    const { latitude, azError } = locationSettings;
+    const { latitude, } = locationSettings;
 
     const azTarget = this.calculateAzTarget(latitude);
 
@@ -126,6 +152,7 @@ export default class Align extends Component {
             <br />
             {this.azTarget(azTarget)}
           </p>
+          <p>Ignore Azimuth: <Switch onChange={this.onIgnoreAzToggled.bind(this)} checked={ignoreAz === true}/></p>
           <p>
             <TextField
               label="Altitude"
@@ -135,6 +162,7 @@ export default class Align extends Component {
             <br />
             {this.altTarget(latitude)}
           </p>
+          <p>Ignore Altitude: <Switch onChange={this.onIgnoreAltToggled.bind(this)} checked={ignoreAlt === true}/></p>
         </div>
       </div>
     );

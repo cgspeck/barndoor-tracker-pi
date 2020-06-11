@@ -2,9 +2,29 @@ import axios from "axios";
 import config from "../../config";
 
 
+async function toggleIgnoreAz(enabled) {
+  return axios
+  .post(`${config.endpoint}/toggle/ignoreAz`, {
+    enabled: enabled
+  })
+  .then(r => {
+    return r.data.enabled;
+  });
+}
+
+async function toggleIgnoreAlt(enabled) {
+  return axios
+  .post(`${config.endpoint}/toggle/ignoreAlt`, {
+    enabled: enabled
+  })
+  .then(r => {
+    return r.data.enabled;
+  });
+}
+
 async function toggleIntervalometer(enabled) {
   return axios
-  .post(`${config.endpoint}/track/toggle/intervalometer`, {
+  .post(`${config.endpoint}/toggle/intervalometer`, {
     enabled: enabled
   })
   .then(r => {
@@ -14,7 +34,7 @@ async function toggleIntervalometer(enabled) {
 
 async function toggleDewController(enabled) {
   return axios
-  .post(`${config.endpoint}/track/toggle/dewcontroller`, {
+  .post(`${config.endpoint}/toggle/dewcontroller`, {
     enabled: enabled
   })
   .then(r => {
@@ -44,6 +64,8 @@ async function stopTracking() {
 }
 
 export {
+  toggleIgnoreAz,
+  toggleIgnoreAlt,
   toggleIntervalometer,
   toggleDewController,
   startHoming,

@@ -93,7 +93,20 @@ async function getInitialTrackStatus() {
 }
 
 async function getTrackState() {
-  return axios.get(`${config.endpoint}/track`).then(r => r.data.state);
+  return axios.get(`${config.endpoint}/track`).then(r => r.data);
+}
+
+async function getDewControllerStatus() {
+  return axios.get(`${config.endpoint}/status/dew_controller`).then(r => r.data);
+}
+
+async function setTargetTemperature(targetTemp) {
+  return axios.post(
+    `${config.endpoint}/settings/dew_controller`,
+    {
+      targetTemp
+    }
+    ).then(r => r.data);
 }
 
 export {
@@ -107,5 +120,7 @@ export {
   setAPSettings,
   setLocationSettings,
   getIntervalometerSettings,
-  setIntervalometerSettings
+  setIntervalometerSettings,
+  getDewControllerStatus,
+  setTargetTemperature
 };

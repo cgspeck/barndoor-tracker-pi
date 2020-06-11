@@ -5,8 +5,7 @@ import Button from "preact-material-components/Button";
 import "preact-material-components/Button/style.css";
 import TextField from "preact-material-components/TextField";
 import "preact-material-components/TextField/style.css";
-import Switch from "preact-material-components/Switch";
-import "preact-material-components/Switch/style.css";
+
 
 import style from "./style";
 
@@ -99,9 +98,6 @@ export default class LocationSettings extends Component {
 					</p>
 
           <h2>Advanced Settings</h2>
-          <h3>Disable Alignment Checking</h3>
-          <p>Ignore Azimuth: <Switch /></p>
-          <p>Ignore Altitude: <Switch /></p>
 					<h3>Alignment Error</h3>
 					<p>
 						<TextField

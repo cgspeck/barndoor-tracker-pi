@@ -35,7 +35,7 @@
         Content-Type: application/json
 
 - request:
-    url: /settings/location
+    url: ^/settings/location$
     method: [GET, POST]
   response:
     - status: 200
@@ -60,6 +60,61 @@
       file: responses/status_track.json
       headers:
         Content-Type: application/json
+    - status: 200
+      body: '{"state": "Homing Requested"}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Homed"}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking Requested"}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking"}'
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Shot 1", "elapsedMillis": 1000}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Shot 1", "elapsedMillis": 2000}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Shot 1", "elapsedMillis": 62000}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Rest 1", "elapsedMillis": 63000}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Rest 1", "elapsedMillis": 121000}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Rest 1", "elapsedMillis": 122000}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Shot 2", "elapsedMillis": 7560000}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Shot 2", "elapsedMillis": 9000001}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Shot 2", "elapsedMillis": 10800000}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Finished"}'
+      headers:
+        Content-Type: application/json
+
 
 - request:
     url: ^/track/all$
@@ -101,7 +156,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/track/toggle/intervalometer$
+    url: ^/toggle/intervalometer$
     method: POST
     json: '{"enabled":true}'
   response:
@@ -111,7 +166,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/track/toggle/intervalometer$
+    url: ^/toggle/intervalometer$
     method: POST
     json: '{"enabled":false}'
   response:
@@ -121,7 +176,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/track/toggle/dewcontroller$
+    url: ^/toggle/dewcontroller$
     method: POST
     json: '{"enabled":true}'
   response:
@@ -131,7 +186,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/track/toggle/dewcontroller$
+    url: ^/toggle/dewcontroller$
     method: POST
     json: '{"enabled":false}'
   response:
@@ -155,5 +210,80 @@
   response:
     - status: 200
       body: '{"bulbInterval": 60, "restInterval": 61}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/toggle/ignoreAz$
+    method: POST
+    json: '{"enabled":true}'
+  response:
+    - status: 200
+      body: '{"enabled":true}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/toggle/ignoreAz$
+    method: POST
+    json: '{"enabled":false}'
+  response:
+    - status: 200
+      body: '{"enabled":false}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/toggle/ignoreAlt$
+    method: POST
+    json: '{"enabled":true}'
+  response:
+    - status: 200
+      body: '{"enabled":true}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/toggle/ignoreAlt$
+    method: POST
+    json: '{"enabled":false}'
+  response:
+    - status: 200
+      body: '{"enabled":false}'
+      headers:
+        Content-Type: application/json
+
+
+- request:
+    url: ^/status/dew_controller$
+    method: [GET]
+  response:
+    - status: 200
+      body: '{"currentTemperature": 8, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 9, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 11, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 13, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 14, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/settings/dew_controller$
+    method: [POST]
+  response:
+    - status: 200
+      body: '{"currentTemperature": "ignored", "currentlyHeating": "ignored", "targetTemperature": 42, "dewControllerEnabled": "ignored"}'
       headers:
         Content-Type: application/json

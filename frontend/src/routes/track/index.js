@@ -17,6 +17,8 @@ export default class Track extends Component {
     trackingState: 'Idle',
     intervalometerEnabled: null,
     dewControllerEnabled: null,
+    intervalometerState: null,
+    elapsedMillis: null,
     error: null
   };
 
@@ -24,9 +26,10 @@ export default class Track extends Component {
 		getInitialTrackStatus()
 			.then(r => {
         this.setState({
-          trackingState: r.trackingState,
+          trackingState: r.state,
           intervalometerEnabled: r.intervalometerEnabled,
-          dewControllerEnabled: r.dewControllerEnabled
+          dewControllerEnabled: r.dewControllerEnabled,
+          elapsedMillis: r.elapsedMillis
         })
         console.log("Starting Refresh Interval");
         this.timer = setInterval(this.refreshAlignmentStatus.bind(this), 1000);
@@ -42,7 +45,11 @@ export default class Track extends Component {
   async refreshAlignmentStatus() {
     getTrackState()
       .then(r => {
-        this.setState({ trackingState: r })
+        this.setState({
+          trackingState: r.state,
+          intervalometerState: r.intervalometerState,
+          elapsedMillis: r.elapsedMillis
+        })
       })
       .catch(e => this.handleError(e));
   }
@@ -50,6 +57,18 @@ export default class Track extends Component {
   componentWillUnmount() {
     console.log("Cancelling timer");
     clearInterval(this.timer._id);
+  }
+
+  msToTime(duration) {
+    var seconds = Math.floor((duration / 1000) % 60),
+      minutes = Math.floor((duration / (1000 * 60)) % 60),
+      hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+    hours = (hours < 10) ? "0" + hours : hours;
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+    return hours + ":" + minutes + ":" + seconds;
   }
 
   errorToast() {
@@ -72,7 +91,11 @@ export default class Track extends Component {
   onTrackPressed = e => {
     e.preventDefault();
     startTracking()
-      .then(r => this.setState({ trackingState: r }))
+      .then(r => this.setState({
+        trackingState: r,
+        intervalometerState: null,
+        elapsedMillis: 0,
+      }))
       .catch(e => this.handleError(e));
   }
 
@@ -137,24 +160,49 @@ export default class Track extends Component {
     }
   }
 
-  render({}, { trackingState, intervalometerEnabled, dewControllerEnabled }) {
+  intervalometerState() {
+    if (this.state.intervalometerEnabled === true && this.state.trackingState === 'Tracking' && this.state.intervalometerState != null) {
+      return(
+        <p>
+          <TextField
+            label="Intervalometer"
+            value={this.state.intervalometerState}
+            disabled="true"/>
+        </p>
+      )
+    }
+  }
+
+  elapsedTime() {
+    if (this.state.trackingState === 'Tracking' && this.state.elapsedMillis != null) {
+      return(
+        <p>
+          <TextField
+            label="Elapsed Time"
+            value={this.msToTime(this.state.elapsedMillis)}
+            disabled="true"/>
+        </p>
+      )
+    }
+  }
+
+  render({}, { trackingState, intervalometerEnabled }) {
     return(
       <div class={style.track}>
         <h1>Track</h1>
         <div>
           {this.errorToast()}
           <p>
-            <TextField label={trackingState} disabled="true"></TextField>
+            <TextField label="Tracking Status" value={trackingState} disabled="true"/>
+          </p>
+          { this.elapsedTime() }
+          { this.intervalometerState() }
+          <p>
+            Intervalometer: <Switch onChange={this.onIntervalometerToggled.bind(this)} checked={intervalometerEnabled === true}></Switch>
           </p>
           { this.homeButton() }
           { this.trackButton() }
           { this.stopButton() }
-          <p>
-            Intervalometer: <Switch onChange={this.onIntervalometerToggled.bind(this)} checked={intervalometerEnabled === true}></Switch>
-          </p>
-          <p>
-            Dew Controller: <Switch onChange={this.onDewControllerEnabled.bind(this)} checked={dewControllerEnabled === true}></Switch>
-          </p>
         </div>
       </div>
     )
