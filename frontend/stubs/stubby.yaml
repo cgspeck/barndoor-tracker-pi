@@ -57,71 +57,57 @@
     method: GET
   response:
     - status: 200
-      file: responses/status_track.json
+      body: '{"state": "Homing Requested", "intervalometerEnabled": true, "dewControllerEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"state": "Homing Requested"}'
+      body: '{"state": "Homed", "intervalometerEnabled": true, "dewControllerEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"state": "Homed"}'
+      body: '{"state": "Tracking Requested", "intervalometerEnabled": true, "dewControllerEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"state": "Tracking Requested"}'
+      body: '{"state": "Tracking", "intervalometerEnabled": true, "dewControllerEnabled": true}'
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Shot 1", "elapsedMillis": 1000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"state": "Tracking"}'
-    - status: 200
-      body: '{"state": "Tracking", "intervalometerState": "Shot 1", "elapsedMillis": 1000}'
+      body: '{"state": "Tracking", "intervalometerState": "Shot 1", "elapsedMillis": 2000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"state": "Tracking", "intervalometerState": "Shot 1", "elapsedMillis": 2000}'
+      body: '{"state": "Tracking", "intervalometerState": "Shot 1", "elapsedMillis": 62000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"state": "Tracking", "intervalometerState": "Shot 1", "elapsedMillis": 62000}'
+      body: '{"state": "Tracking", "intervalometerState": "Rest 1", "elapsedMillis": 63000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"state": "Tracking", "intervalometerState": "Rest 1", "elapsedMillis": 63000}'
+      body: '{"state": "Tracking", "intervalometerState": "Rest 1", "elapsedMillis": 121000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"state": "Tracking", "intervalometerState": "Rest 1", "elapsedMillis": 121000}'
+      body: '{"state": "Tracking", "intervalometerState": "Rest 1", "elapsedMillis": 122000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"state": "Tracking", "intervalometerState": "Rest 1", "elapsedMillis": 122000}'
+      body: '{"state": "Tracking", "intervalometerState": "Shot 2", "elapsedMillis": 7560000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"state": "Tracking", "intervalometerState": "Shot 2", "elapsedMillis": 7560000}'
+      body: '{"state": "Tracking", "intervalometerState": "Shot 2", "elapsedMillis": 9000001, "intervalometerEnabled": true, "dewControllerEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"state": "Tracking", "intervalometerState": "Shot 2", "elapsedMillis": 9000001}'
+      body: '{"state": "Tracking", "intervalometerState": "Shot 2", "elapsedMillis": 10800000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"state": "Tracking", "intervalometerState": "Shot 2", "elapsedMillis": 10800000}'
-      headers:
-        Content-Type: application/json
-    - status: 200
-      body: '{"state": "Finished"}'
-      headers:
-        Content-Type: application/json
-
-
-- request:
-    url: ^/track/all$
-    method: GET
-  response:
-    - status: 200
-      file: responses/status_track_all.json
+      body: '{"state": "Finished", "intervalometerEnabled": true, "dewControllerEnabled": true}'
       headers:
         Content-Type: application/json
 
@@ -252,7 +238,6 @@
       body: '{"enabled":false}'
       headers:
         Content-Type: application/json
-
 
 - request:
     url: ^/status/dew_controller$

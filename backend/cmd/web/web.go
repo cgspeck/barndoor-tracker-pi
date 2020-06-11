@@ -47,7 +47,7 @@ func main() {
 
 	http.Handle("/status/flags", handlers.AppHandler{AppContext: context, H: handlers.Flags})
 	http.Handle("/status/align", handlers.AppHandler{AppContext: context, H: handlers.AlignHandler})
-	// http.Handle("/status/track", handlers.AppHandler{context, ...})
+	http.Handle("/status/track", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
 	http.Handle("/status/debug", handlers.AppHandler{AppContext: context, H: handlers.DebugHandler})
 
 	// location of the React/Preact Frontend

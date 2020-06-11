@@ -72,9 +72,11 @@ type AlignStatus struct {
 
 type TrackStatus struct {
 	sync.RWMutex
-	State              string `json:"state"`
-	IntervolmeterState string `json:"intervolmeterState"`
-	ElapsedMillis      int32  `json:"elapsedMillis"`
+	State                string `json:"state"`
+	ElapsedMillis        int32  `json:"elapsedMillis"`
+	DewControllerEnabled bool   `json:"dewControllerEnabled"`
+	IntervolmeterEnabled bool   `json:"intervalometerEnabled"`
+	IntervolmeterState   string `json:"intervolmeterState"`
 }
 
 // startup flags
