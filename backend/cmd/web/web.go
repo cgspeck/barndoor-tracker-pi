@@ -50,6 +50,10 @@ func main() {
 	http.Handle("/status/track", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
 	http.Handle("/status/debug", handlers.AppHandler{AppContext: context, H: handlers.DebugHandler})
 
+	http.Handle("/toggle/intervalometer", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
+	http.Handle("/toggle/dewcontroller", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
+	http.Handle("/track", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
+
 	// location of the React/Preact Frontend
 	static := "../frontend/build"
 	if context.Arch == "arm" {

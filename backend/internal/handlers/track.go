@@ -11,6 +11,14 @@ import (
 // }
 
 func TrackHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, error) {
+	/*
+		POST handles these routes:
+
+		"/toggle/intervalometer", { "enabled": bool }
+		"/toggle/dewcontroller", { "enabled": bool }
+		"/track" { "command": "val"} <- need to check this against current state!
+
+	*/
 	// if r.Method == "POST" {
 	// 	networkSettings := ah.GetNetworkSettings()
 	// 	networkSettings.RLock()
