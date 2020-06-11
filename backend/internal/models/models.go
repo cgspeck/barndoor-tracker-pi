@@ -70,11 +70,12 @@ type AlignStatus struct {
 	CurrentAlt float64 `json:"currentAlt"`
 }
 
-// type TrackingStatus struct {
-// 	Tracking            bool
-// 	IntervolmeterEnable bool
-// 	DewControlEnable    bool
-// }
+type TrackStatus struct {
+	sync.RWMutex
+	State              string `json:"state"`
+	IntervolmeterState string `json:"intervolmeterState"`
+	ElapsedMillis      int32  `json:"elapsedMillis"`
+}
 
 // startup flags
 type CmdFlags struct {
@@ -99,4 +100,5 @@ type AppContext struct {
 	NetworkSettings  *NetworkSettings  `json:"networkSettings"`
 	OS               string            `json:"os"`
 	Arch             string            `json:"arch"`
+	TrackStatus      *TrackStatus      `json:"trackStatus"`
 }

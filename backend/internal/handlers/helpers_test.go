@@ -19,6 +19,7 @@ func newTestAppHandler() testAppHandler {
 
 	return testAppHandler{
 		AlignStatus:      nil,
+		TrackStatus:      nil,
 		APSettings:       nil,
 		NetworkSettings:  nil,
 		LocationSettings: nil,
@@ -34,6 +35,7 @@ func newTestAppHandler() testAppHandler {
 type testAppHandler struct {
 	APSettings               *models.APSettings
 	AlignStatus              *models.AlignStatus
+	TrackStatus              *models.TrackStatus
 	NetworkSettings          *models.NetworkSettings
 	LocationSettings         *models.LocationSettings
 	Flags                    *models.Flags
@@ -73,6 +75,10 @@ func (ah testAppHandler) GetLocationSettings() *models.LocationSettings {
 
 func (ah testAppHandler) GetAPSettings() *models.APSettings {
 	return ah.APSettings
+}
+
+func (ah testAppHandler) GetTrackStatus() *models.TrackStatus {
+	return ah.TrackStatus
 }
 
 func (ah *testAppHandler) SetAPSettings(input map[string]interface{}) error {

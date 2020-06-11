@@ -26,6 +26,8 @@ type IAppHandler interface {
 
 	GetFlags() *models.Flags
 	GetAlignStatus() *models.AlignStatus
+
+	GetTrackStatus() *models.TrackStatus
 }
 
 type AppHandler struct {
@@ -112,6 +114,10 @@ func (ah AppHandler) GetFlags() *models.Flags {
 
 func (ah AppHandler) GetAlignStatus() *models.AlignStatus {
 	return ah.AppContext.AlignStatus
+}
+
+func (ah AppHandler) GetTrackStatus() *models.TrackStatus {
+	return ah.AppContext.TrackStatus
 }
 
 // func (ah *AppHandler) SetTime(t *time.Time) {

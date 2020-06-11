@@ -32,7 +32,8 @@
     "WirelessProfiles": []
   },
   "os": "",
-  "arch": ""
+  "arch": "",
+  "trackStatus": null
 }),
   Flushed: (bool) false,
   result: (*http.Response)(<nil>),

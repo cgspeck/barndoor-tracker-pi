@@ -97,6 +97,7 @@
     }
   }),
   OS: (string) (len=5) "linux",
-  Arch: (string) (len=5) "amd64"
+  Arch: (string) (len=5) "amd64",
+  TrackStatus: (*models.TrackStatus)(<nil>)
 })
 (interface {}) <nil>

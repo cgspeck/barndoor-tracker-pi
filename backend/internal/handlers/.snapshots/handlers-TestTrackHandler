@@ -6,15 +6,9 @@
     }
   },
   Body: (*bytes.Buffer)({
-  "latitude": 3.4,
-  "magDeclination": -5.6,
-  "azError": 2,
-  "altError": 1,
-  "xOffset": 7,
-  "yOffset": 8,
-  "zOffset": 9,
-  "ignoreAz": false,
-  "ignoreAlt": false
+  "state": "foo",
+  "intervolmeterState": "bar",
+  "elapsedMillis": 123
 }),
   Flushed: (bool) false,
   result: (*http.Response)(<nil>),
