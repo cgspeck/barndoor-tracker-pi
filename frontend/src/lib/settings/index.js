@@ -92,10 +92,6 @@ async function getAlignStatus() {
   return axios.get(`${config.endpoint}/status/align`).then((r) => r.data);
 }
 
-async function getInitialTrackStatus() {
-  return axios.get(`${config.endpoint}/track/all`).then((r) => r.data);
-}
-
 async function getTrackState() {
   return axios.get(`${config.endpoint}/track`).then((r) => r.data);
 }
@@ -120,7 +116,6 @@ export {
   getAPSettings,
   getFlags,
   getLocationSettings,
-  getInitialTrackStatus,
   getTrackState,
   setAPSettings,
   setLocationSettings,

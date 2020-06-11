@@ -8,7 +8,7 @@ import 'preact-material-components/Switch/style.css';
 import TextField from 'preact-material-components/TextField';
 import 'preact-material-components/TextField/style.css';
 
-import { getInitialTrackStatus, getTrackState } from '../../lib/settings';
+import { getTrackState } from '../../lib/settings';
 import {
   startHoming,
   startTracking,
@@ -29,7 +29,7 @@ export default class Track extends Component {
   };
 
   async componentDidMount() {
-    getInitialTrackStatus()
+    getTrackState()
       .then((r) => {
         this.setState({
           trackingState: r.state,
