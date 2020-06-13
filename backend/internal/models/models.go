@@ -73,10 +73,81 @@ type AlignStatus struct {
 type TrackStatus struct {
 	sync.RWMutex
 	State                string `json:"state"`
+	PreviousState        string `json:"previousState"`
 	ElapsedMillis        int32  `json:"elapsedMillis"`
 	DewControllerEnabled bool   `json:"dewControllerEnabled"`
 	IntervolmeterEnabled bool   `json:"intervalometerEnabled"`
 	IntervolmeterState   string `json:"intervolmeterState"`
+}
+
+func (ts *TrackStatus) ProcessTrackCommand(command string) (string, error) {
+	nextState := ""
+	currentState := ts.State
+	stateChanged := false
+
+	switch command {
+	case "home":
+		if currentState == "Idle" || currentState == "Finished" {
+			stateChanged = true
+			nextState = "Homing Requested"
+		}
+	case "track":
+		if currentState == "Homed" {
+			stateChanged = true
+			nextState = "Tracking Requested"
+		}
+	case "stop":
+		if currentState == "Tracking" {
+			stateChanged = true
+			nextState = "Idle"
+		}
+	}
+
+	if stateChanged {
+		ts.PreviousState = currentState
+		ts.State = nextState
+		return nextState, nil
+	}
+
+	return "", InvalidStateChange{
+		CurrentState: currentState,
+		Requested:    command,
+	}
+}
+
+func (ts *TrackStatus) ProcessArduinoStateChange(arduinoReportedState string) (string, error) {
+	nextState := ""
+	currentState := ts.State
+	stateChanged := false
+
+	switch arduinoReportedState {
+	case "Homing":
+		if currentState == "Idle" || currentState == "Homing Requested" || currentState == "Finished" {
+			stateChanged = true
+			nextState = "Homing"
+		}
+	case "Tracking":
+		if currentState == "Homed" {
+			stateChanged = true
+			nextState = "Tracking"
+		}
+	case "Finished":
+		if currentState == "Tracking" {
+			stateChanged = true
+			nextState = "Finished"
+		}
+	}
+
+	if stateChanged {
+		ts.PreviousState = currentState
+		ts.State = nextState
+		return nextState, nil
+	}
+
+	return "", InvalidStateChange{
+		CurrentState: currentState,
+		Requested:    arduinoReportedState,
+	}
 }
 
 // startup flags

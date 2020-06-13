@@ -12,7 +12,14 @@ func NewMutexI2cBus(bus int) MutexI2cBus {
 	return MutexI2cBus{}
 }
 
-func (p *MutexI2cBus) ReadByte(addr byte, value byte) error {
+func (p *MutexI2cBus) ReadByteFromAddr(addr byte) (value byte, err error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	return byte(0x00), nil
+}
+
+func (p *MutexI2cBus) WriteByteToAddr(addr, value byte) (err error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 

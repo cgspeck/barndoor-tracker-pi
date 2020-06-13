@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/cgspeck/barndoor-tracker-pi/internal/runners"
+
 	"github.com/cgspeck/barndoor-tracker-pi/internal/aligncalc"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/config"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/handlers"
@@ -101,6 +103,8 @@ func main() {
 		context.LocationSettings.IgnoreAlt = true
 	}
 
+	trackerRunner := runners.NewTrackerRunner(&bus)
+
 	go func() {
 		for {
 			select {
@@ -135,6 +139,8 @@ func main() {
 					context.Unlock()
 					log.Println(previousTime)
 				}
+
+				trackerRunner.Run(currentTime, context.TrackStatus)
 			}
 		}
 	}()

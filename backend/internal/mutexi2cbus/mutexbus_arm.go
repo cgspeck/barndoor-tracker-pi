@@ -19,11 +19,18 @@ func NewMutexI2cBus(bus int) MutexI2cBus {
 	}
 }
 
-func (p *MutexI2cBus) ReadByte(addr byte, value byte) error {
+func (p *MutexI2cBus) ReadByteFromAddr(addr byte) (value byte, err error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
-	return p.bus.ReadByte(addr, value)
+	return p.bus.ReadByte(addr)
+}
+
+func (p *MutexI2cBus) WriteByteToAddr(addr, value byte) (err error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	return p.bus.WriteByte(addr, value)
 }
 
 // ReadFromReg reads n (len(value)) bytes from the given address and register.

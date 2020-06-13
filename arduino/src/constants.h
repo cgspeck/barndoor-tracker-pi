@@ -1,14 +1,15 @@
 #ifndef constants_h
 #define constants_h
 
-enum mode {
+enum mode
+{
     IDLE,
     HOME_REQUESTED,
     HOMING,
     HOMED,
     TRACK_REQUESTED,
     TRACKING,
-    IDLE_REQUESTED,
+    STOP_REQUESTED,
     FINISHED
 };
 

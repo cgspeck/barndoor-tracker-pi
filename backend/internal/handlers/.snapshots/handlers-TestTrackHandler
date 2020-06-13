@@ -7,8 +7,11 @@
   },
   Body: (*bytes.Buffer)({
   "state": "foo",
-  "intervolmeterState": "bar",
-  "elapsedMillis": 123
+  "previousState": "",
+  "elapsedMillis": 123,
+  "dewControllerEnabled": false,
+  "intervalometerEnabled": false,
+  "intervolmeterState": "bar"
 }),
   Flushed: (bool) false,
   result: (*http.Response)(<nil>),

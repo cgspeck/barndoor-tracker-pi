@@ -1,8 +1,9 @@
 package mutexi2cbus
 
 type I2CBus interface {
-	// ReadByte reads a single byte from the given address
-	ReadByte(addr byte, value byte) error
+	// Read/Write a single byte from the given address
+	ReadByteFromAddr(addr byte) (byte, error)
+	WriteByteToAddr(addr, value byte) error
 	// ReadFromReg reads n (len(value)) bytes from the given address and register.
 	ReadFromReg(addr, reg byte, value []byte) error
 	// ReadByteFromReg reads a byte from the given address and register.
