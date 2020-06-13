@@ -7,18 +7,35 @@ import (
 	"net/http"
 )
 
-// type APManagementDisabledError struct{}
-
-// func (APManagementDisabledError) Error() string {
-// 	return "AP management is disabled"
-// }
-
 type UnrecognisedPathError struct {
 	Path string
 }
 
 func (u UnrecognisedPathError) Error() string {
 	return fmt.Sprintf("Unrecognised path: %q", u.Path)
+}
+
+type BadRequestError struct{}
+
+func (_ BadRequestError) Error() string {
+	return "Bad Request"
+}
+
+type CouldNotCastToBoolError struct {
+	val interface{}
+}
+
+func (e CouldNotCastToBoolError) Error() string {
+	return fmt.Sprintf("Could not cast %q to bool", e.val)
+}
+
+func handleTrackCommand(ah IAppHandler, command string) error {
+	trackStatus := ah.GetTrackStatus()
+	trackStatus.Lock()
+	defer trackStatus.Unlock()
+
+	_, err := trackStatus.ProcessTrackCommand(command)
+	return err
 }
 
 func TrackHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, error) {
@@ -49,22 +66,35 @@ func TrackHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, 
 
 		switch path {
 		case "/track":
-			err = handleTrackCommand()
+			command, ok := input["command"]
+			if ok {
+				err = handleTrackCommand(ah, fmt.Sprintf("%v", command))
+			} else {
+				err = BadRequestError{}
+			}
+		case "/toggle/intervalometer", "/toggle/dewcontroller":
+			iEnabled, ok := input["enabled"]
+
+			if !ok {
+				err = BadRequestError{}
+			}
+
+			bEnabled, ok := iEnabled.(bool)
+
+			if !ok {
+				err = CouldNotCastToBoolError{iEnabled}
+			}
+
+			trackStatus := ah.GetTrackStatus()
+			trackStatus.Lock()
+			defer trackStatus.Unlock()
+
+			if path == "/toggle/intervalometer" {
+				trackStatus.IntervolmeterEnabled = bEnabled
+			} else {
+				trackStatus.DewControllerEnabled = bEnabled
+			}
 		}
-
-		// newState, err
-
-		// 		apSettings := ah.GetAPSettings()
-		// 		apSettings.Lock()
-		// 		err = ah.SetAPSettings(input)
-		// 		apSettings.Unlock()
-
-		// 		if err != nil {
-		// 			return 500, err
-		// 		}
-		// 	} else {
-		// 		return 400, APManagementDisabledError{}
-		// 	}
 	}
 
 	if r.Method == "GET" || r.Method == "POST" {
