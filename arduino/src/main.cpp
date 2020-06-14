@@ -151,6 +151,9 @@ bool setupHomingState(int prev)
 unsigned long trackingStartedAtMillis;
 int previous_minute;
 
+bool homingBlinkOn;
+unsigned long blinkLastChangedAtMillis;
+
 bool setupTrackingState(int prev)
 {
   if (prev != mode::HOMED)
@@ -210,6 +213,13 @@ void loop()
   case mode::HOME_REQUESTED:
     success = setupHomingState(previous_mode);
     current_mode = success ? mode::HOMING : previous_mode;
+
+    if (current_mode == mode::HOMING) {
+      turnOnHomeIndicator();
+      homingBlinkOn = true;
+      blinkLastChangedAtMillis = current_millis;
+    }
+
     break;
   case mode::HOMING:
     if (stepperConfig.isStallguard())
@@ -223,6 +233,16 @@ void loop()
     else
     {
       stepper.runSpeed();
+      if ((unsigned long)(current_millis - blinkLastChangedAtMillis) >= 330) {
+        if (homingBlinkOn) {
+          turnOffHomeIndicator();
+          homingBlinkOn = false;
+        } else {
+          turnOnHomeIndicator();
+          homingBlinkOn = true;
+        }
+        blinkLastChangedAtMillis = current_millis;
+      }
     }
     break;
   case mode::TRACK_REQUESTED:
