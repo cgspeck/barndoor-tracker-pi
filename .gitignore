@@ -17,3 +17,4 @@ pocs/i2c/basic
 pocs/i2c/mag
 pocs/i2c/whichway
 arduino/bin
+arduino/.envrc
