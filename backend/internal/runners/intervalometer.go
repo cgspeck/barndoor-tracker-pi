@@ -2,6 +2,7 @@ package runners
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
@@ -34,7 +35,13 @@ func (s ShotPhase) String() string {
 	return [...]string{"Rest", "Focussing", "Shooting"}[s]
 }
 
+type IntervalPeriods struct {
+	BulbTimeSeconds int `json:"bulbInterval"`
+	RestTimeSeconds int `json:"restInterval"`
+}
+
 type IntervalometerRunner struct {
+	sync.RWMutex
 	focusPin        int
 	shutterPin      int
 	bulbTimeSeconds int
@@ -63,6 +70,18 @@ func (ir *IntervalometerRunner) setupRunState() {}
 func (ir *IntervalometerRunner) setupEnabledState() {}
 
 func (ir *IntervalometerRunner) setupDisabledState() {}
+
+func (ir *IntervalometerRunner) GetIntervalPeriods() IntervalPeriods {
+	return IntervalPeriods{
+		BulbTimeSeconds: ir.bulbTimeSeconds,
+		RestTimeSeconds: ir.restTimeSeconds,
+	}
+}
+
+func (ir *IntervalometerRunner) SetIntervalPeriods(ip IntervalPeriods) {
+	ir.bulbTimeSeconds = ip.BulbTimeSeconds
+	ir.restTimeSeconds = ip.RestTimeSeconds
+}
 
 func (ir *IntervalometerRunner) doInitialFocusOrShoot(currentTime time.Time) (time.Time, ShotPhase, string) {
 	var nextActionTime time.Time
@@ -120,10 +139,35 @@ func (ir *IntervalometerRunner) progressShoot(currentTime time.Time) (time.Time,
 	return nextActionTime, nextShotPhase, tsNextIntervalometerStatus
 }
 
+func (ir *IntervalometerRunner) SetBulbTime(seconds int) {
+	ir.Lock()
+	defer ir.Unlock()
+
+	ir.bulbTimeSeconds = seconds
+}
+
+func (ir *IntervalometerRunner) SetRestTime(seconds int) {
+	ir.Lock()
+	defer ir.Unlock()
+
+	ir.restTimeSeconds = seconds
+}
+
+func (ir *IntervalometerRunner) SetTimes(bulbSeconds int, restSeconds int) {
+	ir.Lock()
+	defer ir.Unlock()
+
+	ir.bulbTimeSeconds = bulbSeconds
+	ir.restTimeSeconds = restSeconds
+}
+
 func (ir *IntervalometerRunner) Run(currentTime time.Time, ts *models.TrackStatus) {
 	if currentTime.After(ir.nextAction) {
 		ts.Lock()
 		defer ts.Unlock()
+		ir.Lock()
+		defer ir.Unlock()
+
 		intervalometerShouldBeEnabled := ts.IntervolmeterEnabled
 		intervalometerShouldBeDisabled := !intervalometerShouldBeEnabled
 		isTracking := ts.State == "Tracking"

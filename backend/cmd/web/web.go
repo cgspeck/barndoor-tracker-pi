@@ -40,10 +40,17 @@ func main() {
 		log.Fatalf("Unable to apply desired network settings: %v\n\n%+v\n", err, context.NetworkSettings)
 	}
 
+	intervalometerRunner := runners.NewIntervalometerRunner(6)
+
 	http.Handle("/settings/network", handlers.AppHandler{AppContext: context, H: handlers.NetworkSettingsHandler})
 	http.Handle("/settings/network/ap", handlers.AppHandler{AppContext: context, H: handlers.APSettingsHandler})
 	// low prio: http.Handle("/settings/network/profiles", handlers.AppHandler{context, ...})
 	// low prio: http.Handle("/settings/network/avaliable", handlers.AppHandler{context, ...})
+	http.Handle("/settings/intervalometer", handlers.AppHandler{
+		AppContext:     context,
+		H:              handlers.IntervalometerSettingsHandler,
+		IntervalRunner: intervalometerRunner,
+	})
 
 	http.Handle("/settings/location", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
 
@@ -141,6 +148,7 @@ func main() {
 				}
 
 				trackerRunner.Run(currentTime, context.TrackStatus)
+				intervalometerRunner.Run(currentTime, context.TrackStatus)
 			}
 		}
 	}()

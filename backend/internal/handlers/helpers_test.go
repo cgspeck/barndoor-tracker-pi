@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
+	"github.com/cgspeck/barndoor-tracker-pi/internal/runners"
 )
 
 func getWirelessInterfaceRpi() (string, error) {
@@ -97,6 +98,10 @@ func (ah testAppHandler) GetFlags() *models.Flags {
 
 func (ah testAppHandler) GetAlignStatus() *models.AlignStatus {
 	return ah.AlignStatus
+}
+
+func (ah testAppHandler) GetIntervalRunner() *runners.IntervalometerRunner {
+	return nil
 }
 
 func (ah *testAppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

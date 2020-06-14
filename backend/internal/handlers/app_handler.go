@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/cgspeck/barndoor-tracker-pi/internal/runners"
+
 	"github.com/cgspeck/barndoor-tracker-pi/internal/config"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/wireless"
@@ -28,11 +30,14 @@ type IAppHandler interface {
 	GetAlignStatus() *models.AlignStatus
 
 	GetTrackStatus() *models.TrackStatus
+
+	GetIntervalRunner() *runners.IntervalometerRunner
 }
 
 type AppHandler struct {
-	AppContext *models.AppContext
-	H          func(IAppHandler, http.ResponseWriter, *http.Request) (int, error)
+	AppContext     *models.AppContext
+	H              func(IAppHandler, http.ResponseWriter, *http.Request) (int, error)
+	IntervalRunner *runners.IntervalometerRunner
 }
 
 func (ah AppHandler) GetContext() *models.AppContext {
@@ -118,6 +123,10 @@ func (ah AppHandler) GetAlignStatus() *models.AlignStatus {
 
 func (ah AppHandler) GetTrackStatus() *models.TrackStatus {
 	return ah.AppContext.TrackStatus
+}
+
+func (ah AppHandler) GetIntervalRunner() *runners.IntervalometerRunner {
+	return ah.IntervalRunner
 }
 
 // func (ah *AppHandler) SetTime(t *time.Time) {
