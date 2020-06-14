@@ -250,7 +250,7 @@ void loop()
     current_mode = success ? mode::TRACKING : previous_mode;
     break;
   case mode::TRACKING:
-    elapsed_millis = current_millis - trackingStartedAtMillis;
+    elapsed_millis = (unsigned long)(current_millis - trackingStartedAtMillis);
     elapsed_seconds = elapsed_millis / 1000;
 
     if (elapsed_seconds >= MAX_TRACKING_DURATION_SECONDS)
