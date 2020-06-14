@@ -8,12 +8,10 @@ void updateButton(unsigned int *buttonHistory, int pin) {
 
 bool isButtonPressed(unsigned int *buttonHistory) {
   bool pressed = false;
-
-  if ((*buttonHistory & DEBOUNCE_MASK) == 0b00001111) {
+  if ((*buttonHistory & DEBOUNCE_MASK) == 0b00000111) {
     pressed = true;
     *buttonHistory = 0b11111111;
   }
-
   return pressed;
 }
 

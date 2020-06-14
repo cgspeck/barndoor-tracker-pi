@@ -177,10 +177,10 @@ void loop()
   updateButton(&inputHomeRunStopButtonHistory, PIN_IN_HOME_RUN_STOP);
   int current_mode = previous_mode;
 
-  if (isButtonPressed(&inputHomeRunStopButtonHistory))
+  if (isButtonRelease(&inputHomeRunStopButtonHistory))
   {
 #ifdef SERIAL_DEBUG
-    Serial.println("Button was pressed");
+    Serial.println("Button was Released");
 #endif
     switch (current_mode)
     {
