@@ -193,9 +193,6 @@ void loop()
     case mode::TRACKING:
       current_mode = mode::STOP_REQUESTED;
       break;
-    case mode::FINISHED:
-      current_mode = mode::HOME_REQUESTED;
-      break;
     default:
       break;
     }
@@ -239,7 +236,7 @@ void loop()
     if (elapsed_seconds >= MAX_TRACKING_DURATION_SECONDS)
     {
       stepper.stop();
-      current_mode = mode::FINISHED;
+      current_mode = mode::IDLE;
     }
     else
     {

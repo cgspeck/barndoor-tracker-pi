@@ -9,8 +9,7 @@ enum mode
     HOMED,
     TRACK_REQUESTED,
     TRACKING,
-    STOP_REQUESTED,
-    FINISHED
+    STOP_REQUESTED
 };
 
 #define SLAVE_ADDRESS 0x04
