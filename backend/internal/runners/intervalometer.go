@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
+	"github.com/cgspeck/barndoor-tracker-pi/internal/pin_wrapper"
 )
 
 const idleCheckIntervalMillis = 1000
@@ -42,8 +43,8 @@ type IntervalPeriods struct {
 
 type IntervalometerRunner struct {
 	sync.RWMutex
-	focusPin        int
-	shutterPin      int
+	focusPin        pin_wrapper.IWrappedPin
+	shutterPin      pin_wrapper.IWrappedPin
 	bulbTimeSeconds int
 	restTimeSeconds int
 
@@ -55,10 +56,21 @@ type IntervalometerRunner struct {
 	shotCount  int
 }
 
-func NewIntervalometerRunner(shutterPin int) *IntervalometerRunner {
+func NewIntervalometerRunner(shutterPinNo int, focusPinNo int) (*IntervalometerRunner, error) {
+	shutterPin, err := pin_wrapper.NewWrappedPin(shutterPinNo)
+	if err != nil {
+		return nil, err
+	}
+
+	focusPin, err := pin_wrapper.NewWrappedPin(focusPinNo)
+	if err != nil {
+		return nil, err
+	}
+
 	return &IntervalometerRunner{
 		shutterPin: shutterPin,
-	}
+		focusPin:   focusPin,
+	}, nil
 }
 
 func turnOffPin(pin int) {}
@@ -90,13 +102,13 @@ func (ir *IntervalometerRunner) doInitialFocusOrShoot(currentTime time.Time) (ti
 
 	if ir.manageFocusPin {
 		ir.shotCount = 0
-		turnOnPin(ir.focusPin)
+		ir.focusPin.SetHigh()
 		nextActionTime = currentTime.Add(time.Duration(focusDelayMillis) * time.Millisecond)
 		nextShotPhase = ShotPhaseFocussing
 		tsNextIntervalometerStatus = nextShotPhase.String()
 	} else {
 		ir.shotCount = 1
-		turnOnPin(ir.shutterPin)
+		ir.shutterPin.SetHigh()
 		nextActionTime = currentTime.Add(time.Duration(ir.bulbTimeSeconds) * time.Second)
 		nextShotPhase = ShotPhaseShooting
 		tsNextIntervalometerStatus = fmt.Sprintf("%s %d", nextShotPhase.String(), ir.shotCount)
@@ -112,26 +124,26 @@ func (ir *IntervalometerRunner) progressShoot(currentTime time.Time) (time.Time,
 	switch ir.shootingPhase {
 	case ShotPhaseRest:
 		if ir.manageFocusPin {
-			turnOnPin(ir.focusPin)
+			ir.focusPin.SetHigh()
 			nextActionTime = currentTime.Add(time.Duration(focusDelayMillis) * time.Millisecond)
 			nextShotPhase = ShotPhaseFocussing
 			tsNextIntervalometerStatus = nextShotPhase.String()
 		} else {
 			ir.shotCount++
-			turnOnPin(ir.shutterPin)
+			ir.shutterPin.SetHigh()
 			nextActionTime = currentTime.Add(time.Duration(ir.bulbTimeSeconds) * time.Second)
 			nextShotPhase = ShotPhaseShooting
 			tsNextIntervalometerStatus = fmt.Sprintf("%s %d", nextShotPhase.String(), ir.shotCount)
 		}
 	case ShotPhaseFocussing:
-		turnOffPin(ir.focusPin)
+		ir.focusPin.SetLow()
 		ir.shotCount++
-		turnOnPin(ir.shutterPin)
+		ir.shutterPin.SetHigh()
 		nextActionTime = currentTime.Add(time.Duration(ir.bulbTimeSeconds) * time.Second)
 		nextShotPhase = ShotPhaseShooting
 		tsNextIntervalometerStatus = fmt.Sprintf("%s %d", nextShotPhase.String(), ir.shotCount)
 	case ShotPhaseShooting:
-		turnOffPin(ir.shutterPin)
+		ir.shutterPin.SetLow()
 		nextActionTime = currentTime.Add(time.Duration(ir.restTimeSeconds) * time.Second)
 		nextShotPhase = ShotPhaseRest
 		tsNextIntervalometerStatus = fmt.Sprintf("%s %d", nextShotPhase.String(), ir.shotCount)
@@ -208,8 +220,8 @@ func (ir *IntervalometerRunner) Run(currentTime time.Time, ts *models.TrackStatu
 				}
 				nextIntervalometerMode = IntervalometerEnabled
 			case IntervalometerRunning:
-				turnOffPin(ir.focusPin)
-				turnOffPin(ir.shutterPin)
+				ir.focusPin.SetLow()
+				ir.shutterPin.SetLow()
 				if intervalometerShouldBeEnabled {
 					nextIntervalometerMode = IntervalometerEnabled
 				} else {

@@ -40,7 +40,11 @@ func main() {
 		log.Fatalf("Unable to apply desired network settings: %v\n\n%+v\n", err, context.NetworkSettings)
 	}
 
-	intervalometerRunner := runners.NewIntervalometerRunner(6)
+	intervalometerRunner, err := runners.NewIntervalometerRunner(5, 6)
+
+	if err != nil {
+		log.Fatalf("Unable to create Intervalometer Runner: %v\n", err)
+	}
 
 	http.Handle("/settings/network", handlers.AppHandler{AppContext: context, H: handlers.NetworkSettingsHandler})
 	http.Handle("/settings/network/ap", handlers.AppHandler{AppContext: context, H: handlers.APSettingsHandler})
