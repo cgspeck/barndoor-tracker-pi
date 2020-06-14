@@ -59,6 +59,20 @@ https://github.com/yryz/ds18b20
 
 ## Ardino / Stepper Driver / Button Wiring
 
+| Arduino   | Rpi          | TMC2130   | Momentary SPST | Home LED     |
+| --------- | ------------ | --------- | -------------- | ------------ |
+| A4        | SDA1 (GPIO2) |           |                |              |
+| A5        | SCL1 (GPIO3) |           |                |              |
+| D2        |              | Step      |                |              |
+| D3        |              | Direction |                |              |
+| D5        |              | CS        |                |              |
+| SCK (13)  |              | SCK       |                |              |
+| MOSI (11) |              | SDI       |                |              |
+| MISO (12) |              | SDO       |                |              |
+| D7        |              |           | Pin 1          |              |
+| GND       |              |           | Pin 2          | Cathode      |
+| D8        |              |           |                | 220R - Anode |
+
 ## Updating snapshots
 
 ```
