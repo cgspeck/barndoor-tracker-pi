@@ -57,6 +57,8 @@ func main() {
 	})
 
 	http.Handle("/settings/location", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
+	http.Handle("/toggle/ignoreAz", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
+	http.Handle("/toggle/ignoreAlt", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
 
 	http.Handle("/status/flags", handlers.AppHandler{AppContext: context, H: handlers.Flags})
 	http.Handle("/status/align", handlers.AppHandler{AppContext: context, H: handlers.AlignHandler})

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -10,6 +11,22 @@ type LocationManagementDisabledError struct{}
 
 func (LocationManagementDisabledError) Error() string {
 	return "Location management is disabled"
+}
+
+type LocationManagementMissingKeyError struct {
+	k string
+}
+
+func (e LocationManagementMissingKeyError) Error() string {
+	return fmt.Sprintf("Key missing %q", e.k)
+}
+
+type LocationManagementInvalidValueError struct {
+	v interface{}
+}
+
+func (e LocationManagementInvalidValueError) Error() string {
+	return fmt.Sprintf("Invalid value %q", e.v)
 }
 
 func LocationSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, error) {
@@ -27,9 +44,37 @@ func LocationSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *http.Requ
 			return 500, err
 		}
 
-		locationSettings.Lock()
-		err = ah.SetLocationSettings(input)
-		locationSettings.Unlock()
+		path := r.URL.Path
+
+		switch path {
+		case "/settings/location":
+			locationSettings.Lock()
+			err = ah.SetLocationSettings(input)
+			locationSettings.Unlock()
+		case "/toggle/ignoreAz":
+			fallthrough
+		case "/toggle/ignoreAlt":
+			rv, ok := input["enabled"]
+
+			if !ok {
+				return 400, LocationManagementMissingKeyError{"enabled"}
+			}
+
+			bv, ok := rv.(bool)
+
+			if !ok {
+				return 400, LocationManagementInvalidValueError{rv}
+			}
+
+			locationSettings.Lock()
+			if path == "/toggle/ignoreAz" {
+				locationSettings.IgnoreAz = bv
+			} else {
+				locationSettings.IgnoreAlt = bv
+			}
+			locationSettings.Unlock()
+		}
+
 		if err != nil {
 			return 500, err
 		}
