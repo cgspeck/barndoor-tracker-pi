@@ -29,14 +29,31 @@ Note:
 - `0x1e` is the default address of the magnetometer
 - `0x6b` is the default address of the accelerometer and gyroscope
 
-## LSM9DS1 Wiring
+## Pi / LSM9DS1 / Nano / Optocoupler Wiring / Transistor / DS18b20 wiring
 
-| Rpi                  | LSM9DS1 |
-| -------------------- | ------- |
-| 3v3                  | VCC     |
-| Ground               | GND     |
-| 2<br/>BCM2<br/>WiPi8 | SDA     |
-| 3<br/>BCM3<br/>WiPi9 | SCL     |
+| Rpi                       | LSM9DS1 | Arduino Nano | Optocoupler                                |
+| ------------------------- | ------- | ------------ | ------------------------------------------ |
+| 3v3                       | VCC     |              | 1k resistor - Anode 1, 1k resistor Anode 2 |
+| Ground                    | GND     | GND          | GND                                        |
+| GPIO 2<br/>BCM2<br/>WiPi8 | SDA1    | A4 (SDA)     |
+| GPIO 3<br/>BCM3<br/>WiPi9 | SCL1    | A5 (SCL)     |
+| GPIO 5                    |         |              | Cathode 1 (shutter)                        |
+| GPIO 6                    |         |              | Cathode 2 (focus)                          |
+
+## Optocoupler & Pi Resouces
+
+Wiring for each Cathode:
+
+| Logic Side                |
+| ------------------------- |
+| 3v3 - 1k resistor - Anode |
+| GPIO - Cathode            |
+
+https://www.sunfounder.com/learn/Super_Kit_V3_0_for_Raspberry_Pi/lesson-8-4n35-super-kit-v3-0-for-raspberry-pi.html
+
+https://raspberrypi.stackexchange.com/questions/74117/why-optocoupler-4n35-needs-resistor
+
+## Ardino / Stepper Driver / Button Wiring
 
 ## Updating snapshots
 
