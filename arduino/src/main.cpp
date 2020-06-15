@@ -110,6 +110,7 @@ void setup()
   // stepperConfig.set_IHOLD_IRUN(31,31,5); // ([0-31],[0-31],[0-5]) sets all currents to maximum
   stepperConfig.set_I_scale_analog(1); // ({0,1}) 0: I_REF internal, 1: sets I_REF to AIN
   stepperConfig.set_tbl(1);            // ([0-3]) set comparator blank time to 16, 24, 36 or 54 clocks, 1 or 2 is recommended
+  stepper.setMaxSpeed(2000);
 }
 
 void setupIdleState(int prev)
@@ -169,6 +170,8 @@ bool setupTrackingState(int prev)
   stepper.setSpeed(MINUTE_TO_STEPS_PER_SECOND[0]);
   stepper.runSpeed();
 #ifdef SERIAL_DEBUG
+  Serial.print("Speed set to ");
+  Serial.println(MINUTE_TO_STEPS_PER_SECOND[0]);
   Serial.println("Finished setting Up Tracking State");
 #endif
 
