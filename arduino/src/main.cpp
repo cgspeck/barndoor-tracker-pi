@@ -38,6 +38,9 @@ unsigned long previous_serial_report_millis = 0;
 
 unsigned int inputHomeRunStopButtonHistory = 0b00000000;
 
+#define PIN_IN_ENDSTOP A3
+unsigned int inputEndstopHistory = 0b11111111;
+
 int previous_mode;
 int current_mode;
 
@@ -93,6 +96,7 @@ void turnOnHomeIndicator()
 void setup()
 {
   pinMode(PIN_IN_HOME_RUN_STOP, INPUT_PULLUP);
+  pinMode(PIN_IN_ENDSTOP, INPUT_PULLUP);
   pinMode(PIN_OUT_HOME_INDICATOR, OUTPUT);
   turnOffHomeIndicator();
   previous_mode = mode::IDLE;
@@ -178,9 +182,14 @@ bool setupTrackingState(int prev)
   return true;
 }
 
+bool isEndstopTriggered() {
+  return isButtonUp(&inputEndstopHistory);
+}
+
 void loop()
 {
   updateButton(&inputHomeRunStopButtonHistory, PIN_IN_HOME_RUN_STOP);
+  updateButton(&inputEndstopHistory, PIN_IN_ENDSTOP);
   int current_mode = previous_mode;
 
   if (isButtonRelease(&inputHomeRunStopButtonHistory))
@@ -225,7 +234,7 @@ void loop()
 
     break;
   case mode::HOMING:
-    if (stepperConfig.isStallguard())
+    if (isEndstopTriggered())
     {
 #ifdef SERIAL_DEBUG
       Serial.println("Homing complete");
