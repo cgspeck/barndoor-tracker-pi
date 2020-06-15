@@ -93,6 +93,9 @@ void turnOnHomeIndicator()
   digitalWrite(PIN_OUT_HOME_INDICATOR, HIGH);
 }
 
+// 1 for full steps, 2 for half steps, 4 for quarter steps etc
+#define MICROSTEP_FACTOR 4
+
 void setup()
 {
   pinMode(PIN_IN_HOME_RUN_STOP, INPUT_PULLUP);
@@ -114,7 +117,7 @@ void setup()
   // stepperConfig.set_IHOLD_IRUN(31,31,5); // ([0-31],[0-31],[0-5]) sets all currents to maximum
   stepperConfig.set_I_scale_analog(1); // ({0,1}) 0: I_REF internal, 1: sets I_REF to AIN
   stepperConfig.set_tbl(1);            // ([0-3]) set comparator blank time to 16, 24, 36 or 54 clocks, 1 or 2 is recommended
-  stepper.setMaxSpeed(2000);
+  stepper.setMaxSpeed(2000 * MICROSTEP_FACTOR);
 }
 
 void setupIdleState(int prev)
@@ -145,7 +148,7 @@ bool setupHomingState(int prev)
   Serial.println("Setting Up Homing State");
 #endif
   stepper.stop();
-  stepper.setSpeed(HOME_SPEED);
+  stepper.setSpeed(HOME_SPEED * MICROSTEP_FACTOR);
   stepper.runSpeed();
 #ifdef SERIAL_DEBUG
   Serial.println("Finished Setting Up Homing State");
@@ -171,10 +174,10 @@ bool setupTrackingState(int prev)
   turnOffHomeIndicator();
   trackingStartedAtMillis = millis();
   previous_minute = 0;
-  stepper.setSpeed(MINUTE_TO_STEPS_PER_SECOND[0]);
+  stepper.setSpeed(MINUTE_TO_STEPS_PER_SECOND[0] * MICROSTEP_FACTOR);
   stepper.runSpeed();
 #ifdef SERIAL_DEBUG
-  Serial.print("Speed set to ");
+  Serial.print("Speed set to reference ");
   Serial.println(MINUTE_TO_STEPS_PER_SECOND[0]);
   Serial.println("Finished setting Up Tracking State");
 #endif
@@ -276,7 +279,7 @@ void loop()
 
       if (current_minute != previous_minute)
       {
-        new_speed = MINUTE_TO_STEPS_PER_SECOND[current_minute];
+        new_speed = MINUTE_TO_STEPS_PER_SECOND[current_minute] * MICROSTEP_FACTOR;
 #ifdef SERIAL_DEBUG
         Serial.print("Changing speed to ");
         Serial.println(new_speed);
