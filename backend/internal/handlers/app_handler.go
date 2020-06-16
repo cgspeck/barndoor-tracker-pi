@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -146,6 +147,10 @@ func writeJson(v interface{}, w http.ResponseWriter) error {
 }
 
 func handleHandlerResult(status int, err error, w http.ResponseWriter, r *http.Request) {
+	type errorMsg struct {
+		Error string `json:"error"`
+	}
+
 	if err != nil {
 		log.Printf("HTTP %d: %q", status, err)
 		switch status {
@@ -154,10 +159,17 @@ func handleHandlerResult(status int, err error, w http.ResponseWriter, r *http.R
 			// And if we wanted a friendlier error page, we can
 			// now leverage our context instance - e.g.
 			// err := ah.renderTemplate(w, "http_404.tmpl", nil)
-		case http.StatusInternalServerError:
-			http.Error(w, http.StatusText(status), status)
 		default:
-			http.Error(w, http.StatusText(status), status)
+			em, err := json.Marshal(errorMsg{
+				Error: err.Error(),
+			})
+
+			if err != nil {
+				fmt.Printf("Error marshalling error response: %v\n", err)
+				http.Error(w, string(em), status)
+			} else {
+				http.Error(w, string(em), status)
+			}
 		}
 	}
 }
