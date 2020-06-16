@@ -96,7 +96,7 @@ func main() {
 
 	l, err := lsm9ds1.New(&bus)
 	if err != nil {
-		fmt.Printf("Error instantiating driver: %v", err)
+		fmt.Printf("Error instantiating LSM9DS1 driver: %v", err)
 		os.Exit(1)
 	}
 

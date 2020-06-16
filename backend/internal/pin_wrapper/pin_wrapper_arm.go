@@ -29,7 +29,7 @@ func NewWrappedPin(pinNo int) (*WrappedPin, error) {
 }
 
 func (wp *WrappedPin) SetHigh() {
-	if logicFlip {
+	if wp.logicFlip {
 		wp.pin.Write(embd.High)
 	} else {
 		wp.pin.Write(embd.Low)
@@ -38,7 +38,7 @@ func (wp *WrappedPin) SetHigh() {
 }
 
 func (wp *WrappedPin) SetLow() {
-	if logicFlip {
+	if wp.logicFlip {
 		wp.pin.Write(embd.Low)
 	} else {
 		wp.pin.Write(embd.High)
