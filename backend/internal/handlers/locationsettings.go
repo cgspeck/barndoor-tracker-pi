@@ -64,13 +64,14 @@ func LocationSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *http.Requ
 				return 400, LocationManagementInvalidValueError{rv}
 			}
 
-			locationSettings.Lock()
 			if path == "/backend/toggle/ignoreAz" {
 				locationSettings.IgnoreAz = bv
 			} else {
 				locationSettings.IgnoreAlt = bv
 			}
-			locationSettings.Unlock()
+
+			fmt.Fprintf(w, "{ \"enabled\" : %v }", rv)
+			return 200, nil
 		}
 
 		if err != nil {

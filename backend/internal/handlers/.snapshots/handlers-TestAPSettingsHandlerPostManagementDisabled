@@ -8,7 +8,7 @@
       (string) (len=7) "nosniff"
     }
   },
-  Body: (*bytes.Buffer)(AP management is disabled
+  Body: (*bytes.Buffer)({"error":"AP management is disabled"}
 ),
   Flushed: (bool) false,
   result: (*http.Response)(<nil>),
