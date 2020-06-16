@@ -74,9 +74,6 @@ func main() {
 	})
 
 	port := 5000
-	if context.Flags.RunningAsRoot {
-		port = 80
-	}
 	log.Printf("Starting server on port %v", port)
 
 	// set up periodic callbacks
