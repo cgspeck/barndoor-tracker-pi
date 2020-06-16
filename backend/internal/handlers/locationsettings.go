@@ -80,8 +80,6 @@ func LocationSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *http.Requ
 
 	if r.Method == "GET" || r.Method == "POST" {
 		locationSettings := ah.GetLocationSettings()
-		locationSettings.RLock()
-		defer locationSettings.RUnlock()
 		err := writeJson(locationSettings, w)
 		if err != nil {
 			return 500, err
