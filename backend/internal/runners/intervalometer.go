@@ -68,8 +68,10 @@ func NewIntervalometerRunner(shutterPinNo int, focusPinNo int) (*IntervalometerR
 	}
 
 	return &IntervalometerRunner{
-		shutterPin: shutterPin,
-		focusPin:   focusPin,
+		shutterPin:      shutterPin,
+		focusPin:        focusPin,
+		bulbTimeSeconds: 30,
+		restTimeSeconds: 30,
 	}, nil
 }
 

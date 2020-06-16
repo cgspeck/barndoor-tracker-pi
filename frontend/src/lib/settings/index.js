@@ -34,10 +34,24 @@ async function getIntervalometerSettings() {
 
 async function setIntervalometerSettings(bulbInterval, restInterval) {
   return axios
-    .post(`${config.endpoint}/backend/settings/intervalometer`, {
-      bulbInterval,
-      restInterval,
-    })
+    .post(
+      `${config.endpoint}/backend/settings/intervalometer`,
+      {
+        bulbInterval,
+        restInterval,
+      },
+      {
+        transformRequest: [
+          function (data, _) {
+            const res = {
+              bulbInterval: parseInt(data.bulbInterval, 10),
+              restInterval: parseInt(data.restInterval, 10),
+            };
+            return JSON.stringify(res);
+          },
+        ],
+      },
+    )
     .then((r) => r.data);
 }
 

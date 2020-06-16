@@ -56,14 +56,14 @@ func IntervalometerSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *htt
 
 		intervalRunner := ah.GetIntervalRunner()
 		intervalRunner.Lock()
-		defer intervalRunner.Unlock()
+		intervalRunner.SetIntervalPeriods(newSettings)
+		intervalRunner.Unlock()
 	}
 
 	if r.Method == "GET" || r.Method == "POST" {
 		intervalRunner := ah.GetIntervalRunner()
 		intervalRunner.RLock()
 		defer intervalRunner.RUnlock()
-
 		intervalPeriods := intervalRunner.GetIntervalPeriods()
 
 		err := writeJson(intervalPeriods, w)
