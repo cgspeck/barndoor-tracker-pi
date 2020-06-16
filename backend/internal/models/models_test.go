@@ -190,6 +190,12 @@ func TestTrackStatusProcessArduinoStateChange(t *testing.T) {
 			expectedState: "Idle",
 		},
 		TestCase{
+			previousState: "Tracking Requested",
+			input:         "Tracking",
+			expectedError: false,
+			expectedState: "Tracking",
+		},
+		TestCase{
 			previousState: "Idle",
 			input:         "FauxCommand",
 			expectedError: true,
