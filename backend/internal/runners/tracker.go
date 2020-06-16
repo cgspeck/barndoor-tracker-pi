@@ -69,9 +69,9 @@ func (i UnexpectedTrackerState) Error() string {
 
 func trackerStateToArduinoInstruction(state string) (byte, error) {
 	stateByteMap := map[string]byte{
-		"Homing Requested": byte(0x01),
-		"Stop Requested":   byte(0x04),
-		"Idle Requested":   byte(0x06),
+		"Homing Requested":   byte(0x01),
+		"Tracking Requested": byte(0x04),
+		"Stop Requested":     byte(0x06),
 	}
 
 	v, ok := stateByteMap[state]

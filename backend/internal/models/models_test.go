@@ -82,7 +82,7 @@ func TestTrackStatusProcessTrackCommand(t *testing.T) {
 			previousState: "Tracking",
 			input:         "stop",
 			expectedError: false,
-			expectedState: "Idle",
+			expectedState: "Stop Requested",
 		},
 		TestCase{
 			previousState: "Homing",

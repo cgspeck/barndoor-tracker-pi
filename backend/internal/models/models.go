@@ -99,7 +99,7 @@ func (ts *TrackStatus) ProcessTrackCommand(command string) (string, error) {
 	case "stop":
 		if currentState == "Tracking" {
 			stateChanged = true
-			nextState = "Idle"
+			nextState = "Stop Requested"
 		}
 	}
 
