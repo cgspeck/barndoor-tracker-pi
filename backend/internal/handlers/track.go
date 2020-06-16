@@ -92,6 +92,9 @@ func TrackHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, 
 			} else {
 				trackStatus.DewControllerEnabled = bEnabled
 			}
+
+			fmt.Fprintf(w, "{ \"enabled\" : %v }", iEnabled)
+			return 200, nil
 		}
 	}
 
