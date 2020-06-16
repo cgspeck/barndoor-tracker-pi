@@ -11,7 +11,7 @@
 #include "lookupTable.h"
 
 // uncomment for debug info via serial console
-#define SERIAL_DEBUG
+// #define SERIAL_DEBUG
 
 #ifdef SERIAL_DEBUG
 #define SERIAL_REPORT_INTERVAL_MILLIS 1000
@@ -41,15 +41,15 @@ unsigned int inputHomeRunStopButtonHistory = 0b00000000;
 #define PIN_IN_ENDSTOP A3
 unsigned int inputEndstopHistory = 0b11111111;
 
-int previous_mode;
-int current_mode;
+volatile byte previous_mode;
+volatile byte i2c_request = 0b00000000;
 
 AccelStepper stepper(AccelStepper::DRIVER);
-Trinamic_TMC2130 stepperConfig(CS_PIN);
+//Trinamic_TMC2130 stepperConfig(CS_PIN);
 
-void handleI2CRecieve(int numBytes)
+void handleI2CRecieve(int _numBytes)
 {
-  int requested_mode = Wire.read();
+  byte requested_mode = Wire.read();
 #ifdef SERIAL_DEBUG
   Serial.print("I2C recieved ");
   Serial.println(requested_mode);
@@ -58,12 +58,20 @@ void handleI2CRecieve(int numBytes)
   switch (requested_mode)
   {
   case mode::STOP_REQUESTED:
+    if (previous_mode == mode::TRACKING) {
+      i2c_request = requested_mode;
+    }
+    break;
   case mode::HOME_REQUESTED:
+    if (previous_mode == mode::IDLE) {
+      i2c_request = requested_mode;
+    }
+    break;
   case mode::TRACK_REQUESTED:
-#ifdef SERIAL_DEBUG
-    Serial.print("I2C recieved is valid");
-#endif
-    current_mode = requested_mode;
+    if (previous_mode == mode::HOMED) {
+      i2c_request = requested_mode;
+    }
+    break;
   }
 
   Wire.flush();
@@ -74,7 +82,7 @@ void handleI2CRequest()
 #ifdef SERIAL_DEBUG
   Serial.println("I2C send current mode");
 #endif
-  Wire.write(byte(current_mode));
+  Wire.write(previous_mode);
 }
 
 void turnOffHomeIndicator()
@@ -112,11 +120,12 @@ void setup()
   Wire.onReceive(handleI2CRecieve);
   Wire.onRequest(handleI2CRequest);
 
-  stepperConfig.init();
+  /*stepperConfig.init();
   stepperConfig.set_mres(64);
   // stepperConfig.set_IHOLD_IRUN(31,31,5); // ([0-31],[0-31],[0-5]) sets all currents to maximum
   stepperConfig.set_I_scale_analog(1); // ({0,1}) 0: I_REF internal, 1: sets I_REF to AIN
   stepperConfig.set_tbl(1);            // ([0-3]) set comparator blank time to 16, 24, 36 or 54 clocks, 1 or 2 is recommended
+  */
   stepper.setMaxSpeed(2000 * MICROSTEP_FACTOR);
 }
 
@@ -214,6 +223,16 @@ void loop()
     default:
       break;
     }
+  } else {
+    noInterrupts();
+    byte i2c_request_copy = i2c_request;
+    interrupts();
+    if (i2c_request != 0b00000000) {
+      current_mode = i2c_request;
+      noInterrupts();
+      i2c_request = 0b00000000;
+      interrupts();
+      }
   }
 
   bool success;
