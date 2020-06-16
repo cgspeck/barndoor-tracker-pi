@@ -1,5 +1,5 @@
 - request:
-    url: /status/debug
+    url: /backend/status/debug
     method: GET
   response:
     - status: 200
@@ -8,7 +8,7 @@
         Content-Type: application/json
 
 - request:
-    url: /settings/network/ap
+    url: /backend/settings/network/ap
     method: [GET, POST]
   response:
     - status: 200
@@ -17,7 +17,7 @@
         Content-Type: application/json
 
 - request:
-    url: /settings/network
+    url: /backend/settings/network
     method: [POST]
   response:
     - status: 200
@@ -26,7 +26,7 @@
         Content-Type: application/json
 
 - request:
-    url: /flags
+    url: /backend/flags
     method: GET
   response:
     - status: 200
@@ -35,7 +35,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/settings/location$
+    url: ^/backend/settings/location$
     method: [GET, POST]
   response:
     - status: 200
@@ -44,7 +44,7 @@
         Content-Type: application/json
 
 - request:
-    url: /status/align
+    url: /backend/status/align
     method: GET
   response:
     - status: 200
@@ -53,7 +53,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/track$
+    url: ^/backend/track$
     method: GET
   response:
     - status: 200
@@ -112,7 +112,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/track$
+    url: ^/backend/track$
     method: POST
     json: '{"command":"home"}'
   response:
@@ -122,7 +122,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/track$
+    url: ^/backend/track$
     method: POST
     json: '{"command":"track"}'
   response:
@@ -132,7 +132,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/track$
+    url: ^/backend/track$
     method: POST
     json: '{"command":"stop"}'
   response:
@@ -142,7 +142,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/toggle/intervalometer$
+    url: ^/backend/toggle/intervalometer$
     method: POST
     json: '{"enabled":true}'
   response:
@@ -152,7 +152,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/toggle/intervalometer$
+    url: ^/backend/toggle/intervalometer$
     method: POST
     json: '{"enabled":false}'
   response:
@@ -162,7 +162,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/toggle/dewcontroller$
+    url: ^/backend/toggle/dewcontroller$
     method: POST
     json: '{"enabled":true}'
   response:
@@ -172,7 +172,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/toggle/dewcontroller$
+    url: ^/backend/toggle/dewcontroller$
     method: POST
     json: '{"enabled":false}'
   response:
@@ -182,7 +182,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/settings/intervalometer$
+    url: ^/backend/settings/intervalometer$
     method: [GET]
   response:
     - status: 200
@@ -191,7 +191,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/settings/intervalometer$
+    url: ^/backend/settings/intervalometer$
     method: [POST]
   response:
     - status: 200
@@ -200,7 +200,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/toggle/ignoreAz$
+    url: ^/backend/toggle/ignoreAz$
     method: POST
     json: '{"enabled":true}'
   response:
@@ -210,7 +210,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/toggle/ignoreAz$
+    url: ^/backend/toggle/ignoreAz$
     method: POST
     json: '{"enabled":false}'
   response:
@@ -220,7 +220,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/toggle/ignoreAlt$
+    url: ^/backend/toggle/ignoreAlt$
     method: POST
     json: '{"enabled":true}'
   response:
@@ -230,7 +230,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/toggle/ignoreAlt$
+    url: ^/backend/toggle/ignoreAlt$
     method: POST
     json: '{"enabled":false}'
   response:
@@ -240,7 +240,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/status/dew_controller$
+    url: ^/backend/status/dew_controller$
     method: [GET]
   response:
     - status: 200
@@ -265,7 +265,7 @@
         Content-Type: application/json
 
 - request:
-    url: ^/settings/dew_controller$
+    url: ^/backend/settings/dew_controller$
     method: [POST]
   response:
     - status: 200

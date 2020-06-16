@@ -3,7 +3,7 @@ import config from '../../config';
 
 async function toggleIgnoreAz(enabled) {
   return axios
-    .post(`${config.endpoint}/toggle/ignoreAz`, {
+    .post(`${config.endpoint}/backend/toggle/ignoreAz`, {
       enabled,
     })
     .then((r) => {
@@ -13,7 +13,7 @@ async function toggleIgnoreAz(enabled) {
 
 async function toggleIgnoreAlt(enabled) {
   return axios
-    .post(`${config.endpoint}/toggle/ignoreAlt`, {
+    .post(`${config.endpoint}/backend/toggle/ignoreAlt`, {
       enabled,
     })
     .then((r) => {
@@ -23,7 +23,7 @@ async function toggleIgnoreAlt(enabled) {
 
 async function toggleIntervalometer(enabled) {
   return axios
-    .post(`${config.endpoint}/toggle/intervalometer`, {
+    .post(`${config.endpoint}/backend/toggle/intervalometer`, {
       enabled,
     })
     .then((r) => {
@@ -33,7 +33,7 @@ async function toggleIntervalometer(enabled) {
 
 async function toggleDewController(enabled) {
   return axios
-    .post(`${config.endpoint}/toggle/dewcontroller`, {
+    .post(`${config.endpoint}/backend/toggle/dewcontroller`, {
       enabled,
     })
     .then((r) => {
@@ -43,7 +43,7 @@ async function toggleDewController(enabled) {
 
 async function startHoming() {
   return axios
-    .post(`${config.endpoint}/track`, {
+    .post(`${config.endpoint}/backend/track`, {
       command: 'home',
     })
     .then((r) => r.data.state);
@@ -51,7 +51,7 @@ async function startHoming() {
 
 async function startTracking() {
   return axios
-    .post(`${config.endpoint}/track`, {
+    .post(`${config.endpoint}/backend/track`, {
       command: 'track',
     })
     .then((r) => r.data.state);
@@ -59,7 +59,7 @@ async function startTracking() {
 
 async function stopTracking() {
   return axios
-    .post(`${config.endpoint}/track`, {
+    .post(`${config.endpoint}/backend/track`, {
       command: 'stop',
     })
     .then((r) => r.data.state);

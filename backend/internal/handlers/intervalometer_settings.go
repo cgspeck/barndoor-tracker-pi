@@ -30,7 +30,7 @@ func IntervalometerSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *htt
 	/*
 		GET/POST handles these routes:
 
-		"/settings/intervalometer", {"bulbInterval": 60, "restInterval": 61}
+		"/backend/settings/intervalometer", {"bulbInterval": 60, "restInterval": 61}
 
 	*/
 	if r.Method == "POST" {

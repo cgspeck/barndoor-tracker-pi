@@ -47,13 +47,13 @@ func LocationSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *http.Requ
 		path := r.URL.Path
 
 		switch path {
-		case "/settings/location":
+		case "/backend/settings/location":
 			locationSettings.Lock()
 			err = ah.SetLocationSettings(input)
 			locationSettings.Unlock()
-		case "/toggle/ignoreAz":
+		case "/backend/toggle/ignoreAz":
 			fallthrough
-		case "/toggle/ignoreAlt":
+		case "/backend/toggle/ignoreAlt":
 			rv, ok := input["enabled"]
 
 			if !ok {
@@ -67,7 +67,7 @@ func LocationSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *http.Requ
 			}
 
 			locationSettings.Lock()
-			if path == "/toggle/ignoreAz" {
+			if path == "/backend/toggle/ignoreAz" {
 				locationSettings.IgnoreAz = bv
 			} else {
 				locationSettings.IgnoreAlt = bv

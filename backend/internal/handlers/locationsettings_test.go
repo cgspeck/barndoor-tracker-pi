@@ -80,7 +80,7 @@ func TestLocationSettingsHandlerPost(t *testing.T) {
 		IgnoreAlt:      true,
 	}
 
-	rr := doLocationSettingsPost("/settings/location", body, &handler, http.StatusOK, t)
+	rr := doLocationSettingsPost("/backend/settings/location", body, &handler, http.StatusOK, t)
 
 	if len(handler.SetLocationSettingsCalls) != 1 {
 		t.Errorf("Expected a call to SetLocationSetting")

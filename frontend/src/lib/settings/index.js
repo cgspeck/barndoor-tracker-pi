@@ -2,22 +2,24 @@ import axios from 'axios';
 import config from '../../config';
 
 async function getAllSettings() {
-  return axios.get(`${config.endpoint}/status/debug`).then((r) => r.data);
+  return axios
+    .get(`${config.endpoint}/backend/status/debug`)
+    .then((r) => r.data);
 }
 
 async function getAPSettings() {
   return axios
-    .get(`${config.endpoint}/settings/network/ap`)
+    .get(`${config.endpoint}/backend/settings/network/ap`)
     .then((r) => r.data);
 }
 
 async function setAPSettings(ssid, key) {
   // remove when frontend actually has wireless management features
-  await axios.post(`${config.endpoint}/settings/network`, {
+  await axios.post(`${config.endpoint}/backend/settings/network`, {
     accessPointMode: true,
   });
   return axios
-    .post(`${config.endpoint}/settings/network/ap`, {
+    .post(`${config.endpoint}/backend/settings/network/ap`, {
       ssid,
       key,
     })
@@ -26,13 +28,13 @@ async function setAPSettings(ssid, key) {
 
 async function getIntervalometerSettings() {
   return axios
-    .get(`${config.endpoint}/settings/intervalometer`)
+    .get(`${config.endpoint}/backend/settings/intervalometer`)
     .then((r) => r.data);
 }
 
 async function setIntervalometerSettings(bulbInterval, restInterval) {
   return axios
-    .post(`${config.endpoint}/settings/intervalometer`, {
+    .post(`${config.endpoint}/backend/settings/intervalometer`, {
       bulbInterval,
       restInterval,
     })
@@ -40,7 +42,9 @@ async function setIntervalometerSettings(bulbInterval, restInterval) {
 }
 
 async function getLocationSettings() {
-  return axios.get(`${config.endpoint}/settings/location`).then((r) => r.data);
+  return axios
+    .get(`${config.endpoint}/backend/settings/location`)
+    .then((r) => r.data);
 }
 
 async function setLocationSettings(
@@ -54,7 +58,7 @@ async function setLocationSettings(
 ) {
   return axios
     .post(
-      `${config.endpoint}/settings/location`,
+      `${config.endpoint}/backend/settings/location`,
       {
         latitude,
         magDeclination,
@@ -85,26 +89,30 @@ async function setLocationSettings(
 }
 
 async function getFlags() {
-  return axios.get(`${config.endpoint}/status/flags`).then((r) => r.data);
+  return axios
+    .get(`${config.endpoint}/backend/status/flags`)
+    .then((r) => r.data);
 }
 
 async function getAlignStatus() {
-  return axios.get(`${config.endpoint}/status/align`).then((r) => r.data);
+  return axios
+    .get(`${config.endpoint}/backend/status/align`)
+    .then((r) => r.data);
 }
 
 async function getTrackState() {
-  return axios.get(`${config.endpoint}/track`).then((r) => r.data);
+  return axios.get(`${config.endpoint}/backend/track`).then((r) => r.data);
 }
 
 async function getDewControllerStatus() {
   return axios
-    .get(`${config.endpoint}/status/dew_controller`)
+    .get(`${config.endpoint}/backend/status/dew_controller`)
     .then((r) => r.data);
 }
 
 async function setTargetTemperature(targetTemp) {
   return axios
-    .post(`${config.endpoint}/settings/dew_controller`, {
+    .post(`${config.endpoint}/backend/settings/dew_controller`, {
       targetTemp,
     })
     .then((r) => r.data);

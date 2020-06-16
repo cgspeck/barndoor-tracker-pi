@@ -98,6 +98,23 @@
   }),
   OS: (string) (len=5) "linux",
   Arch: (string) (len=5) "amd64",
-  TrackStatus: (*models.TrackStatus)(<nil>)
+  TrackStatus: (*models.TrackStatus)({
+    RWMutex: (sync.RWMutex) {
+      w: (sync.Mutex) {
+        state: (int32) 0,
+        sema: (uint32) 0
+      },
+      writerSem: (uint32) 0,
+      readerSem: (uint32) 0,
+      readerCount: (int32) 0,
+      readerWait: (int32) 0
+    },
+    State: (string) (len=4) "Idle",
+    PreviousState: (string) (len=4) "Idle",
+    ElapsedMillis: (int32) 0,
+    DewControllerEnabled: (bool) true,
+    IntervolmeterEnabled: (bool) true,
+    IntervolmeterState: (string) ""
+  })
 })
 (interface {}) <nil>

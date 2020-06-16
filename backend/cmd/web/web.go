@@ -46,30 +46,30 @@ func main() {
 		log.Fatalf("Unable to create Intervalometer Runner: %v\n", err)
 	}
 
-	http.Handle("/settings/network", handlers.AppHandler{AppContext: context, H: handlers.NetworkSettingsHandler})
-	http.Handle("/settings/network/ap", handlers.AppHandler{AppContext: context, H: handlers.APSettingsHandler})
-	// low prio: http.Handle("/settings/network/profiles", handlers.AppHandler{context, ...})
-	// low prio: http.Handle("/settings/network/avaliable", handlers.AppHandler{context, ...})
-	http.Handle("/settings/intervalometer", handlers.AppHandler{
+	http.Handle("/backend/settings/network", handlers.AppHandler{AppContext: context, H: handlers.NetworkSettingsHandler})
+	http.Handle("/backend/settings/network/ap", handlers.AppHandler{AppContext: context, H: handlers.APSettingsHandler})
+	// low prio: http.Handle("/backend/settings/network/profiles", handlers.AppHandler{context, ...})
+	// low prio: http.Handle("/backend/settings/network/avaliable", handlers.AppHandler{context, ...})
+	http.Handle("/backend/settings/intervalometer", handlers.AppHandler{
 		AppContext:     context,
 		H:              handlers.IntervalometerSettingsHandler,
 		IntervalRunner: intervalometerRunner,
 	})
 
-	http.Handle("/settings/location", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
-	http.Handle("/toggle/ignoreAz", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
-	http.Handle("/toggle/ignoreAlt", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
+	http.Handle("/backend/settings/location", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
+	http.Handle("/backend/toggle/ignoreAz", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
+	http.Handle("/backend/toggle/ignoreAlt", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
 
-	http.Handle("/status/flags", handlers.AppHandler{AppContext: context, H: handlers.Flags})
-	http.Handle("/status/align", handlers.AppHandler{AppContext: context, H: handlers.AlignHandler})
-	http.Handle("/status/track", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
-	http.Handle("/status/debug", handlers.AppHandler{AppContext: context, H: handlers.DebugHandler})
+	http.Handle("/backend/status/flags", handlers.AppHandler{AppContext: context, H: handlers.Flags})
+	http.Handle("/backend/status/align", handlers.AppHandler{AppContext: context, H: handlers.AlignHandler})
+	http.Handle("/backend/status/track", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
+	http.Handle("/backend/status/debug", handlers.AppHandler{AppContext: context, H: handlers.DebugHandler})
 
-	http.Handle("/toggle/intervalometer", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
-	http.Handle("/toggle/dewcontroller", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
-	http.Handle("/track", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
+	http.Handle("/backend/toggle/intervalometer", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
+	http.Handle("/backend/toggle/dewcontroller", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
+	http.Handle("/backend/track", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
 
-	http.HandleFunc("/config.json", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/backend/config.json", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./config.json")
 	})
 

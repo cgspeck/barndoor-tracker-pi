@@ -42,15 +42,15 @@ func TrackHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, 
 	/*
 		POST handles these routes:
 
-		"/toggle/intervalometer", { "enabled": bool }
-		"/toggle/dewcontroller", { "enabled": bool }
-		"/track" { "command": "val"} <- need to check this against current state!
+		"/backend/toggle/intervalometer", { "enabled": bool }
+		"/backend/toggle/dewcontroller", { "enabled": bool }
+		"/backend/track" { "command": "val"} <- need to check this against current state!
 
 	*/
 	if r.Method == "POST" {
 		path := r.URL.Path
 
-		if !(path == "/track" || path == "/toggle/intervalometer" || path == "/toggle/dewcontroller") {
+		if !(path == "/backend/track" || path == "/backend/toggle/intervalometer" || path == "/backend/toggle/dewcontroller") {
 			return 404, UnrecognisedPathError{path}
 		}
 
@@ -65,14 +65,14 @@ func TrackHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, 
 		}
 
 		switch path {
-		case "/track":
+		case "/backend/track":
 			command, ok := input["command"]
 			if ok {
 				err = handleTrackCommand(ah, fmt.Sprintf("%v", command))
 			} else {
 				err = BadRequestError{}
 			}
-		case "/toggle/intervalometer", "/toggle/dewcontroller":
+		case "/backend/toggle/intervalometer", "/backend/toggle/dewcontroller":
 			iEnabled, ok := input["enabled"]
 
 			if !ok {
@@ -89,7 +89,7 @@ func TrackHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, 
 			trackStatus.Lock()
 			defer trackStatus.Unlock()
 
-			if path == "/toggle/intervalometer" {
+			if path == "/backend/toggle/intervalometer" {
 				trackStatus.IntervolmeterEnabled = bEnabled
 			} else {
 				trackStatus.DewControllerEnabled = bEnabled
