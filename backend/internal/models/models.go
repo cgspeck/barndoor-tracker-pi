@@ -137,7 +137,7 @@ func (ts *TrackStatus) ProcessArduinoStateChange(arduinoReportedState string) (s
 			nextState = "Tracking"
 		}
 	case "Idle":
-		if currentState == "Tracking" {
+		if currentState == "Tracking" || currentState == "Stop Requested" {
 			stateChanged = true
 			nextState = "Idle"
 		}
