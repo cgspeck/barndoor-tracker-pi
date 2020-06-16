@@ -182,7 +182,7 @@ func (ir *IntervalometerRunner) Run(currentTime time.Time, ts *models.TrackStatu
 		ir.Lock()
 		defer ir.Unlock()
 
-		intervalometerShouldBeEnabled := ts.IntervolmeterEnabled
+		intervalometerShouldBeEnabled := ts.IntervalometerEnabled
 		intervalometerShouldBeDisabled := !intervalometerShouldBeEnabled
 		isTracking := ts.State == "Tracking"
 		var nextActionTime time.Time
@@ -234,7 +234,7 @@ func (ir *IntervalometerRunner) Run(currentTime time.Time, ts *models.TrackStatu
 			tsNextIntervalometerStatus = nextIntervalometerMode.String()
 		}
 
-		ts.IntervolmeterState = tsNextIntervalometerStatus
+		ts.IntervalometerState = tsNextIntervalometerStatus
 		ir.nextAction = nextActionTime
 		ir.shootingPhase = nextShotPhase
 		ir.mode = nextIntervalometerMode

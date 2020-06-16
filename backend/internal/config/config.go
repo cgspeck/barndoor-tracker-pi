@@ -322,7 +322,7 @@ func NewAppContext(
 		State: "Idle",
 		PreviousState: "Idle",
 		DewControllerEnabled: true,
-		IntervolmeterEnabled: true,
+		IntervalometerEnabled: true,
 
 	}
 	return res, nil

@@ -14,7 +14,7 @@ func TestTrackHandler(t *testing.T) {
 
 	handler.TrackStatus = &models.TrackStatus{
 		State:              "foo",
-		IntervolmeterState: "bar",
+		IntervalometerState: "bar",
 		ElapsedMillis:      123,
 	}
 

@@ -11,7 +11,7 @@
   "elapsedMillis": 123,
   "dewControllerEnabled": false,
   "intervalometerEnabled": false,
-  "intervolmeterState": "bar",
+  "intervalometerState": "bar",
   "TrackStartedAt": "0001-01-01T00:00:00Z"
 }),
   Flushed: (bool) false,

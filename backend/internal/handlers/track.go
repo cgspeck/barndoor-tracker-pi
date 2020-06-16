@@ -88,7 +88,7 @@ func TrackHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, 
 			trackStatus := ah.GetTrackStatus()
 
 			if path == "/backend/toggle/intervalometer" {
-				trackStatus.IntervolmeterEnabled = bEnabled
+				trackStatus.IntervalometerEnabled = bEnabled
 			} else {
 				trackStatus.DewControllerEnabled = bEnabled
 			}
