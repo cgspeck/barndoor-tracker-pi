@@ -61,12 +61,6 @@ func TestTrackStatusProcessTrackCommand(t *testing.T) {
 			expectedState: "Homing Requested",
 		},
 		TestCase{
-			previousState: "Finished",
-			input:         "home",
-			expectedError: false,
-			expectedState: "Homing Requested",
-		},
-		TestCase{
 			previousState: "Homing",
 			input:         "home",
 			expectedError: true,
@@ -97,10 +91,10 @@ func TestTrackStatusProcessTrackCommand(t *testing.T) {
 			expectedState: "Homing",
 		},
 		TestCase{
-			previousState: "Finished",
+			previousState: "Idle",
 			input:         "fauxcommand",
 			expectedError: true,
-			expectedState: "Finished",
+			expectedState: "Idle",
 		},
 	}
 
@@ -160,10 +154,10 @@ func TestTrackStatusProcessArduinoStateChange(t *testing.T) {
 			expectedState: "Homing",
 		},
 		TestCase{
-			previousState: "Finished",
-			input:         "Homing",
+			previousState: "Homing",
+			input:         "Homed",
 			expectedError: false,
-			expectedState: "Homing",
+			expectedState: "Homed",
 		},
 		TestCase{
 			previousState: "Tracking",
@@ -185,21 +179,15 @@ func TestTrackStatusProcessArduinoStateChange(t *testing.T) {
 		},
 		TestCase{
 			previousState: "Tracking",
-			input:         "Finished",
+			input:         "Idle",
 			expectedError: false,
-			expectedState: "Finished",
-		},
-		TestCase{
-			previousState: "Idle",
-			input:         "Finished",
-			expectedError: true,
 			expectedState: "Idle",
 		},
 		TestCase{
-			previousState: "Finished",
+			previousState: "Idle",
 			input:         "FauxCommand",
 			expectedError: true,
-			expectedState: "Finished",
+			expectedState: "Idle",
 		},
 	}
 

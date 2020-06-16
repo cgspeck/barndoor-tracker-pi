@@ -87,7 +87,7 @@ func (ts *TrackStatus) ProcessTrackCommand(command string) (string, error) {
 
 	switch command {
 	case "home":
-		if currentState == "Idle" || currentState == "Finished" {
+		if currentState == "Idle" {
 			stateChanged = true
 			nextState = "Homing Requested"
 		}
@@ -122,19 +122,24 @@ func (ts *TrackStatus) ProcessArduinoStateChange(arduinoReportedState string) (s
 
 	switch arduinoReportedState {
 	case "Homing":
-		if currentState == "Idle" || currentState == "Homing Requested" || currentState == "Finished" {
+		if currentState == "Idle" || currentState == "Homing Requested" {
 			stateChanged = true
 			nextState = "Homing"
+		}
+	case "Homed":
+		if currentState == "Homing" {
+			stateChanged = true
+			nextState = "Homed"
 		}
 	case "Tracking":
 		if currentState == "Homed" {
 			stateChanged = true
 			nextState = "Tracking"
 		}
-	case "Finished":
+	case "Idle":
 		if currentState == "Tracking" {
 			stateChanged = true
-			nextState = "Finished"
+			nextState = "Idle"
 		}
 	}
 

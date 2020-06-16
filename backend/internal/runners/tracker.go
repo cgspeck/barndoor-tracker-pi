@@ -50,7 +50,6 @@ func arduinoByteStatusToString(byteStatus byte) (string, error) {
 		byte(0x04): "Tracking Requested",
 		byte(0x05): "Tracking",
 		byte(0x06): "Stop Requested",
-		byte(0x07): "Finished",
 	}
 
 	if v, ok := byteStatusMap[byteStatus]; ok {
