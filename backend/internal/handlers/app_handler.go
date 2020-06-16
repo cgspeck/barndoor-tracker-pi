@@ -65,6 +65,9 @@ func (ah AppHandler) GetLocationSettings() *models.LocationSettings {
 
 func (ah *AppHandler) SetLocationSettings(input map[string]interface{}) error {
 	currentSettings := ah.GetLocationSettings()
+	currentSettings.Lock()
+	defer currentSettings.Unlock()
+
 	mustApplyChanges, newSettings, err := config.IsLocationConfigChanged(input, *currentSettings)
 	if err != nil {
 		return err
