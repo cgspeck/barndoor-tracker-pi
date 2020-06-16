@@ -160,6 +160,12 @@ func TestTrackStatusProcessArduinoStateChange(t *testing.T) {
 			expectedState: "Homed",
 		},
 		TestCase{
+			previousState: "Idle",
+			input:         "Homed",
+			expectedError: false,
+			expectedState: "Homed",
+		},
+		TestCase{
 			previousState: "Tracking",
 			input:         "Homing",
 			expectedError: true,

@@ -127,7 +127,7 @@ func (ts *TrackStatus) ProcessArduinoStateChange(arduinoReportedState string) (s
 			nextState = "Homing"
 		}
 	case "Homed":
-		if currentState == "Homing" {
+		if currentState == "Homing" || currentState == "Idle" {
 			stateChanged = true
 			nextState = "Homed"
 		}
