@@ -86,8 +86,6 @@ func TrackHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, 
 			}
 
 			trackStatus := ah.GetTrackStatus()
-			trackStatus.Lock()
-			defer trackStatus.Unlock()
 
 			if path == "/backend/toggle/intervalometer" {
 				trackStatus.IntervolmeterEnabled = bEnabled
