@@ -69,15 +69,6 @@ func main() {
 	http.Handle("/toggle/dewcontroller", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
 	http.Handle("/track", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
 
-	// location of the React/Preact Frontend
-	static := "../frontend/build"
-	if context.Arch == "arm" {
-		static = "html"
-	}
-	log.Printf("Serving static content from %v", static)
-	fs := http.FileServer(http.Dir(static))
-	http.Handle("/", fs)
-
 	http.HandleFunc("/config.json", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./config.json")
 	})

@@ -3,6 +3,7 @@ go
 go-tools
 hostapd
 i2c-tools
+lighttpd
 lm_sensors
 man-db
 man-pages
