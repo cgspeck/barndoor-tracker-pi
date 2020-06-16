@@ -72,12 +72,13 @@ type AlignStatus struct {
 
 type TrackStatus struct {
 	sync.RWMutex
-	State                string `json:"state"`
-	PreviousState        string `json:"previousState"`
-	ElapsedMillis        int32  `json:"elapsedMillis"`
-	DewControllerEnabled bool   `json:"dewControllerEnabled"`
-	IntervolmeterEnabled bool   `json:"intervalometerEnabled"`
-	IntervolmeterState   string `json:"intervolmeterState"`
+	State                string    `json:"state"`
+	PreviousState        string    `json:"previousState"`
+	ElapsedMillis        int64     `json:"elapsedMillis"`
+	DewControllerEnabled bool      `json:"dewControllerEnabled"`
+	IntervolmeterEnabled bool      `json:"intervalometerEnabled"`
+	IntervolmeterState   string    `json:"intervolmeterState"`
+	TrackStartedAt       time.Time `json:"TrackStartedAt"`
 }
 
 func (ts *TrackStatus) ProcessTrackCommand(command string) (string, error) {
@@ -135,6 +136,7 @@ func (ts *TrackStatus) ProcessArduinoStateChange(arduinoReportedState string) (s
 		if currentState == "Homed" || currentState == "Tracking Requested" {
 			stateChanged = true
 			nextState = "Tracking"
+			ts.TrackStartedAt = time.Now()
 		}
 	case "Idle":
 		if currentState == "Tracking" || currentState == "Stop Requested" {

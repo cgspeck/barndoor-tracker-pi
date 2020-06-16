@@ -111,10 +111,11 @@
     },
     State: (string) (len=4) "Idle",
     PreviousState: (string) (len=4) "Idle",
-    ElapsedMillis: (int32) 0,
+    ElapsedMillis: (int64) 0,
     DewControllerEnabled: (bool) true,
     IntervolmeterEnabled: (bool) true,
-    IntervolmeterState: (string) ""
+    IntervolmeterState: (string) "",
+    TrackStartedAt: (time.Time) 0001-01-01 00:00:00 +0000 UTC
   })
 })
 (interface {}) <nil>

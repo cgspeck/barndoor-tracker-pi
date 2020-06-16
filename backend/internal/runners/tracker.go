@@ -141,5 +141,10 @@ func (tr *TrackerRunner) Run(currentTime time.Time, ts *models.TrackStatus) {
 
 			tr.previousState = ts.State
 		}
+
+		if ts.State == "Tracking" {
+			diffMillis := time.Now().Sub(ts.TrackStartedAt).Milliseconds()
+			ts.ElapsedMillis = diffMillis
+		}
 	}
 }
