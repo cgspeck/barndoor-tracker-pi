@@ -49,7 +49,6 @@ func LocationSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *http.Requ
 		switch path {
 		case "/backend/settings/location":
 			err = ah.SetLocationSettings(input)
-			fmt.Println("b5")
 		case "/backend/toggle/ignoreAz":
 			fallthrough
 		case "/backend/toggle/ignoreAlt":
@@ -80,19 +79,13 @@ func LocationSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *http.Requ
 	}
 
 	if r.Method == "GET" || r.Method == "POST" {
-		fmt.Println("b6")
 		locationSettings := ah.GetLocationSettings()
-		fmt.Println("b7")
 		locationSettings.RLock()
-		fmt.Println("b8")
 		defer locationSettings.RUnlock()
-		fmt.Println("b9")
 		err := writeJson(locationSettings, w)
-		fmt.Println("b10")
 		if err != nil {
 			return 500, err
 		}
-		fmt.Println("b11")
 
 		return 200, nil
 	}
