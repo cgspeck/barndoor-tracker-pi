@@ -318,5 +318,12 @@ func NewAppContext(
 		Arch:             goArch,
 	}
 	res.LocationSettings.IgnoreAz = false
+	res.TrackStatus = &models.TrackStatus{
+		State: "Idle",
+		PreviousState: "Idle",
+		DewControllerEnabled: true,
+		IntervolmeterEnabled: true,
+
+	}
 	return res, nil
 }
