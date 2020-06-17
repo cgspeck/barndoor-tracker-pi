@@ -81,7 +81,6 @@ func (ah *AppHandler) SetLocationSettings(input map[string]interface{}) error {
 		ah.AppContext.LocationSettings = &newSettings
 		ah.AppContext.Flags.NeedsLocationSettings = false
 		err = config.SaveConfig(ah.GetContext())
-		// TODO: hook to recalculate align status
 	}
 	return err
 }

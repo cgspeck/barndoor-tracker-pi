@@ -26,7 +26,7 @@
         Content-Type: application/json
 
 - request:
-    url: /backend/flags
+    url: /backend/status/flags
     method: GET
   response:
     - status: 200
@@ -244,31 +244,53 @@
     method: [GET]
   response:
     - status: 200
-      body: '{"currentTemperature": 8, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true}'
+      body: '{"currentTemperature": 8, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 1.23, "i": 4.56, "d": 7.89, "loggingEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"currentTemperature": 9, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true}'
+      body: '{"currentTemperature": 9, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 2.23, "i": 5.56, "d": 8.89, "loggingEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"currentTemperature": 11, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true}'
+      body: '{"currentTemperature": 11, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 3.23, "i": 6.56, "d": 9.89, "loggingEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"currentTemperature": 13, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true}'
+      body: '{"currentTemperature": 13, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true, "p": 4.23, "i": 7.56, "d": 10.89, "loggingEnabled": true}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"currentTemperature": 14, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true}'
+      body: '{"currentTemperature": 14, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true, "p": 5.23, "i": 8.56, "d": 11.89, "loggingEnabled": true}'
       headers:
         Content-Type: application/json
 
+# - request:
+#     url: ^/backend/settings/dew_controller$
+#     method: [POST]
+#   response:
+#     - status: 200
+#       body: '{
+#         "currentTemperature": "ignored",
+#         "currentlyHeating": "ignored",
+#         "targetTemperature": 42,
+#         "dewControllerEnabled": "ignored",
+#         "p": 1.23,
+#         "i": 4.56,
+#         "d": 7.89,
+#         "loggingEnabled": true
+#         }'
+#       headers:
+#         Content-Type: application/json
+
 - request:
-    url: ^/backend/settings/dew_controller$
+    url: ^/backend/settings/pid$
     method: [POST]
   response:
     - status: 200
-      body: '{"currentTemperature": "ignored", "currentlyHeating": "ignored", "targetTemperature": 42, "dewControllerEnabled": "ignored"}'
+      body: '{
+        "p": 1.23,
+        "i": 4.56,
+        "d": 7.89,
+        }'
       headers:
         Content-Type: application/json

@@ -7,6 +7,7 @@ import {
   getLocationSettings,
   setAPSettings,
   setLocationSettings,
+  setPID,
 } from '../../src/lib/settings';
 import Axios from 'axios';
 
@@ -182,6 +183,31 @@ describe('getAlignStatus', () => {
       altAligned: true,
       currentAz: 110.3,
       currentAlt: 37.3,
+    });
+  });
+});
+
+describe('setPID', () => {
+  beforeEach(() => {
+    mock
+      .onPost(`${config.endpoint}/backend/settings/pid`, {
+        p: 1.23,
+        i: 4.56,
+        d: 7.89,
+      })
+      .reply(200, {
+        p: 1.23,
+        i: 4.56,
+        d: 7.89,
+      });
+  });
+
+  it('returns expected value', async () => {
+    const res = await setPID('1.23', '4.56', '7.89');
+    expect(res).toEqual({
+      p: 1.23,
+      i: 4.56,
+      d: 7.89,
     });
   });
 });

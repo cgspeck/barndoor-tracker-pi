@@ -132,6 +132,31 @@ async function setTargetTemperature(targetTemp) {
     .then((r) => r.data);
 }
 
+async function setPID(p, i, d) {
+  return axios
+    .post(
+      `${config.endpoint}/backend/settings/pid`,
+      {
+        p,
+        i,
+        d,
+      },
+      {
+        transformRequest: [
+          function (data) {
+            const res = {
+              p: parseFloat(data.p),
+              i: parseFloat(data.i),
+              d: parseFloat(data.d),
+            };
+            return JSON.stringify(res);
+          },
+        ],
+      },
+    )
+    .then((r) => r.data);
+}
+
 export {
   getAllSettings,
   getAlignStatus,
@@ -145,4 +170,5 @@ export {
   setIntervalometerSettings,
   getDewControllerStatus,
   setTargetTemperature,
+  setPID,
 };
