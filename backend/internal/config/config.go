@@ -370,7 +370,6 @@ func NewAppContext(
 	res.TrackStatus = &models.TrackStatus{
 		State:                 "Idle",
 		PreviousState:         "Idle",
-		DewControllerEnabled:  true,
 		IntervalometerEnabled: true,
 	}
 	res.DewControllerSettings = configSettings.DewControllerSettings

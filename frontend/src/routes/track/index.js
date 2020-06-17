@@ -14,7 +14,6 @@ import {
   startTracking,
   stopTracking,
   toggleIntervalometer,
-  toggleDewController,
 } from '../../lib/commands';
 import { setInterval } from 'timers';
 
@@ -22,7 +21,6 @@ export default class Track extends Component {
   state = {
     trackingState: 'Idle',
     intervalometerEnabled: null,
-    dewControllerEnabled: null,
     intervalometerState: null,
     elapsedMillis: null,
     error: null,
@@ -34,7 +32,6 @@ export default class Track extends Component {
         this.setState({
           trackingState: r.state,
           intervalometerEnabled: r.intervalometerEnabled,
-          dewControllerEnabled: r.dewControllerEnabled,
           elapsedMillis: r.elapsedMillis,
         });
         console.log('Starting Refresh Interval');
@@ -118,17 +115,6 @@ export default class Track extends Component {
     this.setState({ intervalometerEnabled: enabled });
     toggleIntervalometer(enabled)
       .then((r) => this.setState({ intervalometerEnabled: r }))
-      .catch((e) => this.handleError(e));
-  };
-
-  onDewControllerEnabled = (e) => {
-    const enabled = e.target.checked;
-    console.log(
-      `Dew controller toggled to: ${enabled ? 'enabled' : 'disabled'}`,
-    );
-    this.setState({ dewControllerEnabled: enabled });
-    toggleDewController(enabled)
-      .then((r) => this.setState({ dewControllerEnabled: r }))
       .catch((e) => this.handleError(e));
   };
 

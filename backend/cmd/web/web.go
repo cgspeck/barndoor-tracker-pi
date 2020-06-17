@@ -72,6 +72,11 @@ func main() {
 		H:                   handlers.DewControllerHandler,
 		DewControllerRunner: dewcontrollerRunner,
 	})
+	http.Handle("/backend/toggle/dewcontroller", handlers.AppHandler{
+		AppContext:          context,
+		H:                   handlers.DewControllerHandler,
+		DewControllerRunner: dewcontrollerRunner,
+	})
 
 	http.Handle("/backend/settings/location", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
 	http.Handle("/backend/toggle/ignoreAz", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
@@ -83,7 +88,6 @@ func main() {
 	http.Handle("/backend/status/debug", handlers.AppHandler{AppContext: context, H: handlers.DebugHandler})
 
 	http.Handle("/backend/toggle/intervalometer", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
-	http.Handle("/backend/toggle/dewcontroller", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
 	http.Handle("/backend/track", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
 
 	http.HandleFunc("/backend/config.json", func(w http.ResponseWriter, r *http.Request) {

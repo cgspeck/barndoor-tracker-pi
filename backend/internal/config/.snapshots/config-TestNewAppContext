@@ -112,7 +112,6 @@
     State: (string) (len=4) "Idle",
     PreviousState: (string) (len=4) "Idle",
     ElapsedMillis: (int64) 0,
-    DewControllerEnabled: (bool) true,
     IntervalometerEnabled: (bool) true,
     IntervalometerState: (string) "",
     TrackStartedAt: (time.Time) 0001-01-01 00:00:00 +0000 UTC
