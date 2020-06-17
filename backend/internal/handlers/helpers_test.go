@@ -136,6 +136,10 @@ func (ah testAppHandler) SetTargetTemperature(targetTemperature int) error {
 	return nil
 }
 
+func (ah testAppHandler) SaveAppConfig() error {
+	return nil
+}
+
 func (ah *testAppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	status, err := ah.H(ah, w, r)
