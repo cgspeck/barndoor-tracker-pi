@@ -46,6 +46,12 @@ func main() {
 		log.Fatalf("Unable to create Intervalometer Runner: %v\n", err)
 	}
 
+	dewcontrollerRunner, err := runners.NewDewControllerRunner()
+
+	if err != nil {
+		log.Fatalf("Unable to create Dew Controller Runner: %v\n", err)
+	}
+
 	http.Handle("/backend/settings/network", handlers.AppHandler{AppContext: context, H: handlers.NetworkSettingsHandler})
 	http.Handle("/backend/settings/network/ap", handlers.AppHandler{AppContext: context, H: handlers.APSettingsHandler})
 	// low prio: http.Handle("/backend/settings/network/profiles", handlers.AppHandler{context, ...})
@@ -54,6 +60,17 @@ func main() {
 		AppContext:     context,
 		H:              handlers.IntervalometerSettingsHandler,
 		IntervalRunner: intervalometerRunner,
+	})
+
+	http.Handle("/backend/status/dew_controller", handlers.AppHandler{
+		AppContext:          context,
+		H:                   handlers.DewControllerHandler,
+		DewControllerRunner: dewcontrollerRunner,
+	})
+	http.Handle("/backend/settings/pid", handlers.AppHandler{
+		AppContext:          context,
+		H:                   handlers.DewControllerHandler,
+		DewControllerRunner: dewcontrollerRunner,
 	})
 
 	http.Handle("/backend/settings/location", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})

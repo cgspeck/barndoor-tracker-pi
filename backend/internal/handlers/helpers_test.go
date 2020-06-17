@@ -112,6 +112,14 @@ func (ah testAppHandler) GetIntervalPeriods() *models.IntervalPeriods {
 	return nil
 }
 
+func (ah testAppHandler) SaveDewControllerSettings(_ *models.DewControllerSettings) error {
+	return nil
+}
+
+func (ah testAppHandler) GetDewControllerSettings() *models.DewControllerSettings {
+	return nil
+}
+
 func (ah *testAppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	status, err := ah.H(ah, w, r)

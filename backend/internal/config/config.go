@@ -43,6 +43,13 @@ const configKeyLocationZOffset = "zOffset"
 const configKeyIntervalPeriodsbulbTimeSeconds = "bulbTime"
 const configKeyIntervalPeriodsrestTimeSeconds = "restTime"
 
+// dew controller
+const configKeyDewControllerTargetTemperature = "dcTargetTemperature"
+const configKeyDewControllerEnabled = "dcEnabled"
+const configKeyDewControllerP = "dcP"
+const configKeyDewControllerI = "dcI"
+const configKeyDewControllerD = "dcD"
+
 type configSettings struct {
 	AccessPointMode       bool
 	APSettings            *models.APSettings
@@ -50,6 +57,7 @@ type configSettings struct {
 	NeedsNetworkSettings  bool
 	NeedsLocationSettings bool
 	IntervalPeriods       *models.IntervalPeriods
+	DewControllerSettings *models.DewControllerSettings
 }
 
 func configBoolOrFatal(c *config.Config, key string) bool {
@@ -105,6 +113,11 @@ func loadConfig() *configSettings {
 		configKeyLocationZOffset:                "0",
 		configKeyIntervalPeriodsbulbTimeSeconds: "30",
 		configKeyIntervalPeriodsrestTimeSeconds: "30",
+		configKeyDewControllerTargetTemperature: "14",
+		configKeyDewControllerEnabled:           "true",
+		configKeyDewControllerP:                 "10.0",
+		configKeyDewControllerI:                 "0.3",
+		configKeyDewControllerD:                 "0.0",
 	}
 
 	defaults := config.NewStatic(mappings)
@@ -142,6 +155,13 @@ func loadConfig() *configSettings {
 			BulbTimeSeconds: configIntOrFatal(c, configKeyIntervalPeriodsbulbTimeSeconds),
 			RestTimeSeconds: configIntOrFatal(c, configKeyIntervalPeriodsrestTimeSeconds),
 		},
+		DewControllerSettings: &models.DewControllerSettings{
+			TargetTemperature: configIntOrFatal(c, configKeyDewControllerTargetTemperature),
+			Enabled:           configBoolOrFatal(c, configKeyDewControllerEnabled),
+			P:                 configFloatOrFatal(c, configKeyDewControllerP),
+			I:                 configFloatOrFatal(c, configKeyDewControllerI),
+			D:                 configFloatOrFatal(c, configKeyDewControllerD),
+		},
 	}
 	return &cs
 }
@@ -172,6 +192,7 @@ func SaveConfig(a *models.AppContext) error {
 		NeedsNetworkSettings:  a.Flags.NeedsNetworkSettings,
 		NeedsLocationSettings: a.Flags.NeedsLocationSettings,
 		IntervalPeriods:       a.IntervalPeriods,
+		DewControllerSettings: a.DewControllerSettings,
 	}
 	log.Printf("Saving config to %v", configFilename)
 	err = saveConfig(&c, fh)
@@ -207,6 +228,12 @@ func saveConfig(c *configSettings, w io.Writer) error {
 
 		configKeyIntervalPeriodsbulbTimeSeconds: c.IntervalPeriods.BulbTimeSeconds,
 		configKeyIntervalPeriodsrestTimeSeconds: c.IntervalPeriods.RestTimeSeconds,
+
+		configKeyDewControllerTargetTemperature: c.DewControllerSettings.TargetTemperature,
+		configKeyDewControllerEnabled:           c.DewControllerSettings.Enabled,
+		configKeyDewControllerP:                 c.DewControllerSettings.P,
+		configKeyDewControllerI:                 c.DewControllerSettings.I,
+		configKeyDewControllerD:                 c.DewControllerSettings.D,
 	}
 	b, err := json.MarshalIndent(transformed, "", "  ")
 	if err != nil {
@@ -346,5 +373,7 @@ func NewAppContext(
 		DewControllerEnabled:  true,
 		IntervalometerEnabled: true,
 	}
+	res.DewControllerSettings = configSettings.DewControllerSettings
+
 	return res, nil
 }

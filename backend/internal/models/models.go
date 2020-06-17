@@ -87,6 +87,15 @@ type IntervalPeriods struct {
 	RestTimeSeconds int `json:"restInterval"`
 }
 
+type DewControllerSettings struct {
+	sync.RWMutex
+	TargetTemperature int     `json:"targetTemperature"`
+	Enabled           bool    `json:"dewControllerEnabled"`
+	P                 float64 `json:"p"`
+	I                 float64 `json:"i"`
+	D                 float64 `json:"d"`
+}
+
 func (ts *TrackStatus) ProcessTrackCommand(command string) (string, error) {
 	nextState := ""
 	currentState := ts.State
@@ -179,13 +188,14 @@ type AppContextProvider interface {
 // the app context!
 type AppContext struct {
 	sync.RWMutex
-	AlignStatus      *AlignStatus      `json:"alignStatus"`
-	Flags            *Flags            `json:"flags"`
-	LocationSettings *LocationSettings `json:"location"`
-	Time             *time.Time        `json:"time"`
-	NetworkSettings  *NetworkSettings  `json:"networkSettings"`
-	OS               string            `json:"os"`
-	Arch             string            `json:"arch"`
-	TrackStatus      *TrackStatus      `json:"trackStatus"`
-	IntervalPeriods  *IntervalPeriods  `json:"intervalPeriods"`
+	AlignStatus           *AlignStatus           `json:"alignStatus"`
+	Flags                 *Flags                 `json:"flags"`
+	LocationSettings      *LocationSettings      `json:"location"`
+	Time                  *time.Time             `json:"time"`
+	NetworkSettings       *NetworkSettings       `json:"networkSettings"`
+	OS                    string                 `json:"os"`
+	Arch                  string                 `json:"arch"`
+	TrackStatus           *TrackStatus           `json:"trackStatus"`
+	IntervalPeriods       *IntervalPeriods       `json:"intervalPeriods"`
+	DewControllerSettings *DewControllerSettings `json: "dewControllerSettings"`
 }

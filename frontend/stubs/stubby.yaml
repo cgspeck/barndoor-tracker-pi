@@ -264,24 +264,6 @@
       headers:
         Content-Type: application/json
 
-# - request:
-#     url: ^/backend/settings/dew_controller$
-#     method: [POST]
-#   response:
-#     - status: 200
-#       body: '{
-#         "currentTemperature": "ignored",
-#         "currentlyHeating": "ignored",
-#         "targetTemperature": 42,
-#         "dewControllerEnabled": "ignored",
-#         "p": 1.23,
-#         "i": 4.56,
-#         "d": 7.89,
-#         "loggingEnabled": true
-#         }'
-#       headers:
-#         Content-Type: application/json
-
 - request:
     url: ^/backend/settings/pid$
     method: [POST]

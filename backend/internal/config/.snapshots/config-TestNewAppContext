@@ -130,6 +130,23 @@
     },
     BulbTimeSeconds: (int) 10,
     RestTimeSeconds: (int) 20
+  }),
+  DewControllerSettings: (*models.DewControllerSettings)({
+    RWMutex: (sync.RWMutex) {
+      w: (sync.Mutex) {
+        state: (int32) 0,
+        sema: (uint32) 0
+      },
+      writerSem: (uint32) 0,
+      readerSem: (uint32) 0,
+      readerCount: (int32) 0,
+      readerWait: (int32) 0
+    },
+    TargetTemperature: (int) 0,
+    Enabled: (bool) true,
+    P: (float64) 1,
+    I: (float64) 2,
+    D: (float64) 3
   })
 })
 (interface {}) <nil>

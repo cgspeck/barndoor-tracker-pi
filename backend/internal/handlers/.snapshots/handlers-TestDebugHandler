@@ -34,7 +34,8 @@
   "os": "",
   "arch": "",
   "trackStatus": null,
-  "intervalPeriods": null
+  "intervalPeriods": null,
+  "DewControllerSettings": null
 }),
   Flushed: (bool) false,
   result: (*http.Response)(<nil>),

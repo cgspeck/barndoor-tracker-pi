@@ -35,12 +35,16 @@ type IAppHandler interface {
 	GetIntervalRunner() *runners.IntervalometerRunner
 	SaveIntervalPeriods(*models.IntervalPeriods) error
 	GetIntervalPeriods() *models.IntervalPeriods
+
+	GetDewControllerSettings() *models.DewControllerSettings
+	SaveDewControllerSettings(*models.DewControllerSettings) error
 }
 
 type AppHandler struct {
-	AppContext     *models.AppContext
-	H              func(IAppHandler, http.ResponseWriter, *http.Request) (int, error)
-	IntervalRunner *runners.IntervalometerRunner
+	AppContext          *models.AppContext
+	H                   func(IAppHandler, http.ResponseWriter, *http.Request) (int, error)
+	IntervalRunner      *runners.IntervalometerRunner
+	DewControllerRunner *runners.DewControllerRunner
 }
 
 func (ah AppHandler) GetContext() *models.AppContext {
@@ -135,11 +139,11 @@ func (ah AppHandler) GetIntervalRunner() *runners.IntervalometerRunner {
 }
 
 func (ah AppHandler) SaveIntervalPeriods(ip *models.IntervalPeriods) error {
-	ir := ah.GetIntervalRunner()
-	ir.Lock()
-	defer ir.Unlock()
+	// ir := ah.GetIntervalRunner()
+	ah.IntervalRunner.Lock()
+	defer ah.IntervalRunner.Unlock()
 
-	ir.SetIntervalPeriods(ip)
+	ah.IntervalRunner.SetIntervalPeriods(ip)
 	ah.AppContext.IntervalPeriods = ip
 	err := config.SaveConfig(ah.AppContext)
 	if err != nil {
@@ -150,6 +154,24 @@ func (ah AppHandler) SaveIntervalPeriods(ip *models.IntervalPeriods) error {
 
 func (ah AppHandler) GetIntervalPeriods() *models.IntervalPeriods {
 	return ah.AppContext.IntervalPeriods
+}
+
+func (ah AppHandler) SaveDewControllerSettings(ds *models.DewControllerSettings) error {
+	// ir := ah.Get
+	// ir.Lock()
+	// defer ir.Unlock()
+
+	// ir.SetIntervalPeriods(ip)
+	ah.AppContext.DewControllerSettings = ds
+	err := config.SaveConfig(ah.AppContext)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ah AppHandler) GetDewControllerSettings() *models.DewControllerSettings {
+	return ah.AppContext.DewControllerSettings
 }
 
 // func (ah *AppHandler) SetTime(t *time.Time) {
