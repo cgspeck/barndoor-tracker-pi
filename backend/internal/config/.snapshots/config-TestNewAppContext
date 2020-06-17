@@ -116,6 +116,20 @@
     IntervalometerEnabled: (bool) true,
     IntervalometerState: (string) "",
     TrackStartedAt: (time.Time) 0001-01-01 00:00:00 +0000 UTC
+  }),
+  IntervalPeriods: (*models.IntervalPeriods)({
+    RWMutex: (sync.RWMutex) {
+      w: (sync.Mutex) {
+        state: (int32) 0,
+        sema: (uint32) 0
+      },
+      writerSem: (uint32) 0,
+      readerSem: (uint32) 0,
+      readerCount: (int32) 0,
+      readerWait: (int32) 0
+    },
+    BulbTimeSeconds: (int) 10,
+    RestTimeSeconds: (int) 20
   })
 })
 (interface {}) <nil>

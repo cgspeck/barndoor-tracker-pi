@@ -29,6 +29,10 @@ func createTestConfigSettings(t *testing.T) configSettings {
 		},
 		NeedsNetworkSettings:  false,
 		NeedsLocationSettings: true,
+		IntervalPeriods: &models.IntervalPeriods{
+			BulbTimeSeconds: 10,
+			RestTimeSeconds: 20,
+		},
 	}
 }
 func TestSaveConfig(t *testing.T) {

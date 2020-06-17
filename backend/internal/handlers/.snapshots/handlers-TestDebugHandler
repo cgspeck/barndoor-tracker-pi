@@ -33,7 +33,8 @@
   },
   "os": "",
   "arch": "",
-  "trackStatus": null
+  "trackStatus": null,
+  "intervalPeriods": null
 }),
   Flushed: (bool) false,
   result: (*http.Response)(<nil>),

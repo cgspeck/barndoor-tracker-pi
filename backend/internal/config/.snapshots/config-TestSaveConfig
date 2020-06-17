@@ -5,10 +5,12 @@
   "accessPointMode": true,
   "altError": 1,
   "azError": 2,
+  "bulbTime": 10,
   "latitude": 3.4,
   "magDeclination": -5.6,
   "needsLocationSettings": true,
   "needsNetworkSettings": false,
+  "restTime": 20,
   "xOffset": 7,
   "yOffset": 8,
   "zOffset": 9

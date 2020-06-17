@@ -36,11 +36,6 @@ func (s ShotPhase) String() string {
 	return [...]string{"Rest", "Focussing", "Shooting"}[s]
 }
 
-type IntervalPeriods struct {
-	BulbTimeSeconds int `json:"bulbInterval"`
-	RestTimeSeconds int `json:"restInterval"`
-}
-
 type IntervalometerRunner struct {
 	sync.RWMutex
 	focusPin        pin_wrapper.IWrappedPin
@@ -56,7 +51,7 @@ type IntervalometerRunner struct {
 	shotCount  int
 }
 
-func NewIntervalometerRunner(shutterPinNo int, focusPinNo int) (*IntervalometerRunner, error) {
+func NewIntervalometerRunner(shutterPinNo int, focusPinNo int, ip *models.IntervalPeriods) (*IntervalometerRunner, error) {
 	shutterPin, err := pin_wrapper.NewWrappedPin(shutterPinNo)
 	if err != nil {
 		return nil, err
@@ -70,8 +65,8 @@ func NewIntervalometerRunner(shutterPinNo int, focusPinNo int) (*IntervalometerR
 	return &IntervalometerRunner{
 		shutterPin:      shutterPin,
 		focusPin:        focusPin,
-		bulbTimeSeconds: 30,
-		restTimeSeconds: 30,
+		bulbTimeSeconds: ip.BulbTimeSeconds,
+		restTimeSeconds: ip.RestTimeSeconds,
 	}, nil
 }
 
@@ -79,20 +74,14 @@ func turnOffPin(pin int) {}
 
 func turnOnPin(pin int) {}
 
-func (ir *IntervalometerRunner) setupRunState() {}
-
-func (ir *IntervalometerRunner) setupEnabledState() {}
-
-func (ir *IntervalometerRunner) setupDisabledState() {}
-
-func (ir *IntervalometerRunner) GetIntervalPeriods() IntervalPeriods {
-	return IntervalPeriods{
+func (ir *IntervalometerRunner) GetIntervalPeriods() models.IntervalPeriods {
+	return models.IntervalPeriods{
 		BulbTimeSeconds: ir.bulbTimeSeconds,
 		RestTimeSeconds: ir.restTimeSeconds,
 	}
 }
 
-func (ir *IntervalometerRunner) SetIntervalPeriods(ip IntervalPeriods) {
+func (ir *IntervalometerRunner) SetIntervalPeriods(ip *models.IntervalPeriods) {
 	ir.bulbTimeSeconds = ip.BulbTimeSeconds
 	ir.restTimeSeconds = ip.RestTimeSeconds
 }
@@ -151,28 +140,6 @@ func (ir *IntervalometerRunner) progressShoot(currentTime time.Time) (time.Time,
 		tsNextIntervalometerStatus = fmt.Sprintf("%s %d", nextShotPhase.String(), ir.shotCount)
 	}
 	return nextActionTime, nextShotPhase, tsNextIntervalometerStatus
-}
-
-func (ir *IntervalometerRunner) SetBulbTime(seconds int) {
-	ir.Lock()
-	defer ir.Unlock()
-
-	ir.bulbTimeSeconds = seconds
-}
-
-func (ir *IntervalometerRunner) SetRestTime(seconds int) {
-	ir.Lock()
-	defer ir.Unlock()
-
-	ir.restTimeSeconds = seconds
-}
-
-func (ir *IntervalometerRunner) SetTimes(bulbSeconds int, restSeconds int) {
-	ir.Lock()
-	defer ir.Unlock()
-
-	ir.bulbTimeSeconds = bulbSeconds
-	ir.restTimeSeconds = restSeconds
 }
 
 func (ir *IntervalometerRunner) Run(currentTime time.Time, ts *models.TrackStatus) {

@@ -39,12 +39,17 @@ const configKeyLocationXOffset = "xOffset"
 const configKeyLocationYOffset = "yOffset"
 const configKeyLocationZOffset = "zOffset"
 
+// interval periods
+const configKeyIntervalPeriodsbulbTimeSeconds = "bulbTime"
+const configKeyIntervalPeriodsrestTimeSeconds = "restTime"
+
 type configSettings struct {
 	AccessPointMode       bool
 	APSettings            *models.APSettings
 	LocationSettings      *models.LocationSettings
 	NeedsNetworkSettings  bool
 	NeedsLocationSettings bool
+	IntervalPeriods       *models.IntervalPeriods
 }
 
 func configBoolOrFatal(c *config.Config, key string) bool {
@@ -85,19 +90,21 @@ func configFloatOrFatal(c *config.Config, key string) float64 {
 
 func loadConfig() *configSettings {
 	mappings := map[string]string{
-		configKeyAccessPointMode:        "true",
-		configKeyNeedsLocationSettings:  "true",
-		configKeyNeedsNetworkSettings:   "true",
-		configKeyAPChannel:              "11",
-		configKeyAPSSID:                 "barndoor-tracker",
-		configKeyAPKey:                  "",
-		configKeyLocationLatitude:       "-37.74",
-		configKeyLocationMagDeclination: "11.64",
-		configKeyLocationAzError:        "2.0",
-		configKeyLocationAltError:       "2.0",
-		configKeyLocationXOffset:        "0",
-		configKeyLocationYOffset:        "0",
-		configKeyLocationZOffset:        "0",
+		configKeyAccessPointMode:                "true",
+		configKeyNeedsLocationSettings:          "true",
+		configKeyNeedsNetworkSettings:           "true",
+		configKeyAPChannel:                      "11",
+		configKeyAPSSID:                         "barndoor-tracker",
+		configKeyAPKey:                          "",
+		configKeyLocationLatitude:               "-37.74",
+		configKeyLocationMagDeclination:         "11.64",
+		configKeyLocationAzError:                "2.0",
+		configKeyLocationAltError:               "2.0",
+		configKeyLocationXOffset:                "0",
+		configKeyLocationYOffset:                "0",
+		configKeyLocationZOffset:                "0",
+		configKeyIntervalPeriodsbulbTimeSeconds: "30",
+		configKeyIntervalPeriodsrestTimeSeconds: "30",
 	}
 
 	defaults := config.NewStatic(mappings)
@@ -131,6 +138,10 @@ func loadConfig() *configSettings {
 		},
 		NeedsLocationSettings: configBoolOrFatal(c, configKeyNeedsLocationSettings),
 		NeedsNetworkSettings:  configBoolOrFatal(c, configKeyNeedsNetworkSettings),
+		IntervalPeriods: &models.IntervalPeriods{
+			BulbTimeSeconds: configIntOrFatal(c, configKeyIntervalPeriodsbulbTimeSeconds),
+			RestTimeSeconds: configIntOrFatal(c, configKeyIntervalPeriodsrestTimeSeconds),
+		},
 	}
 	return &cs
 }
@@ -160,6 +171,7 @@ func SaveConfig(a *models.AppContext) error {
 		LocationSettings:      a.LocationSettings,
 		NeedsNetworkSettings:  a.Flags.NeedsNetworkSettings,
 		NeedsLocationSettings: a.Flags.NeedsLocationSettings,
+		IntervalPeriods:       a.IntervalPeriods,
 	}
 	log.Printf("Saving config to %v", configFilename)
 	err = saveConfig(&c, fh)
@@ -192,6 +204,9 @@ func saveConfig(c *configSettings, w io.Writer) error {
 		configKeyLocationXOffset:        c.LocationSettings.XOffset,
 		configKeyLocationYOffset:        c.LocationSettings.YOffset,
 		configKeyLocationZOffset:        c.LocationSettings.ZOffset,
+
+		configKeyIntervalPeriodsbulbTimeSeconds: c.IntervalPeriods.BulbTimeSeconds,
+		configKeyIntervalPeriodsrestTimeSeconds: c.IntervalPeriods.RestTimeSeconds,
 	}
 	b, err := json.MarshalIndent(transformed, "", "  ")
 	if err != nil {
@@ -308,6 +323,12 @@ func NewAppContext(
 		WirelessProfiles:  wirelessProfiles,
 		WirelessInterface: wirelessInterface,
 	}
+
+	intervalometerPeriods := models.IntervalPeriods{
+		BulbTimeSeconds: configSettings.IntervalPeriods.BulbTimeSeconds,
+		RestTimeSeconds: configSettings.IntervalPeriods.RestTimeSeconds,
+	}
+
 	res := &models.AppContext{
 		AlignStatus:      &alignStatus,
 		Flags:            &flags,
@@ -316,14 +337,14 @@ func NewAppContext(
 		NetworkSettings:  &networkSettings,
 		OS:               goOS,
 		Arch:             goArch,
+		IntervalPeriods:  &intervalometerPeriods,
 	}
 	res.LocationSettings.IgnoreAz = false
 	res.TrackStatus = &models.TrackStatus{
-		State: "Idle",
-		PreviousState: "Idle",
-		DewControllerEnabled: true,
+		State:                 "Idle",
+		PreviousState:         "Idle",
+		DewControllerEnabled:  true,
 		IntervalometerEnabled: true,
-
 	}
 	return res, nil
 }

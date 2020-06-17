@@ -81,6 +81,12 @@ type TrackStatus struct {
 	TrackStartedAt        time.Time `json:"TrackStartedAt"`
 }
 
+type IntervalPeriods struct {
+	sync.RWMutex
+	BulbTimeSeconds int `json:"bulbInterval"`
+	RestTimeSeconds int `json:"restInterval"`
+}
+
 func (ts *TrackStatus) ProcessTrackCommand(command string) (string, error) {
 	nextState := ""
 	currentState := ts.State
@@ -181,4 +187,5 @@ type AppContext struct {
 	OS               string            `json:"os"`
 	Arch             string            `json:"arch"`
 	TrackStatus      *TrackStatus      `json:"trackStatus"`
+	IntervalPeriods  *IntervalPeriods  `json:"intervalPeriods"`
 }

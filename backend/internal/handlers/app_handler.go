@@ -33,6 +33,8 @@ type IAppHandler interface {
 	GetTrackStatus() *models.TrackStatus
 
 	GetIntervalRunner() *runners.IntervalometerRunner
+	SaveIntervalPeriods(*models.IntervalPeriods) error
+	GetIntervalPeriods() *models.IntervalPeriods
 }
 
 type AppHandler struct {
@@ -130,6 +132,24 @@ func (ah AppHandler) GetTrackStatus() *models.TrackStatus {
 
 func (ah AppHandler) GetIntervalRunner() *runners.IntervalometerRunner {
 	return ah.IntervalRunner
+}
+
+func (ah AppHandler) SaveIntervalPeriods(ip *models.IntervalPeriods) error {
+	ir := ah.GetIntervalRunner()
+	ir.Lock()
+	defer ir.Unlock()
+
+	ir.SetIntervalPeriods(ip)
+	ah.AppContext.IntervalPeriods = ip
+	err := config.SaveConfig(ah.AppContext)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ah AppHandler) GetIntervalPeriods() *models.IntervalPeriods {
+	return ah.AppContext.IntervalPeriods
 }
 
 // func (ah *AppHandler) SetTime(t *time.Time) {

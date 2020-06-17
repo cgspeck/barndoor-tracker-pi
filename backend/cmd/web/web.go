@@ -40,7 +40,7 @@ func main() {
 		log.Fatalf("Unable to apply desired network settings: %v\n\n%+v\n", err, context.NetworkSettings)
 	}
 
-	intervalometerRunner, err := runners.NewIntervalometerRunner(5, 6)
+	intervalometerRunner, err := runners.NewIntervalometerRunner(5, 6, context.IntervalPeriods)
 
 	if err != nil {
 		log.Fatalf("Unable to create Intervalometer Runner: %v\n", err)

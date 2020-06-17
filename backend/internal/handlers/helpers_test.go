@@ -104,6 +104,14 @@ func (ah testAppHandler) GetIntervalRunner() *runners.IntervalometerRunner {
 	return nil
 }
 
+func (ah testAppHandler) SaveIntervalPeriods(ip *models.IntervalPeriods) error {
+	return nil
+}
+
+func (ah testAppHandler) GetIntervalPeriods() *models.IntervalPeriods {
+	return nil
+}
+
 func (ah *testAppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	status, err := ah.H(ah, w, r)

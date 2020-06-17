@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/cgspeck/barndoor-tracker-pi/internal/runners"
+	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 )
 
 type InvalidBulbInterval struct {
@@ -39,7 +39,7 @@ func IntervalometerSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *htt
 			log.Printf("Error reading stream: %v\n", err)
 			return 500, err
 		}
-		var newSettings runners.IntervalPeriods
+		var newSettings models.IntervalPeriods
 		err = json.Unmarshal(body, &newSettings)
 		if err != nil {
 			log.Printf("Error unmarshalling json: %v\n", err)
@@ -54,17 +54,15 @@ func IntervalometerSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *htt
 			return 400, RestBulbInterval{newSettings.RestTimeSeconds}
 		}
 
-		intervalRunner := ah.GetIntervalRunner()
-		intervalRunner.Lock()
-		intervalRunner.SetIntervalPeriods(newSettings)
-		intervalRunner.Unlock()
+		err = ah.SaveIntervalPeriods(&newSettings)
+		if err != nil {
+			log.Printf("Error applying update: %v\n", err)
+			return 500, err
+		}
 	}
 
 	if r.Method == "GET" || r.Method == "POST" {
-		intervalRunner := ah.GetIntervalRunner()
-		intervalRunner.RLock()
-		defer intervalRunner.RUnlock()
-		intervalPeriods := intervalRunner.GetIntervalPeriods()
+		intervalPeriods := ah.GetIntervalPeriods()
 
 		err := writeJson(intervalPeriods, w)
 		if err != nil {
