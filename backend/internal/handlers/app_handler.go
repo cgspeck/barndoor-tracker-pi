@@ -42,7 +42,7 @@ type IAppHandler interface {
 	GetDewControllerStatus() *models.DewControllerStatus
 	SetPID(p float64, i float64, d float64) error
 	SetDewControllerEnabled(enabled bool) error
-	SetTargetTemperature(targetTemperature int) error
+	SetTargetTemperature(targetTemperature float64) error
 
 	SaveAppConfig() error
 }
@@ -191,7 +191,7 @@ func (ah AppHandler) SetDewControllerEnabled(enabled bool) error {
 	return config.SaveConfig(ah.AppContext)
 }
 
-func (ah AppHandler) SetTargetTemperature(targetTemperature int) error {
+func (ah AppHandler) SetTargetTemperature(targetTemperature float64) error {
 	ah.DewControllerRunner.SetTargetTemperature(targetTemperature)
 	ah.AppContext.DewControllerSettings.TargetTemperature = targetTemperature
 	return config.SaveConfig(ah.AppContext)

@@ -141,7 +141,7 @@
       readerCount: (int32) 0,
       readerWait: (int32) 0
     },
-    TargetTemperature: (int) 0,
+    TargetTemperature: (float64) 0,
     Enabled: (bool) true,
     P: (float64) 1,
     I: (float64) 2,

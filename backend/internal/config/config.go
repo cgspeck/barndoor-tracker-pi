@@ -156,7 +156,7 @@ func loadConfig() *configSettings {
 			RestTimeSeconds: configIntOrFatal(c, configKeyIntervalPeriodsrestTimeSeconds),
 		},
 		DewControllerSettings: &models.DewControllerSettings{
-			TargetTemperature: configIntOrFatal(c, configKeyDewControllerTargetTemperature),
+			TargetTemperature: configFloatOrFatal(c, configKeyDewControllerTargetTemperature),
 			Enabled:           configBoolOrFatal(c, configKeyDewControllerEnabled),
 			P:                 configFloatOrFatal(c, configKeyDewControllerP),
 			I:                 configFloatOrFatal(c, configKeyDewControllerI),

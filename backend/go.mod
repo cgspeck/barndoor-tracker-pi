@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/felixge/pidctrl v0.0.0-20160307080219-7b13bcae7243
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-ini/ini v1.52.0 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect

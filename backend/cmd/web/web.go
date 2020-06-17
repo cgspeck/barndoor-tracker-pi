@@ -46,7 +46,13 @@ func main() {
 		log.Fatalf("Unable to create Intervalometer Runner: %v\n", err)
 	}
 
-	dewcontrollerRunner, err := runners.NewDewControllerRunner()
+	dewcontrollerRunner, err := runners.NewDewControllerRunner(
+		context.DewControllerSettings.P,
+		context.DewControllerSettings.I,
+		context.DewControllerSettings.D,
+		context.DewControllerSettings.TargetTemperature,
+		context.DewControllerSettings.Enabled,
+	)
 
 	if err != nil {
 		log.Fatalf("Unable to create Dew Controller Runner: %v\n", err)

@@ -88,7 +88,7 @@ type IntervalPeriods struct {
 
 type DewControllerSettings struct {
 	sync.RWMutex
-	TargetTemperature int     `json:"targetTemperature"`
+	TargetTemperature float64 `json:"targetTemperature"`
 	Enabled           bool    `json:"dewControllerEnabled"`
 	P                 float64 `json:"p"`
 	I                 float64 `json:"i"`
@@ -96,8 +96,8 @@ type DewControllerSettings struct {
 }
 
 type DewControllerStatus struct {
-	TargetTemperature  int     `json:"targetTemperature"`
-	CurrentTemperature int     `json:"currentTemperature"`
+	TargetTemperature  float64 `json:"targetTemperature"`
+	CurrentTemperature float64 `json:"currentTemperature"`
 	CurrentlyHeating   bool    `json:"currentlyHeating"`
 	Enabled            bool    `json:"dewControllerEnabled"`
 	P                  float64 `json:"p"`
