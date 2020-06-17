@@ -39,6 +39,10 @@ func DewControllerHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request
 	/*
 		POST handles these routes:
 
+		/backend/status/dew_controller
+		/backend/settings/pid
+		/backend/toggle/dewcontroller
+
 	*/
 	/*
 		if r.Method == "POST" {
@@ -91,17 +95,17 @@ func DewControllerHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request
 				return 200, nil
 			}
 		}
-
-		if r.Method == "GET" || r.Method == "POST" {
-			trackStatus := ah.GetTrackStatus()
-			trackStatus.RLock()
-			defer trackStatus.RUnlock()
-			err := writeJson(trackStatus, w)
-			if err != nil {
-				return 500, err
-			}
-			return 200, nil
-		}
 	*/
+
+	if r.Method == "GET" || r.Method == "POST" {
+		dewControllerStatus := ah.GetDewControllerStatus()
+
+		err := writeJson(dewControllerStatus, w)
+		if err != nil {
+			return 500, err
+		}
+		return 200, nil
+	}
+
 	return 501, nil
 }

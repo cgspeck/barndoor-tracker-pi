@@ -120,6 +120,22 @@ func (ah testAppHandler) GetDewControllerSettings() *models.DewControllerSetting
 	return nil
 }
 
+func (ah testAppHandler) GetDewControllerStatus() *models.DewControllerStatus {
+	return nil
+}
+
+func (ah testAppHandler) SetPID(p float64, i float64, d float64) error {
+	return nil
+}
+
+func (ah testAppHandler) SetDewControllerEnabled(enabled bool) error {
+	return nil
+}
+
+func (ah testAppHandler) SetTargetTemperature(targetTemperature int) error {
+	return nil
+}
+
 func (ah *testAppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	status, err := ah.H(ah, w, r)

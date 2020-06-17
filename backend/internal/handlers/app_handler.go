@@ -38,6 +38,11 @@ type IAppHandler interface {
 
 	GetDewControllerSettings() *models.DewControllerSettings
 	SaveDewControllerSettings(*models.DewControllerSettings) error
+
+	GetDewControllerStatus() *models.DewControllerStatus
+	SetPID(p float64, i float64, d float64) error
+	SetDewControllerEnabled(enabled bool) error
+	SetTargetTemperature(targetTemperature int) error
 }
 
 type AppHandler struct {
@@ -145,11 +150,7 @@ func (ah AppHandler) SaveIntervalPeriods(ip *models.IntervalPeriods) error {
 
 	ah.IntervalRunner.SetIntervalPeriods(ip)
 	ah.AppContext.IntervalPeriods = ip
-	err := config.SaveConfig(ah.AppContext)
-	if err != nil {
-		return err
-	}
-	return nil
+	return config.SaveConfig(ah.AppContext)
 }
 
 func (ah AppHandler) GetIntervalPeriods() *models.IntervalPeriods {
@@ -163,15 +164,35 @@ func (ah AppHandler) SaveDewControllerSettings(ds *models.DewControllerSettings)
 
 	// ir.SetIntervalPeriods(ip)
 	ah.AppContext.DewControllerSettings = ds
-	err := config.SaveConfig(ah.AppContext)
-	if err != nil {
-		return err
-	}
-	return nil
+	return config.SaveConfig(ah.AppContext)
 }
 
 func (ah AppHandler) GetDewControllerSettings() *models.DewControllerSettings {
 	return ah.AppContext.DewControllerSettings
+}
+
+func (ah AppHandler) GetDewControllerStatus() *models.DewControllerStatus {
+	return ah.DewControllerRunner.GetStatus()
+}
+
+func (ah AppHandler) SetPID(p float64, i float64, d float64) error {
+	ah.DewControllerRunner.SetPID(p, i, d)
+	ah.AppContext.DewControllerSettings.P = p
+	ah.AppContext.DewControllerSettings.I = i
+	ah.AppContext.DewControllerSettings.D = d
+	return config.SaveConfig(ah.AppContext)
+}
+
+func (ah AppHandler) SetDewControllerEnabled(enabled bool) error {
+	ah.DewControllerRunner.SetEnabled(enabled)
+	ah.AppContext.DewControllerSettings.Enabled = enabled
+	return config.SaveConfig(ah.AppContext)
+}
+
+func (ah AppHandler) SetTargetTemperature(targetTemperature int) error {
+	ah.DewControllerRunner.SetTargetTemperature(targetTemperature)
+	ah.AppContext.DewControllerSettings.TargetTemperature = targetTemperature
+	return config.SaveConfig(ah.AppContext)
 }
 
 // func (ah *AppHandler) SetTime(t *time.Time) {
