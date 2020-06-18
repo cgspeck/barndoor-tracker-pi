@@ -5,3 +5,8 @@ gpu_mem=16
 initramfs initramfs-linux.img followkernel
 dtparam=i2c_arm=on
 
+#
+# see https://github.com/yryz/ds18b20#connect-ds18b20
+# enables 1 wire protocol on gpio 4
+#
+dtoverlay=w1-gpio

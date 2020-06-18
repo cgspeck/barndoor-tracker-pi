@@ -96,13 +96,16 @@ type DewControllerSettings struct {
 }
 
 type DewControllerStatus struct {
-	TargetTemperature  float64 `json:"targetTemperature"`
-	CurrentTemperature float64 `json:"currentTemperature"`
-	CurrentlyHeating   bool    `json:"currentlyHeating"`
-	Enabled            bool    `json:"dewControllerEnabled"`
-	P                  float64 `json:"p"`
-	I                  float64 `json:"i"`
-	D                  float64 `json:"d"`
+	TargetTemperature  float64   `json:"targetTemperature"`
+	CurrentTemperature float64   `json:"currentTemperature"`
+	CurrentlyHeating   bool      `json:"currentlyHeating"`
+	Enabled            bool      `json:"dewControllerEnabled"`
+	P                  float64   `json:"p"`
+	I                  float64   `json:"i"`
+	D                  float64   `json:"d"`
+	LastSampleTime     time.Time `json: "lastSampleTime"`
+	HeatEntireDuration bool      `json: "heatEntireDuration"`
+	TurnHeatOffAfter   time.Time `json: "turnOffHeatAfter"`
 }
 
 func (ts *TrackStatus) ProcessTrackCommand(command string) (string, error) {

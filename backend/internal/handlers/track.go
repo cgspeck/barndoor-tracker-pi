@@ -7,28 +7,6 @@ import (
 	"net/http"
 )
 
-type UnrecognisedPathError struct {
-	Path string
-}
-
-func (u UnrecognisedPathError) Error() string {
-	return fmt.Sprintf("Unrecognised path: %q", u.Path)
-}
-
-type BadRequestError struct{}
-
-func (_ BadRequestError) Error() string {
-	return "Bad Request"
-}
-
-type CouldNotCastToBoolError struct {
-	val interface{}
-}
-
-func (e CouldNotCastToBoolError) Error() string {
-	return fmt.Sprintf("Could not cast %q to bool", e.val)
-}
-
 func handleTrackCommand(ah IAppHandler, command string) error {
 	trackStatus := ah.GetTrackStatus()
 	trackStatus.Lock()

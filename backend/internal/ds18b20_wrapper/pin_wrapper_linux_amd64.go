@@ -1,4 +1,4 @@
-package pin_wrapper
+package ds18b20_wrapper
 
 import (
 	_ "github.com/kidoman/embd/host/rpi"

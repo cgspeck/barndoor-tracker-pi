@@ -52,12 +52,12 @@ type IntervalometerRunner struct {
 }
 
 func NewIntervalometerRunner(shutterPinNo int, focusPinNo int, ip *models.IntervalPeriods) (*IntervalometerRunner, error) {
-	shutterPin, err := pin_wrapper.NewWrappedPin(shutterPinNo)
+	shutterPin, err := pin_wrapper.NewWrappedPin(shutterPinNo, true)
 	if err != nil {
 		return nil, err
 	}
 
-	focusPin, err := pin_wrapper.NewWrappedPin(focusPinNo)
+	focusPin, err := pin_wrapper.NewWrappedPin(focusPinNo, true)
 	if err != nil {
 		return nil, err
 	}

@@ -1,101 +1,122 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
-// type UnrecognisedPathError struct {
-// 	Path string
-// }
+func extractFloat64(hashMap map[string]interface{}, key string) (float64, error) {
+	v, ok := hashMap[key]
 
-// func (u UnrecognisedPathError) Error() string {
-// 	return fmt.Sprintf("Unrecognised path: %q", u.Path)
-// }
+	if !ok {
+		return 0, KeyNotFoundError{hashMap: hashMap, k: key}
+	}
 
-// type BadRequestError struct{}
+	f, ok := v.(float64)
 
-// func (_ BadRequestError) Error() string {
-// 	return "Bad Request"
-// }
+	if !ok {
+		return 0, CouldNotCastToFloat64Error{v}
+	}
 
-// type CouldNotCastToBoolError struct {
-// 	val interface{}
-// }
+	return f, nil
+}
 
-// func (e CouldNotCastToBoolError) Error() string {
-// 	return fmt.Sprintf("Could not cast %q to bool", e.val)
-// }
+func extractPID(hashMap map[string]interface{}) (float64, float64, float64, error) {
+	res := map[string]float64{
+		"p": 0,
+		"i": 0,
+		"d": 0,
+	}
 
-// func handleTrackCommand(ah IAppHandler, command string) error {
-// 	trackStatus := ah.GetTrackStatus()
-// 	trackStatus.Lock()
-// 	defer trackStatus.Unlock()
+	var err error
 
-// 	_, err := trackStatus.ProcessTrackCommand(command)
-// 	return err
-// }
+	for k := range res {
+		res[k], err = extractFloat64(hashMap, k)
+		if err != nil {
+			break
+		}
+	}
+
+	if err != nil {
+		return 0, 0, 0, err
+	}
+
+	return res["p"], res["i"], res["d"], nil
+}
 
 func DewControllerHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (int, error) {
 	/*
 		POST handles these routes:
-
-		/backend/status/dew_controller
+		/backend/settings/dew_controller (set targetTemp)
 		/backend/settings/pid
 		/backend/toggle/dewcontroller
 
 	*/
-	/*
-		if r.Method == "POST" {
-			path := r.URL.Path
 
-			if !(path == "/backend/track" || path == "/backend/toggle/intervalometer" || path == "/backend/toggle/dewcontroller") {
-				return 404, UnrecognisedPathError{path}
-			}
+	if r.Method == "POST" {
+		path := r.URL.Path
 
-			body, err := ioutil.ReadAll(r.Body)
-			if err != nil {
-				return 500, err
-			}
-			input := make(map[string]interface{})
-			err = json.Unmarshal(body, &input)
-			if err != nil {
-				return 500, err
-			}
-
-			switch path {
-			case "/backend/track":
-				command, ok := input["command"]
-				if ok {
-					err = handleTrackCommand(ah, fmt.Sprintf("%v", command))
-				} else {
-					err = BadRequestError{}
-				}
-			case "/backend/toggle/intervalometer", "/backend/toggle/dewcontroller":
-				iEnabled, ok := input["enabled"]
-
-				if !ok {
-					err = BadRequestError{}
-				}
-
-				bEnabled, ok := iEnabled.(bool)
-
-				if !ok {
-					err = CouldNotCastToBoolError{iEnabled}
-				}
-
-				trackStatus := ah.GetTrackStatus()
-
-				if path == "/backend/toggle/intervalometer" {
-					trackStatus.IntervalometerEnabled = bEnabled
-				} else {
-					trackStatus.DewControllerEnabled = bEnabled
-				}
-
-				fmt.Fprintf(w, "{ \"enabled\" : %v }", iEnabled)
-				return 200, nil
-			}
+		if !(path == "/backend/settings/dew_controller" || path == "/backend/settings/pid" || path == "/backend/toggle/dewcontroller") {
+			return 404, UnrecognisedPathError{path}
 		}
-	*/
+
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			return 500, err
+		}
+		input := make(map[string]interface{})
+		err = json.Unmarshal(body, &input)
+		if err != nil {
+			return 500, err
+		}
+
+		switch path {
+		case "/backend/settings/dew_controller":
+			v, err := extractFloat64(input, "targetTemp")
+
+			if err != nil {
+				return 500, err
+			}
+
+			err = ah.SetTargetTemperature(v)
+
+			if err != nil {
+				return 500, err
+			}
+
+		case "/backend/settings/pid":
+			p, i, d, err := extractPID(input)
+			if err != nil {
+				return 500, err
+			}
+
+			ah.SetPID(p, i, d)
+
+		case "/backend/toggle/dewcontroller":
+			iEnabled, ok := input["enabled"]
+
+			if !ok {
+				err = BadRequestError{}
+			}
+
+			bEnabled, ok := iEnabled.(bool)
+
+			if !ok {
+				err = CouldNotCastToBoolError{iEnabled}
+			}
+
+			err = ah.SetDewControllerEnabled(bEnabled)
+
+			if err != nil {
+				return 500, err
+			}
+
+			fmt.Fprintf(w, "{ \"enabled\" : %v }", iEnabled)
+			return 200, nil
+		}
+	}
 
 	if r.Method == "GET" || r.Method == "POST" {
 		dewControllerStatus := ah.GetDewControllerStatus()

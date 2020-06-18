@@ -47,6 +47,8 @@ cp etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf
 mkdir -p /home/alarm/src/barndoor-tracker-pi/frontend/build
 chown alarm:alarm /home/alarm/src/barndoor-tracker-pi/frontend/build
 
+chmod o+rx /home/alarm/src/barndoor-tracker-pi/backend/logs
+chmod o+rx /home/alarm/src/barndoor-tracker-pi/backend
 chmod o+rx /home/alarm/src/barndoor-tracker-pi/frontend/build
 chmod o+rx /home/alarm/src/barndoor-tracker-pi/frontend
 chmod o+rx /home/alarm/src/barndoor-tracker-pi

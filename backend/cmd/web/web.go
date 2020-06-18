@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/cgspeck/barndoor-tracker-pi/internal/graphlogger"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/runners"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/aligncalc"
@@ -46,12 +47,19 @@ func main() {
 		log.Fatalf("Unable to create Intervalometer Runner: %v\n", err)
 	}
 
+	graphLogger, err := graphlogger.NewGraphLogger()
+	defer graphLogger.Close()
+
+	doLogging := true
 	dewcontrollerRunner, err := runners.NewDewControllerRunner(
 		context.DewControllerSettings.P,
 		context.DewControllerSettings.I,
 		context.DewControllerSettings.D,
 		context.DewControllerSettings.TargetTemperature,
 		context.DewControllerSettings.Enabled,
+		25,
+		doLogging,
+		graphLogger,
 	)
 
 	if err != nil {
@@ -69,6 +77,11 @@ func main() {
 	})
 
 	http.Handle("/backend/status/dew_controller", handlers.AppHandler{
+		AppContext:          context,
+		H:                   handlers.DewControllerHandler,
+		DewControllerRunner: dewcontrollerRunner,
+	})
+	http.Handle("/backend/settings/dew_controller", handlers.AppHandler{
 		AppContext:          context,
 		H:                   handlers.DewControllerHandler,
 		DewControllerRunner: dewcontrollerRunner,
@@ -170,6 +183,7 @@ func main() {
 
 				trackerRunner.Run(currentTime, context.TrackStatus)
 				intervalometerRunner.Run(currentTime, context.TrackStatus)
+				dewcontrollerRunner.Run(currentTime)
 			}
 		}
 	}()

@@ -126,9 +126,22 @@ async function getDewControllerStatus() {
 
 async function setTargetTemperature(targetTemp) {
   return axios
-    .post(`${config.endpoint}/backend/settings/dew_controller`, {
-      targetTemp,
-    })
+    .post(
+      `${config.endpoint}/backend/settings/dew_controller`,
+      {
+        targetTemp,
+      },
+      {
+        transformRequest: [
+          function (data) {
+            const res = {
+              targetTemp: parseFloat(data.targetTemp),
+            };
+            return JSON.stringify(res);
+          },
+        ],
+      },
+    )
     .then((r) => r.data);
 }
 

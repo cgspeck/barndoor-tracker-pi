@@ -1,4 +1,4 @@
-package pin_wrapper
+package ds18b20_wrapper
 
 import (
 	"github.com/kidoman/embd"
