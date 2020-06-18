@@ -145,7 +145,8 @@
     Enabled: (bool) true,
     P: (float64) 1,
     I: (float64) 2,
-    D: (float64) 3
+    D: (float64) 3,
+    LoggingEnabled: (bool) false
   })
 })
 (interface {}) <nil>

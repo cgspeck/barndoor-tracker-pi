@@ -43,6 +43,7 @@ type IAppHandler interface {
 	SetPID(p float64, i float64, d float64) error
 	SetDewControllerEnabled(enabled bool) error
 	SetTargetTemperature(targetTemperature float64) error
+	SetDewControllerLoggingEnabled(enabled bool) error
 
 	SaveAppConfig() error
 }
@@ -188,6 +189,12 @@ func (ah AppHandler) SetPID(p float64, i float64, d float64) error {
 func (ah AppHandler) SetDewControllerEnabled(enabled bool) error {
 	ah.DewControllerRunner.SetEnabled(enabled)
 	ah.AppContext.DewControllerSettings.Enabled = enabled
+	return config.SaveConfig(ah.AppContext)
+}
+
+func (ah AppHandler) SetDewControllerLoggingEnabled(enabled bool) error {
+	ah.DewControllerRunner.SetLoggingEnabled(enabled)
+	ah.AppContext.DewControllerSettings.LoggingEnabled = enabled
 	return config.SaveConfig(ah.AppContext)
 }
 

@@ -132,6 +132,10 @@ func (ah testAppHandler) SetDewControllerEnabled(enabled bool) error {
 	return nil
 }
 
+func (ah testAppHandler) SetDewControllerLoggingEnabled(enabled bool) error {
+	return nil
+}
+
 func (ah testAppHandler) SetTargetTemperature(targetTemperature float64) error {
 	return nil
 }

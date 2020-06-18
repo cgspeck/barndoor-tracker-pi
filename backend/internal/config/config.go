@@ -49,6 +49,7 @@ const configKeyDewControllerEnabled = "dcEnabled"
 const configKeyDewControllerP = "dcP"
 const configKeyDewControllerI = "dcI"
 const configKeyDewControllerD = "dcD"
+const configKeyDewControllerLoggingEnabled = "dcLoggingEnabled"
 
 type configSettings struct {
 	AccessPointMode       bool
@@ -118,6 +119,7 @@ func loadConfig() *configSettings {
 		configKeyDewControllerP:                 "10.0",
 		configKeyDewControllerI:                 "0.3",
 		configKeyDewControllerD:                 "0.0",
+		configKeyDewControllerLoggingEnabled:    "true",
 	}
 
 	defaults := config.NewStatic(mappings)
@@ -161,6 +163,7 @@ func loadConfig() *configSettings {
 			P:                 configFloatOrFatal(c, configKeyDewControllerP),
 			I:                 configFloatOrFatal(c, configKeyDewControllerI),
 			D:                 configFloatOrFatal(c, configKeyDewControllerD),
+			LoggingEnabled:    configBoolOrFatal(c, configKeyDewControllerLoggingEnabled),
 		},
 	}
 	return &cs
@@ -234,6 +237,7 @@ func saveConfig(c *configSettings, w io.Writer) error {
 		configKeyDewControllerP:                 c.DewControllerSettings.P,
 		configKeyDewControllerI:                 c.DewControllerSettings.I,
 		configKeyDewControllerD:                 c.DewControllerSettings.D,
+		configKeyDewControllerLoggingEnabled:    c.DewControllerSettings.LoggingEnabled,
 	}
 	b, err := json.MarshalIndent(transformed, "", "  ")
 	if err != nil {

@@ -9,6 +9,7 @@
   "dcD": 3,
   "dcEnabled": true,
   "dcI": 2,
+  "dcLoggingEnabled": false,
   "dcP": 1,
   "dcTargetTemperature": 0,
   "latitude": 3.4,

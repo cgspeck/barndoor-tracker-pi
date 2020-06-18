@@ -93,6 +93,7 @@ type DewControllerSettings struct {
 	P                 float64 `json:"p"`
 	I                 float64 `json:"i"`
 	D                 float64 `json:"d"`
+	LoggingEnabled    bool    `json:"loggingEnabled"`
 }
 
 type DewControllerStatus struct {
@@ -100,6 +101,7 @@ type DewControllerStatus struct {
 	CurrentTemperature float64   `json:"currentTemperature"`
 	CurrentlyHeating   bool      `json:"currentlyHeating"`
 	Enabled            bool      `json:"dewControllerEnabled"`
+	LoggingEnabled     bool      `json:"loggingEnabled"`
 	P                  float64   `json:"p"`
 	I                  float64   `json:"i"`
 	D                  float64   `json:"d"`

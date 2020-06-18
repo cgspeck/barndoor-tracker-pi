@@ -41,6 +41,16 @@ async function toggleDewController(enabled) {
     });
 }
 
+async function toggleDewControllerLogging(enabled) {
+  return axios
+    .post(`${config.endpoint}/backend/toggle/dewcontroller/logging`, {
+      enabled,
+    })
+    .then((r) => {
+      return r.data.enabled;
+    });
+}
+
 async function startHoming() {
   return axios
     .post(`${config.endpoint}/backend/track`, {
@@ -70,6 +80,7 @@ export {
   toggleIgnoreAlt,
   toggleIntervalometer,
   toggleDewController,
+  toggleDewControllerLogging,
   startHoming,
   startTracking,
   stopTracking,

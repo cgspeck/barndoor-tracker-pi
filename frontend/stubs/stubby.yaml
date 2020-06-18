@@ -248,7 +248,7 @@
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"currentTemperature": 9, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 2.23, "i": 5.56, "d": 8.89, "loggingEnabled": true}'
+      body: '{"currentTemperature": 9, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 2.23, "i": 5.56, "d": 8.89, "loggingEnabled": false}'
       headers:
         Content-Type: application/json
     - status: 200
@@ -274,5 +274,25 @@
         "i": 4.56,
         "d": 7.89,
         }'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/toggle/dewcontroller/logging$
+    method: POST
+    json: '{"enabled":true}'
+  response:
+    - status: 200
+      body: '{"enabled":true}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/toggle/dewcontroller/logging$
+    method: POST
+    json: '{"enabled":false}'
+  response:
+    - status: 200
+      body: '{"enabled":false}'
       headers:
         Content-Type: application/json

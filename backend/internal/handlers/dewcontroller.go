@@ -58,7 +58,7 @@ func DewControllerHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request
 	if r.Method == "POST" {
 		path := r.URL.Path
 
-		if !(path == "/backend/settings/dew_controller" || path == "/backend/settings/pid" || path == "/backend/toggle/dewcontroller") {
+		if !(path == "/backend/settings/dew_controller" || path == "/backend/settings/pid" || path == "/backend/toggle/dewcontroller" || path == "/backend/toggle/dewcontroller/logging") {
 			return 404, UnrecognisedPathError{path}
 		}
 
@@ -94,6 +94,8 @@ func DewControllerHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request
 
 			ah.SetPID(p, i, d)
 
+		case "/backend/toggle/dewcontroller/logging":
+			fallthrough
 		case "/backend/toggle/dewcontroller":
 			iEnabled, ok := input["enabled"]
 
@@ -107,7 +109,11 @@ func DewControllerHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request
 				err = CouldNotCastToBoolError{iEnabled}
 			}
 
-			err = ah.SetDewControllerEnabled(bEnabled)
+			if path == "/backend/toggle/dewcontroller" {
+				err = ah.SetDewControllerEnabled(bEnabled)
+			} else {
+				err = ah.SetDewControllerLoggingEnabled(bEnabled)
+			}
 
 			if err != nil {
 				return 500, err

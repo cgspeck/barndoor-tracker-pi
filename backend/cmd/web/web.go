@@ -50,7 +50,6 @@ func main() {
 	graphLogger, err := graphlogger.NewGraphLogger()
 	defer graphLogger.Close()
 
-	doLogging := true
 	dewcontrollerRunner, err := runners.NewDewControllerRunner(
 		context.DewControllerSettings.P,
 		context.DewControllerSettings.I,
@@ -58,7 +57,7 @@ func main() {
 		context.DewControllerSettings.TargetTemperature,
 		context.DewControllerSettings.Enabled,
 		25,
-		doLogging,
+		context.DewControllerSettings.LoggingEnabled,
 		graphLogger,
 	)
 
@@ -92,6 +91,11 @@ func main() {
 		DewControllerRunner: dewcontrollerRunner,
 	})
 	http.Handle("/backend/toggle/dewcontroller", handlers.AppHandler{
+		AppContext:          context,
+		H:                   handlers.DewControllerHandler,
+		DewControllerRunner: dewcontrollerRunner,
+	})
+	http.Handle("/backend/toggle/dewcontroller/logging", handlers.AppHandler{
 		AppContext:          context,
 		H:                   handlers.DewControllerHandler,
 		DewControllerRunner: dewcontrollerRunner,

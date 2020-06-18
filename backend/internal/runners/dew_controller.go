@@ -54,7 +54,11 @@ func (dcr *DewControllerRunner) SetPID(p float64, i float64, d float64) {
 }
 
 func (dcr *DewControllerRunner) SetEnabled(enabled bool) {
-	dcr.enabled = false
+	dcr.enabled = enabled
+}
+
+func (dcr *DewControllerRunner) SetLoggingEnabled(enabled bool) {
+	dcr.doLogging = enabled
 }
 
 func (dcr *DewControllerRunner) SetTargetTemperature(setPoint float64) {
@@ -74,6 +78,7 @@ func (dcr *DewControllerRunner) GetStatus() *models.DewControllerStatus {
 		LastSampleTime:     dcr.lastSampleTime,
 		HeatEntireDuration: dcr.heatEntireDuration,
 		TurnHeatOffAfter:   dcr.turnHeatOffAfter,
+		LoggingEnabled:     dcr.doLogging,
 	}
 }
 

@@ -25,29 +25,35 @@ import {
   setTargetTemperature,
   setPID,
 } from '../../lib/settings';
-import { toggleDewController } from '../../lib/commands';
+import {
+  toggleDewController,
+  toggleDewControllerLogging,
+} from '../../lib/commands';
 import { setInterval } from 'timers';
 
 import style from './style';
 
 export default class DewController extends Component {
-  state = {
-    currentTemperature: null,
-    currentlyHeating: null,
-    dewControllerEnabled: null,
-    targetTemperature: null,
-    P: null,
-    I: null,
-    D: null,
-    vPFormValue: null,
-    desiredP: null,
-    desiredI: null,
-    desiredD: null,
-    PIDFormDirty: false,
-    loggingEnabled: null,
-    info: null,
-    error: null,
-  };
+  constructor() {
+    super();
+    this.state = {
+      currentTemperature: null,
+      currentlyHeating: null,
+      dewControllerEnabled: null,
+      targetTemperature: null,
+      P: null,
+      I: null,
+      D: null,
+      vPFormValue: null,
+      desiredP: null,
+      desiredI: null,
+      desiredD: null,
+      PIDFormDirty: false,
+      loggingEnabled: null,
+      info: null,
+      error: null,
+    };
+  }
 
   async componentDidMount() {
     getDewControllerStatus()
@@ -190,6 +196,15 @@ export default class DewController extends Component {
     );
   }
 
+  onLoggingEnabled = (e) => {
+    const enabled = e.target.checked;
+    console.log(`Logging toggled to: ${enabled ? 'enabled' : 'disabled'}`);
+    this.setState({ dewControllerEnabled: enabled });
+    toggleDewControllerLogging(enabled)
+      .then((r) => this.setState({ dewControllerEnabled: r }))
+      .catch((e) => this.handleError(e));
+  };
+
   CSVDialogTags() {
     return (
       <Dialog
@@ -200,13 +215,15 @@ export default class DewController extends Component {
         <Dialog.Header>Download Logs</Dialog.Header>
         <Dialog.Body>
           <p>
-            Logging Enabled: <Switch id="dewControllerEnable"></Switch>
+            Logging Enabled:{' '}
+            <Switch
+              id="loggingEnabled"
+              onChange={this.onLoggingEnabled.bind(this)}
+              checked={this.state.loggingEnabled === true}
+            />
           </p>
           <p>
             <a href="/logs">View/Download Logs</a>
-          </p>
-          <p>
-            <Button>Delete Logs</Button>
           </p>
         </Dialog.Body>
         <Dialog.Footer>
@@ -289,7 +306,7 @@ export default class DewController extends Component {
               ripple
               onClick={() => this.csvDialog.MDComponent.show()}
             >
-              Download CSVs
+              Logs
             </Button>
           </p>
           {this.PIDDialogTags()}
