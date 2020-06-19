@@ -31,16 +31,17 @@ Note:
 
 ## Pi / LSM9DS1 / Nano / Optocoupler Wiring / Transistor / DS18b20 wiring
 
-| Rpi                         | LSM9DS1 | Arduino Nano | Optocoupler                                | DS18B20     | Transistor |
-| --------------------------- | ------- | ------------ | ------------------------------------------ | ----------- | ---------- |
-| 3v3                         | VCC     |              | 1k resistor - Anode 1, 1k resistor Anode 2 | VCC (pin 3) |            |
-| Ground                      | GND     | GND          | GND                                        | GND (pin 1) | Collector  |
-| GPIO 2<br/>BCM2<br/>WiPi8   | SDA1    | A4 (SDA)     |                                            |             |            |
-| GPIO 3<br/>BCM3<br/>WiPi9   | SCL1    | A5 (SCL)     |                                            |             |            |
-| GPIO 4<br/>BCM4<br/>WiPi7   |         |              |                                            | DQ (pin 2)  |            |
-| GPIO 5                      |         |              | Cathode 1 (shutter)                        |             |            |
-| GPIO 6                      |         |              | Cathode 2 (focus)                          |             |            |
-| GPIO 25<br/>BCM25<br/>WiPi6 |         |              |                                            |             | Base       |
+| Rpi                         | LSM9DS1 | Arduino Nano | Optocoupler                                | DS18B20        | Transistor |
+| --------------------------- | ------- | ------------ | ------------------------------------------ | -------------- | ---------- |
+| 3v3                         | VCC     |              | 1k resistor - Anode 1, 1k resistor Anode 2 | VCC (pin 3)    |            |
+| Ground                      | GND     | GND          | GND                                        | GND (pin 1)    | Collector  |
+| GPIO 2<br/>BCM2<br/>WiPi8   | SDA1    | A4 (SDA)     |                                            |                |            |
+| GPIO 3<br/>BCM3<br/>WiPi9   | SCL1    | A5 (SCL)     |                                            |                |            |
+| GPIO 4<br/>BCM4<br/>WiPi7   |         |              |                                            | DQ (pin 2)     |            |
+| GPIO 5                      |         |              | Cathode 1 (shutter)                        |                |            |
+| GPIO 6                      |         |              | Cathode 2 (focus)                          |                |            |
+| GPIO 25<br/>BCM25<br/>WiPi6 |         |              |                                            |                | Base       |
+|                             |         |              |                                            | DQ - 4k7 - VCC |            |
 
 ## Optocoupler & Pi Resources
 
