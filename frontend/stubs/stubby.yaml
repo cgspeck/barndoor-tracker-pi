@@ -296,3 +296,19 @@
       body: '{"enabled":false}'
       headers:
         Content-Type: application/json
+
+- request:
+    url: ^/backend/log_list$
+    method: GET
+  response:
+    - status: 200
+      file: responses/loglist.json
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/logs/pid.log$
+    method: GET
+  response:
+    - status: 200
+      file: responses/pid.log

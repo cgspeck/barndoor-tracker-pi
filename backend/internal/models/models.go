@@ -110,6 +110,17 @@ type DewControllerStatus struct {
 	TurnHeatOffAfter   time.Time `json: "turnOffHeatAfter"`
 }
 
+type PIDLogFileRecord struct {
+	Filename        string    `json:"filename"`
+	EscapedFilename string    `json:"escapedFilename"`
+	Size            int64     `json:"size"`
+	Modified        time.Time `json:"modified"`
+}
+
+type PIDLogFiles struct {
+	Files []PIDLogFileRecord `json:"files"`
+}
+
 func (ts *TrackStatus) ProcessTrackCommand(command string) (string, error) {
 	nextState := ""
 	currentState := ts.State
@@ -212,4 +223,5 @@ type AppContext struct {
 	TrackStatus           *TrackStatus           `json:"trackStatus"`
 	IntervalPeriods       *IntervalPeriods       `json:"intervalPeriods"`
 	DewControllerSettings *DewControllerSettings `json: "dewControllerSettings"`
+	PIDLogFiles           *PIDLogFiles           `json:"PIDLogFiles"`
 }

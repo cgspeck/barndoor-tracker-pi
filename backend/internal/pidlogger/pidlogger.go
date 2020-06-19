@@ -1,12 +1,16 @@
-package graphlogger
+package pidlogger
 
 import (
+	"fmt"
+	"html"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 )
 
-type GraphLogger struct {
+type PIDLogger struct {
 	fh *os.File
 }
 
@@ -62,7 +66,36 @@ func manageFiles() error {
 	return nil
 }
 
-func NewGraphLogger() (*GraphLogger, error) {
+func ScanForLogFiles() (*models.PIDLogFiles, error) {
+	matches, err := filepath.Glob("./logs/pid*")
+
+	if err != nil {
+		return nil, err
+	}
+
+	res := models.PIDLogFiles{}
+
+	for _, match := range matches {
+		fmt.Println(match)
+		fileInfo, err := os.Stat(match)
+
+		if err != nil {
+			return nil, err
+		}
+
+		newRecord := models.PIDLogFileRecord{
+			Modified:        fileInfo.ModTime(),
+			Filename:        match,
+			Size:            fileInfo.Size(),
+			EscapedFilename: html.EscapeString(match),
+		}
+		res.Files = append(res.Files, newRecord)
+	}
+
+	return &res, nil
+}
+
+func NewPIDLogger() (*PIDLogger, error) {
 	err := manageFiles()
 
 	if err != nil {
@@ -82,12 +115,12 @@ func NewGraphLogger() (*GraphLogger, error) {
 		return nil, err
 	}
 
-	return &GraphLogger{
+	return &PIDLogger{
 		fh: fh,
 	}, nil
 }
 
-func (g *GraphLogger) Emit(line string) error {
+func (g *PIDLogger) Emit(line string) error {
 	_, err := g.fh.WriteString(line)
 
 	if err != nil {
@@ -98,6 +131,6 @@ func (g *GraphLogger) Emit(line string) error {
 	return err
 }
 
-func (g *GraphLogger) Close() {
+func (g *PIDLogger) Close() {
 	g.fh.Close()
 }

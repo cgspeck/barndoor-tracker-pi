@@ -45,6 +45,8 @@ type IAppHandler interface {
 	SetTargetTemperature(targetTemperature float64) error
 	SetDewControllerLoggingEnabled(enabled bool) error
 
+	GetPIDLogFiles() *models.PIDLogFiles
+
 	SaveAppConfig() error
 }
 
@@ -206,6 +208,10 @@ func (ah AppHandler) SetTargetTemperature(targetTemperature float64) error {
 
 func (ah AppHandler) SaveAppConfig() error {
 	return config.SaveConfig(ah.AppContext)
+}
+
+func (ah AppHandler) GetPIDLogFiles() *models.PIDLogFiles {
+	return ah.AppContext.PIDLogFiles
 }
 
 // func (ah *AppHandler) SetTime(t *time.Time) {

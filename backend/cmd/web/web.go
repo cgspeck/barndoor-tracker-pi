@@ -8,7 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/cgspeck/barndoor-tracker-pi/internal/graphlogger"
+	"github.com/cgspeck/barndoor-tracker-pi/internal/pidlogger"
+
 	"github.com/cgspeck/barndoor-tracker-pi/internal/runners"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/aligncalc"
@@ -47,8 +48,14 @@ func main() {
 		log.Fatalf("Unable to create Intervalometer Runner: %v\n", err)
 	}
 
-	graphLogger, err := graphlogger.NewGraphLogger()
-	defer graphLogger.Close()
+	pidLogger, err := pidlogger.NewPIDLogger()
+	defer pidLogger.Close()
+
+	context.PIDLogFiles, err = pidlogger.ScanForLogFiles()
+
+	if err != nil {
+		log.Fatalf("Unable to scan for log files: %v\n", err)
+	}
 
 	dewcontrollerRunner, err := runners.NewDewControllerRunner(
 		context.DewControllerSettings.P,
@@ -58,12 +65,14 @@ func main() {
 		context.DewControllerSettings.Enabled,
 		25,
 		context.DewControllerSettings.LoggingEnabled,
-		graphLogger,
+		pidLogger,
 	)
 
 	if err != nil {
 		log.Fatalf("Unable to create Dew Controller Runner: %v\n", err)
 	}
+
+	http.Handle("/backend/log_list", handlers.AppHandler{AppContext: context, H: handlers.PIDLogHandler})
 
 	http.Handle("/backend/settings/network", handlers.AppHandler{AppContext: context, H: handlers.NetworkSettingsHandler})
 	http.Handle("/backend/settings/network/ap", handlers.AppHandler{AppContext: context, H: handlers.APSettingsHandler})

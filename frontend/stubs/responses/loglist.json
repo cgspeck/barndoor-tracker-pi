@@ -1,0 +1,40 @@
+{
+  "files": [
+    {
+      "filename": "logs/pid.log",
+      "escapedFilename": "logs/pid.log",
+      "size": 0,
+      "modified": "2020-06-19T16:43:10.357943803+10:00"
+    },
+    {
+      "filename": "logs/pid.log.1",
+      "escapedFilename": "logs/pid.log.1",
+      "size": 37,
+      "modified": "2020-06-19T16:38:08.521323603+10:00"
+    },
+    {
+      "filename": "logs/pid.log.2",
+      "escapedFilename": "logs/pid.log.2",
+      "size": 37,
+      "modified": "2020-06-19T16:36:31.765154863+10:00"
+    },
+    {
+      "filename": "logs/pid.log.3",
+      "escapedFilename": "logs/pid.log.3",
+      "size": 37,
+      "modified": "2020-06-19T16:36:06.997114722+10:00"
+    },
+    {
+      "filename": "logs/pid.log.4",
+      "escapedFilename": "logs/pid.log.4",
+      "size": 1073,
+      "modified": "2020-06-19T16:36:02.38110739+10:00"
+    },
+    {
+      "filename": "logs/pid.log.5",
+      "escapedFilename": "logs/pid.log.5",
+      "size": 37,
+      "modified": "2020-06-19T16:30:14.23636058+10:00"
+    }
+  ]
+}

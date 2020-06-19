@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cgspeck/barndoor-tracker-pi/internal/graphlogger"
+	"github.com/cgspeck/barndoor-tracker-pi/internal/pidlogger"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/pin_wrapper"
@@ -24,11 +24,11 @@ type DewControllerRunner struct {
 	isHeatingNow       bool
 	turnHeatOffAfter   time.Time
 	heatPin            pin_wrapper.IWrappedPin
-	graphLogger        *graphlogger.GraphLogger
+	pidLogger          *pidlogger.PIDLogger
 	doLogging          bool
 }
 
-func NewDewControllerRunner(p float64, i float64, d float64, setPoint float64, enabled bool, heatPinNo int, doLogging bool, graphLogger *graphlogger.GraphLogger) (*DewControllerRunner, error) {
+func NewDewControllerRunner(p float64, i float64, d float64, setPoint float64, enabled bool, heatPinNo int, doLogging bool, pidLogger *pidlogger.PIDLogger) (*DewControllerRunner, error) {
 	pidctrl_ := pidctrl.NewPIDController(p, i, d)
 	pidctrl_.SetOutputLimits(0, samplePeriodSeconds)
 	pidctrl_.Set(setPoint)
@@ -45,7 +45,7 @@ func NewDewControllerRunner(p float64, i float64, d float64, setPoint float64, e
 		processValue:      0,
 		heatPin:           heatPin,
 		doLogging:         doLogging,
-		graphLogger:       graphLogger,
+		pidLogger:         pidLogger,
 	}, nil
 }
 
@@ -130,7 +130,7 @@ func (dcr *DewControllerRunner) Run(currentTime time.Time) {
 			}
 
 			if dcr.doLogging {
-				dcr.graphLogger.Emit(fmt.Sprintf("%v, %v, %v, %v\n", currentTime.Format(time.RFC3339), dcr.pid.Get(), pv, hv))
+				dcr.pidLogger.Emit(fmt.Sprintf("%v, %v, %v, %v\n", currentTime.Format(time.RFC3339), dcr.pid.Get(), pv, hv))
 			}
 		} else {
 			if !dcr.heatEntireDuration && currentTime.After(dcr.turnHeatOffAfter) {
