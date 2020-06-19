@@ -1,6 +1,12 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# PID Log Viewer
+
+Fetches in the browser, parses and graphs the file named in query paramater `?file=foo.log` from `$HOST/logs/`.
+
+E.g. `?file=pid.log` will fetch `$HOST/logs/pid.log`.
 
 ## Available Scripts
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 In the project directory, you can run:
 
