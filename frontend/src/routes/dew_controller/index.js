@@ -29,6 +29,7 @@ import {
   toggleDewController,
   toggleDewControllerLogging,
 } from '../../lib/commands';
+import { getLogList } from '../../lib/information';
 import { setInterval } from 'timers';
 
 import style from './style';
@@ -52,10 +53,14 @@ export default class DewController extends Component {
       loggingEnabled: null,
       info: null,
       error: null,
+      logList: null,
     };
   }
 
   async componentDidMount() {
+    getLogList().then((r) => {
+      this.setState({ logList: r });
+    });
     getDewControllerStatus()
       .then((r) => {
         this.setState({
@@ -205,6 +210,32 @@ export default class DewController extends Component {
       .catch((e) => this.handleError(e));
   };
 
+  logListTags() {
+    const { logList } = this.state;
+
+    if (logList === null) {
+      return;
+    }
+
+    if (logList === undefined) {
+      return;
+    }
+
+    console.log(logList);
+
+    return (
+      <List>
+        {logList.map((logFile) => (
+          <List.Item>
+            <a href={`pid-log-viewer/?file=${logFile.escapedFilename}`}>
+              {logFile.filename}
+            </a>
+          </List.Item>
+        ))}
+      </List>
+    );
+  }
+
   CSVDialogTags() {
     return (
       <Dialog
@@ -222,9 +253,7 @@ export default class DewController extends Component {
               checked={this.state.loggingEnabled === true}
             />
           </p>
-          <p>
-            <a href="/logs">View/Download Logs</a>
-          </p>
+          <p>{this.logListTags()}</p>
         </Dialog.Body>
         <Dialog.Footer>
           <Dialog.FooterButton accept={true}>Close</Dialog.FooterButton>
