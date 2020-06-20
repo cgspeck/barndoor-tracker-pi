@@ -108,6 +108,8 @@ type DewControllerStatus struct {
 	LastSampleTime     time.Time `json: "lastSampleTime"`
 	HeatEntireDuration bool      `json: "heatEntireDuration"`
 	TurnHeatOffAfter   time.Time `json: "turnOffHeatAfter"`
+	DutyCycle          int       `json: "dutyCycle"`
+	SensorOk           bool      `json:"sensorOk"`
 }
 
 type PIDLogFileRecord struct {

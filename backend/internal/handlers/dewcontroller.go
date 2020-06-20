@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 func extractFloat64(hashMap map[string]interface{}, key string) (float64, error) {
@@ -21,6 +22,25 @@ func extractFloat64(hashMap map[string]interface{}, key string) (float64, error)
 	}
 
 	return f, nil
+}
+
+func extractInt(hashMap map[string]interface{}, key string) (int, error) {
+	v, ok := hashMap[key]
+	if !ok {
+		return 0, KeyNotFoundError{hashMap: hashMap, k: key}
+	}
+
+	var i int
+
+	switch v := v.(type) {
+	case float64:
+		i = int(v)
+	case string:
+		i, _ = strconv.Atoi(v)
+	default:
+		return 0, CouldNotCastToIntError{v}
+	}
+	return i, nil
 }
 
 func extractPID(hashMap map[string]interface{}) (float64, float64, float64, error) {
@@ -58,7 +78,7 @@ func DewControllerHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request
 	if r.Method == "POST" {
 		path := r.URL.Path
 
-		if !(path == "/backend/settings/dew_controller" || path == "/backend/settings/pid" || path == "/backend/toggle/dewcontroller" || path == "/backend/toggle/dewcontroller/logging") {
+		if !(path == "/backend/settings/dew_controller" || path == "/backend/settings/pid" || path == "/backend/toggle/dewcontroller" || path == "/backend/toggle/dewcontroller/logging" || path == "/backend/settings/dew_controller/duty_cycle") {
 			return 404, UnrecognisedPathError{path}
 		}
 
@@ -93,6 +113,15 @@ func DewControllerHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request
 			}
 
 			ah.SetPID(p, i, d)
+
+		case "/backend/settings/dew_controller/duty_cycle":
+			v, err := extractInt(input, "dutyCycle")
+
+			if err != nil {
+				return 500, err
+			}
+
+			ah.SetDutyCycle(v)
 
 		case "/backend/toggle/dewcontroller/logging":
 			fallthrough

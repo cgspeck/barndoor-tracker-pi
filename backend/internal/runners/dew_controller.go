@@ -2,6 +2,7 @@ package runners
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/pidlogger"
@@ -26,6 +27,8 @@ type DewControllerRunner struct {
 	heatPin            pin_wrapper.IWrappedPin
 	pidLogger          *pidlogger.PIDLogger
 	doLogging          bool
+	rawDutyCycle       float64
+	sensorOk           bool
 }
 
 func NewDewControllerRunner(p float64, i float64, d float64, setPoint float64, enabled bool, heatPinNo int, doLogging bool, pidLogger *pidlogger.PIDLogger) (*DewControllerRunner, error) {
@@ -67,6 +70,7 @@ func (dcr *DewControllerRunner) SetTargetTemperature(setPoint float64) {
 
 func (dcr *DewControllerRunner) GetStatus() *models.DewControllerStatus {
 	p, i, d := dcr.pid.PID()
+	scaledDutyCycle := int(dcr.rawDutyCycle / samplePeriodSeconds * 10)
 	return &models.DewControllerStatus{
 		CurrentTemperature: dcr.processValue,
 		CurrentlyHeating:   dcr.isHeatingNow,
@@ -79,7 +83,22 @@ func (dcr *DewControllerRunner) GetStatus() *models.DewControllerStatus {
 		HeatEntireDuration: dcr.heatEntireDuration,
 		TurnHeatOffAfter:   dcr.turnHeatOffAfter,
 		LoggingEnabled:     dcr.doLogging,
+		DutyCycle:          scaledDutyCycle,
+		SensorOk:           dcr.sensorOk,
 	}
+}
+
+func (dcr *DewControllerRunner) SetDutyCycle(dc int) {
+	if dc < 0 || dc > 10 {
+		log.Printf("Unexpected scaled duty cycle:%v", dc)
+		return
+	}
+	scaledMin := 0
+	scaledMax := 10
+	rawMin := 0
+	rawMax := samplePeriodSeconds
+	unscaledDutyCycle := float64((dc-scaledMin)*(rawMax-rawMin)) / float64((scaledMax-scaledMin)+rawMin)
+	dcr.rawDutyCycle = unscaledDutyCycle
 }
 
 func (dcr *DewControllerRunner) getProcessValue() float64 {
@@ -110,9 +129,18 @@ func (dcr *DewControllerRunner) Run(currentTime time.Time) {
 		secondsSincePreviousCheck := currentTime.Sub(dcr.lastSampleTime).Seconds()
 
 		if secondsSincePreviousCheck >= samplePeriodSeconds {
-			pv := dcr.getProcessValue()
-			hv := dcr.pid.Update(pv)
+			var hv, pv float64
+
+			if dcr.sensorOk {
+				pv = dcr.getProcessValue()
+				hv = dcr.pid.Update(pv)
+			} else {
+				pv = 0
+				hv = dcr.rawDutyCycle
+			}
+
 			dcr.lastSampleTime = currentTime
+			dcr.rawDutyCycle = hv
 
 			if hv >= 0 {
 				if int(hv) >= samplePeriodSeconds {

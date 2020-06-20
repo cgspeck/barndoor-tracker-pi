@@ -35,7 +35,8 @@
   "arch": "",
   "trackStatus": null,
   "intervalPeriods": null,
-  "DewControllerSettings": null
+  "DewControllerSettings": null,
+  "PIDLogFiles": null
 }),
   Flushed: (bool) false,
   result: (*http.Response)(<nil>),

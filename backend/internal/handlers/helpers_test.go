@@ -140,6 +140,14 @@ func (ah testAppHandler) SetTargetTemperature(targetTemperature float64) error {
 	return nil
 }
 
+func (ah testAppHandler) SetDutyCycle(_ int) error {
+	return nil
+}
+
+func (ah testAppHandler) GetPIDLogFiles() *models.PIDLogFiles {
+	return nil
+}
+
 func (ah testAppHandler) SaveAppConfig() error {
 	return nil
 }

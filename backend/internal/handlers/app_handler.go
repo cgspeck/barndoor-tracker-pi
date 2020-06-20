@@ -44,6 +44,7 @@ type IAppHandler interface {
 	SetDewControllerEnabled(enabled bool) error
 	SetTargetTemperature(targetTemperature float64) error
 	SetDewControllerLoggingEnabled(enabled bool) error
+	SetDutyCycle(dc int) error
 
 	GetPIDLogFiles() *models.PIDLogFiles
 
@@ -204,6 +205,11 @@ func (ah AppHandler) SetTargetTemperature(targetTemperature float64) error {
 	ah.DewControllerRunner.SetTargetTemperature(targetTemperature)
 	ah.AppContext.DewControllerSettings.TargetTemperature = targetTemperature
 	return config.SaveConfig(ah.AppContext)
+}
+
+func (ah AppHandler) SetDutyCycle(dc int) error {
+	ah.DewControllerRunner.SetDutyCycle(dc)
+	return nil
 }
 
 func (ah AppHandler) SaveAppConfig() error {

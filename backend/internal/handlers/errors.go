@@ -7,7 +7,7 @@ type UnrecognisedPathError struct {
 }
 
 func (u UnrecognisedPathError) Error() string {
-	return fmt.Sprintf("Unrecognised path: %q", u.Path)
+	return fmt.Sprintf("Unrecognised path: %v", u.Path)
 }
 
 type BadRequestError struct{}
@@ -21,7 +21,7 @@ type CouldNotCastToBoolError struct {
 }
 
 func (e CouldNotCastToBoolError) Error() string {
-	return fmt.Sprintf("Could not cast %q to bool", e.val)
+	return fmt.Sprintf("Could not cast %v to bool", e.val)
 }
 
 type CouldNotCastToFloat64Error struct {
@@ -29,7 +29,15 @@ type CouldNotCastToFloat64Error struct {
 }
 
 func (e CouldNotCastToFloat64Error) Error() string {
-	return fmt.Sprintf("Could not cast %q to float64", e.val)
+	return fmt.Sprintf("Could not cast %v to float64", e.val)
+}
+
+type CouldNotCastToIntError struct {
+	val interface{}
+}
+
+func (e CouldNotCastToIntError) Error() string {
+	return fmt.Sprintf("Could not cast %v to int", e.val)
 }
 
 type KeyNotFoundError struct {

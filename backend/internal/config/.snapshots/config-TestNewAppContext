@@ -147,6 +147,7 @@
     I: (float64) 2,
     D: (float64) 3,
     LoggingEnabled: (bool) false
-  })
+  }),
+  PIDLogFiles: (*models.PIDLogFiles)(<nil>)
 })
 (interface {}) <nil>

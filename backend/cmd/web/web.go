@@ -109,6 +109,11 @@ func main() {
 		H:                   handlers.DewControllerHandler,
 		DewControllerRunner: dewcontrollerRunner,
 	})
+	http.Handle("/backend/settings/dew_controller/duty_cycle", handlers.AppHandler{
+		AppContext:          context,
+		H:                   handlers.DewControllerHandler,
+		DewControllerRunner: dewcontrollerRunner,
+	})
 
 	http.Handle("/backend/settings/location", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
 	http.Handle("/backend/toggle/ignoreAz", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})

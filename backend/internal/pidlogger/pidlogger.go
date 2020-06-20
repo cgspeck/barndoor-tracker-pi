@@ -1,7 +1,6 @@
 package pidlogger
 
 import (
-	"fmt"
 	"html"
 	"log"
 	"os"
@@ -76,7 +75,6 @@ func ScanForLogFiles() (*models.PIDLogFiles, error) {
 	res := models.PIDLogFiles{}
 
 	for _, match := range matches {
-		fmt.Println(match)
 		fileInfo, err := os.Stat(match)
 
 		if err != nil {
