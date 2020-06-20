@@ -171,7 +171,7 @@ func main() {
 				diff := currentTime.Sub(previousTime)
 
 				if diff.Milliseconds() >= 200.0 {
-					if l.AccelAvailable() || l.MagAvailable(lsm9ds1.ALL_AXIS) {
+					if l != nil && (l.AccelAvailable() || l.MagAvailable(lsm9ds1.ALL_AXIS)) {
 						l.ReadAccel()
 						l.ReadMag()
 						mx, my, mz := l.M.GetReading()
