@@ -145,6 +145,29 @@ async function setTargetTemperature(targetTemp) {
     .then((r) => r.data);
 }
 
+async function setDutyCycle(dutyCycle) {
+  return axios
+    .post(
+      `${config.endpoint}/backend/settings/dew_controller/duty_cycle`,
+      {
+        dutyCycle,
+      },
+      {
+        transformRequest: [
+          function (data) {
+            const res = {
+              dutyCycle: parseInt(data.dutyCycle, 10),
+            };
+            return JSON.stringify(res);
+          },
+        ],
+      },
+    )
+    .then((r) => {
+      return r.data.enabled;
+    });
+}
+
 async function setPID(p, i, d) {
   return axios
     .post(
@@ -182,6 +205,7 @@ export {
   getIntervalometerSettings,
   setIntervalometerSettings,
   getDewControllerStatus,
+  setDutyCycle,
   setTargetTemperature,
   setPID,
 };

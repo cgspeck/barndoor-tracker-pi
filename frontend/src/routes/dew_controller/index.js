@@ -27,6 +27,7 @@ import {
   getDewControllerStatus,
   setTargetTemperature,
   setPID,
+  setDutyCycle,
 } from '../../lib/settings';
 import {
   toggleDewController,
@@ -59,6 +60,7 @@ export default class DewController extends Component {
       logList: null,
       sensorOk: null,
       lastSliderChanged: Date.now(),
+      dutyCycle: null,
     };
   }
 
@@ -68,6 +70,8 @@ export default class DewController extends Component {
     });
     getDewControllerStatus()
       .then((r) => {
+        const { dutyCycle } = r;
+
         this.setState({
           currentTemperature: r.currentTemperature,
           currentlyHeating: r.currentlyHeating,
@@ -77,7 +81,14 @@ export default class DewController extends Component {
           I: r.i,
           D: r.d,
           loggingEnabled: r.loggingEnabled,
+          dutyCycle: dutyCycle,
+          sensorOk: r.sensorOk,
         });
+
+        const slider = this.fallbackSlider;
+        if (slider) {
+          slider.setValue(dutyCycle);
+        }
         this.timer = setInterval(this.refreshStatus.bind(this), 2000);
       })
       .catch((e) => this.handleError(e));
@@ -91,6 +102,7 @@ export default class DewController extends Component {
   async refreshStatus() {
     getDewControllerStatus()
       .then((r) => {
+        const { dutyCycle } = r;
         this.setState({
           currentTemperature: r.currentTemperature,
           currentlyHeating: r.currentlyHeating,
@@ -98,7 +110,14 @@ export default class DewController extends Component {
           I: r.i,
           D: r.d,
           loggingEnabled: r.loggingEnabled,
+          dutyCycle: dutyCycle,
+          sensorOk: r.sensorOk,
         });
+
+        const slider = this.fallbackSlider;
+        if (slider) {
+          slider.setValue(dutyCycle);
+        }
       })
       .catch((e) => this.handleError(e));
   }
@@ -194,11 +213,7 @@ export default class DewController extends Component {
         </Dialog.Body>
         <Dialog.Footer>
           <Dialog.FooterButton cancel={true}>Cancel</Dialog.FooterButton>
-          <Dialog.FooterButton
-            accept={true}
-            // onClick={() => this.onPIDSubmit.bind(this)}
-            onClick={() => this.onPIDSubmit()}
-          >
+          <Dialog.FooterButton accept={true} onClick={() => this.onPIDSubmit()}>
             Update
           </Dialog.FooterButton>
         </Dialog.Footer>
@@ -283,19 +298,23 @@ export default class DewController extends Component {
 
     if (now - lastSliderChanged > 100 || lastSliderChanged === undefined) {
       this.setState({ lastSliderChanged: now });
-      console.log(e.detail.value);
+      const dutyCycle = e.detail.value;
+      console.log(`Setting duty cycle to ${dutyCycle}`);
+      setDutyCycle(dutyCycle);
     }
   };
 
   FallbackControlTags() {
     const { sensorOk } = this.state;
-
     if (sensorOk !== true) {
       return (
         <div>
           <Slider
+            ref={(fallbackSlider) => {
+              this.fallbackSlider = fallbackSlider;
+            }}
             step={1}
-            value={5}
+            min={0}
             max={10}
             discrete={true}
             onChange={(e) => this.onFallbackSliderChange(e)}

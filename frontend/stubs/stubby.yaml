@@ -244,28 +244,54 @@
     method: [GET]
   response:
     - status: 200
-      body: '{"currentTemperature": 8, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 1.23, "i": 4.56, "d": 7.89, "loggingEnabled": true}'
+      body: '{"currentTemperature": 8, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 1.23, "i": 4.56, "d": 7.89, "loggingEnabled": true, "dutyCycle": 8, "sensorOk": false}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"currentTemperature": 9, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 2.23, "i": 5.56, "d": 8.89, "loggingEnabled": false}'
+      body: '{"currentTemperature": 9, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 2.23, "i": 5.56, "d": 8.89, "loggingEnabled": false, "dutyCycle": 7, "sensorOk": false}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"currentTemperature": 11, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 3.23, "i": 6.56, "d": 9.89, "loggingEnabled": true}'
+      body: '{"currentTemperature": 11, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 3.23, "i": 6.56, "d": 9.89, "loggingEnabled": true, "dutyCycle": 6, "sensorOk": false}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"currentTemperature": 13, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true, "p": 4.23, "i": 7.56, "d": 10.89, "loggingEnabled": true}'
+      body: '{"currentTemperature": 13, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true, "p": 4.23, "i": 7.56, "d": 10.89, "loggingEnabled": true, "dutyCycle": 5, "sensorOk": false}'
       headers:
         Content-Type: application/json
     - status: 200
-      body: '{"currentTemperature": 14, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true, "p": 5.23, "i": 8.56, "d": 11.89, "loggingEnabled": true}'
+      body: '{"currentTemperature": 14, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true, "p": 5.23, "i": 8.56, "d": 11.89, "loggingEnabled": true, "dutyCycle": 4, "sensorOk": false}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 8, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 1.23, "i": 4.56, "d": 7.89, "loggingEnabled": true, "dutyCycle": 8, "sensorOk": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 9, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 2.23, "i": 5.56, "d": 8.89, "loggingEnabled": false, "dutyCycle": 7, "sensorOk": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 11, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 3.23, "i": 6.56, "d": 9.89, "loggingEnabled": true, "dutyCycle": 6, "sensorOk": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 13, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true, "p": 4.23, "i": 7.56, "d": 10.89, "loggingEnabled": true, "dutyCycle": 5, "sensorOk": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 14, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true, "p": 5.23, "i": 8.56, "d": 11.89, "loggingEnabled": true, "dutyCycle": 4, "sensorOk": true}'
       headers:
         Content-Type: application/json
 
 - request:
     url: ^/backend/settings/dew_controller$
+    method: [POST]
+  response:
+    - status: 200
+
+- request:
+    url: ^/backend/settings/dew_controller/duty_cycle$
     method: [POST]
   response:
     - status: 200
