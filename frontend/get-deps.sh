@@ -1,4 +1,4 @@
-#! /bin/bash -e +x
+#! /bin/bash -ex
 # https://gist.github.com/developit/f1a3425ded9b52206c372b6c6b54ddcb
 npm i
 # scaffold your project
