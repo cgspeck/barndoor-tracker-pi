@@ -265,6 +265,12 @@
         Content-Type: application/json
 
 - request:
+    url: ^/backend/settings/dew_controller$
+    method: [POST]
+  response:
+    - status: 200
+
+- request:
     url: ^/backend/settings/pid$
     method: [POST]
   response:

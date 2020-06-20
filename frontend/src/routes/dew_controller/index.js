@@ -20,6 +20,9 @@ import 'preact-material-components/Dialog/style.css';
 import List from 'preact-material-components/List';
 import 'preact-material-components/List/style.css';
 
+import Slider from 'preact-material-components/Slider';
+import 'preact-material-components/Slider/style.css';
+
 import {
   getDewControllerStatus,
   setTargetTemperature,
@@ -54,6 +57,8 @@ export default class DewController extends Component {
       info: null,
       error: null,
       logList: null,
+      sensorOk: null,
+      lastSliderChanged: Date.now(),
     };
   }
 
@@ -221,8 +226,6 @@ export default class DewController extends Component {
       return;
     }
 
-    console.log(logList);
-
     return (
       <List>
         {logList.map((logFile) => (
@@ -273,37 +276,44 @@ export default class DewController extends Component {
     this.pidDialog.MDComponent.show();
   }
 
-  render(
-    {},
-    {
-      currentTemperature,
-      currentlyHeating,
-      dewControllerEnabled,
-      targetTemperature,
-    },
-  ) {
-    return (
-      <div class={style.main}>
-        <h1>Dew Controller</h1>
+  onFallbackSliderChange = (e) => {
+    // filter out spurious events: https://github.com/material-components/material-components-web/issues/5789
+    const now = Date.now();
+    const { previousChangeEvent } = this.lastSliderChanged;
+
+    if (now - previousChangeEvent > 100) {
+      this.setState({ previousChangeEvent: now });
+    } else {
+      console.log('Spurious slider event filtered out');
+    }
+  };
+
+  FallbackControlTags() {
+    const { sensorOk } = this.state;
+
+    if (sensorOk !== true) {
+      return (
         <div>
-          Enabled:{' '}
-          <Switch
-            id="dewControllerEnable"
-            onChange={this.onDewControllerEnabled.bind(this)}
-            checked={dewControllerEnabled === true}
-          ></Switch>
+          <Slider
+            step={1}
+            value={5}
+            max={10}
+            discrete={true}
+            onChange={(e) => this.onFallbackSliderChange(e)}
+            // onChange={this.onFallbackSliderChange.bind(this)}
+          />
+        </div>
+      );
+    }
+  }
+
+  PIDControlsTags() {
+    const { currentTemperature, sensorOk, targetTemperature } = this.state;
+
+    if (sensorOk === true) {
+      return (
+        <div>
           <form onSubmit={this.onSubmit.bind(this)}>
-            {this.infoToast()}
-            {this.errorToast()}
-            <FormField>
-              <Radio
-                id="heating"
-                name="Basic Options"
-                disabled="true"
-                checked={currentlyHeating === true}
-              />
-              <label for="heating">Heating</label>
-            </FormField>
             <p>
               <TextField
                 label="Current Temperature °C"
@@ -329,6 +339,37 @@ export default class DewController extends Component {
               PID Values
             </Button>
           </p>
+        </div>
+      );
+    }
+  }
+
+  render({}, { currentlyHeating, dewControllerEnabled }) {
+    return (
+      <div class={style.main}>
+        <h1>Dew Controller</h1>
+        <div>
+          Enabled:{' '}
+          <Switch
+            id="dewControllerEnable"
+            onChange={this.onDewControllerEnabled.bind(this)}
+            checked={dewControllerEnabled === true}
+          ></Switch>
+          {this.infoToast()}
+          {this.errorToast()}
+          <p>
+            <FormField>
+              <Radio
+                id="heating"
+                name="Basic Options"
+                disabled="true"
+                checked={currentlyHeating === true}
+              />
+              <label for="heating">Heating</label>
+            </FormField>
+          </p>
+          {this.FallbackControlTags()}
+          {this.PIDControlsTags()}
           <p>
             <Button
               raised
