@@ -23,7 +23,7 @@ func New(i2c mutexi2cbus.I2CBus) (*LSM9DS1, error) {
 
 	err := l.checkWhoAmI()
 	if err != nil {
-		return &l, err
+		return nil, err
 	}
 
 	// Gyro initialization stuff:
