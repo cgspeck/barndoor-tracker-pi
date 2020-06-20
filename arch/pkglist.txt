@@ -12,3 +12,4 @@ neovim
 sudo
 tmux
 wireless_tools
+yarn
