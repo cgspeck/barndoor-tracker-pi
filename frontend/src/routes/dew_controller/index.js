@@ -279,12 +279,11 @@ export default class DewController extends Component {
   onFallbackSliderChange = (e) => {
     // filter out spurious events: https://github.com/material-components/material-components-web/issues/5789
     const now = Date.now();
-    const { previousChangeEvent } = this.lastSliderChanged;
+    const { lastSliderChanged } = this.state;
 
-    if (now - previousChangeEvent > 100) {
-      this.setState({ previousChangeEvent: now });
-    } else {
-      console.log('Spurious slider event filtered out');
+    if (now - lastSliderChanged > 100 || lastSliderChanged === undefined) {
+      this.setState({ lastSliderChanged: now });
+      console.log(e.detail.value);
     }
   };
 
@@ -300,7 +299,6 @@ export default class DewController extends Component {
             max={10}
             discrete={true}
             onChange={(e) => this.onFallbackSliderChange(e)}
-            // onChange={this.onFallbackSliderChange.bind(this)}
           />
         </div>
       );
