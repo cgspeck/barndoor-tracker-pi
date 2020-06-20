@@ -1,4 +1,3 @@
-build/
 node_modules/
 frontend/node_modules/
 frontend/build/
@@ -19,4 +18,4 @@ pocs/i2c/whichway
 arduino/bin
 arduino/.envrc
 backend/logs/pid*
-pid-log-viewer/build
+
