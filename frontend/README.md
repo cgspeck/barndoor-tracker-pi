@@ -2,9 +2,9 @@
 
 ## CLI Commands
 
-``` bash
+```bash
 # install dependencies
-npm install
+`./get-deps.sh`
 
 # serve with hot reload at localhost:8080
 npm run dev
