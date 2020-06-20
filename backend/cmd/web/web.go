@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/pidlogger"
@@ -143,10 +142,9 @@ func main() {
 	l, err := lsm9ds1.New(&bus)
 	if err != nil {
 		fmt.Printf("Error instantiating LSM9DS1 driver: %v", err)
-		os.Exit(1)
 	}
 
-	if context.Arch == "arm" {
+	if context.Arch == "arm" && l != nil {
 		log.Println("Begin calibration")
 		l.Calibrate(true)
 		log.Println("End calibration")
