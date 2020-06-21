@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/cgspeck/barndoor-tracker-pi/internal/ds18b20_wrapper"
+
 	"github.com/cgspeck/barndoor-tracker-pi/internal/pidlogger"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/runners"
@@ -56,6 +58,14 @@ func main() {
 		log.Fatalf("Unable to scan for log files: %v\n", err)
 	}
 
+	ds18b20, err := ds18b20_wrapper.New()
+
+	if err != nil {
+		log.Printf("Unable to initialise ds18b20: %v\n", err)
+	} else if !ds18b20.SensorOk() {
+		log.Printf("Initalised ds18b20 but sensor is not responding.")
+	}
+
 	dewcontrollerRunner, err := runners.NewDewControllerRunner(
 		context.DewControllerSettings.P,
 		context.DewControllerSettings.I,
@@ -65,6 +75,7 @@ func main() {
 		25,
 		context.DewControllerSettings.LoggingEnabled,
 		pidLogger,
+		ds18b20,
 	)
 
 	if err != nil {

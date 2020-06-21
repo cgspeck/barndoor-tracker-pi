@@ -5,6 +5,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/cgspeck/barndoor-tracker-pi/internal/ds18b20_wrapper"
+
 	"github.com/cgspeck/barndoor-tracker-pi/internal/pidlogger"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
@@ -29,9 +31,10 @@ type DewControllerRunner struct {
 	doLogging          bool
 	rawDutyCycle       float64
 	sensorOk           bool
+	ds18b20            ds18b20_wrapper.IWrappedDS18B20
 }
 
-func NewDewControllerRunner(p float64, i float64, d float64, setPoint float64, enabled bool, heatPinNo int, doLogging bool, pidLogger *pidlogger.PIDLogger) (*DewControllerRunner, error) {
+func NewDewControllerRunner(p float64, i float64, d float64, setPoint float64, enabled bool, heatPinNo int, doLogging bool, pidLogger *pidlogger.PIDLogger, ds18b20 ds18b20_wrapper.IWrappedDS18B20) (*DewControllerRunner, error) {
 	pidctrl_ := pidctrl.NewPIDController(p, i, d)
 	pidctrl_.SetOutputLimits(0, samplePeriodSeconds)
 	pidctrl_.Set(setPoint)
@@ -49,6 +52,8 @@ func NewDewControllerRunner(p float64, i float64, d float64, setPoint float64, e
 		heatPin:           heatPin,
 		doLogging:         doLogging,
 		pidLogger:         pidLogger,
+		ds18b20:           ds18b20,
+		sensorOk:          ds18b20.SensorOk(),
 	}, nil
 }
 
@@ -102,7 +107,7 @@ func (dcr *DewControllerRunner) SetDutyCycle(dc int) {
 }
 
 func (dcr *DewControllerRunner) getProcessValue() float64 {
-	return 0.0
+	return dcr.ds18b20.Temperature()
 }
 
 func (dcr *DewControllerRunner) turnOffHeat() {
