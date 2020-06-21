@@ -35,6 +35,7 @@ class App extends Component {
       endDate: null,
       desiredEndDate: null,
       filteredRecords: null,
+      loading: true,
     };
   }
 
@@ -47,11 +48,15 @@ class App extends Component {
       return;
     }
 
-    fetch(`/logs/${logFile}`)
+    fetch(`/${logFile}`)
       .then((r) => r.text())
       .then((v) => {
         this.setState({ csv: v });
         this.parseCSV();
+      })
+      .catch((e) => {
+        console.log(`Error retrieving '${logFile}'`, e);
+        this.setState({ hasData: false });
       });
   }
 

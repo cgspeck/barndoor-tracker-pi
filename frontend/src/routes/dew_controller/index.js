@@ -245,7 +245,9 @@ export default class DewController extends Component {
       <List>
         {logList.map((logFile) => (
           <List.Item>
-            <a href={`pid-log-viewer/?file=${logFile.escapedFilename}`}>
+            <a
+              href={`pid-log-viewer/index.html?file=${logFile.escapedFilename}`}
+            >
               {logFile.filename}
             </a>
           </List.Item>
@@ -261,7 +263,7 @@ export default class DewController extends Component {
           this.csvDialog = csvDialog;
         }}
       >
-        <Dialog.Header>Download Logs</Dialog.Header>
+        <Dialog.Header>View Logs</Dialog.Header>
         <Dialog.Body>
           <p>
             Logging Enabled:{' '}
@@ -272,6 +274,7 @@ export default class DewController extends Component {
             />
           </p>
           <p>{this.logListTags()}</p>
+          <a href="/logs/">View Folder</a>
         </Dialog.Body>
         <Dialog.Footer>
           <Dialog.FooterButton accept={true}>Close</Dialog.FooterButton>
