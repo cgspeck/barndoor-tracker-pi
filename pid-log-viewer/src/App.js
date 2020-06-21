@@ -44,7 +44,7 @@ class App extends Component {
     const logFile = qp.split("file=")[1];
 
     if (logFile === undefined) {
-      this.setState({ hasData: false });
+      this.setState({ hasData: false, loading: false });
       return;
     }
 
@@ -56,7 +56,7 @@ class App extends Component {
       })
       .catch((e) => {
         console.log(`Error retrieving '${logFile}'`, e);
-        this.setState({ hasData: false });
+        this.setState({ hasData: false, loading: false });
       });
   }
 
@@ -77,6 +77,7 @@ class App extends Component {
   parseCSV() {
     const splittedLines = this.state.csv.split("\n");
     const maxLen = splittedLines.length - 1;
+    this.setState({ loading: false });
     if (maxLen < 0) {
       this.setState({ hasData: false });
       return;
@@ -236,8 +237,14 @@ class App extends Component {
   }
 
   noData() {
-    if (this.state.hasData !== true) {
+    if (this.state.hasData !== true && this.state.loading === false) {
       return <div>No data!</div>;
+    }
+  }
+
+  loading() {
+    if (this.state.loading === true) {
+      return <div>Loading</div>;
     }
   }
 
@@ -246,6 +253,7 @@ class App extends Component {
       <BrowserRouter basename={process.env.PUBLIC_URL}>
         <MuiPickersUtilsProvider utils={LuxonUtils}>
           <div className="App">
+            {this.loading()}
             {this.datePickers()}
             {this.graph()}
             {this.noData()}
