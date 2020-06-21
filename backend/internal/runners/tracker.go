@@ -14,10 +14,11 @@ const arduinoAddress = byte(0x04)
 
 type TrackerRunner struct {
 	sync.RWMutex
-	previousState       string
-	previousCheck       time.Time
-	checkIntervalMillis int64
-	i2c                 mutexi2cbus.I2CBus
+	previousState                    string
+	previousCheck                    time.Time
+	checkIntervalMillis              int64
+	i2c                              mutexi2cbus.I2CBus
+	suppressArduinoStatusReadMessage bool
 }
 
 func NewTrackerRunner(i2c mutexi2cbus.I2CBus) *TrackerRunner {
@@ -103,8 +104,10 @@ func (tr *TrackerRunner) Run(currentTime time.Time, ts *models.TrackStatus) {
 		// ask the arduino how it is doing!
 		bArduinoStatus, err := tr.readArduinoStatus()
 
-		if err != nil {
+		if err != nil && !tr.suppressArduinoStatusReadMessage {
 			log.Printf("Error reading Arduino status: %v", err)
+			tr.suppressArduinoStatusReadMessage = true
+			log.Println("Suppressing further status read error messages")
 			return
 		}
 
