@@ -51,6 +51,8 @@ chmod o+rx /home/alarm/src/barndoor-tracker-pi/backend/logs
 chmod o+rx /home/alarm/src/barndoor-tracker-pi/backend
 chmod o+rx /home/alarm/src/barndoor-tracker-pi/frontend/build
 chmod o+rx /home/alarm/src/barndoor-tracker-pi/frontend
+chmod o+rx /home/alarm/src/barndoor-tracker-pi/pid-log-viewer/build
+chmod o+rx /home/alarm/src/barndoor-tracker-pi/pid-log-viewer
 chmod o+rx /home/alarm/src/barndoor-tracker-pi
 chmod o+rx /home/alarm/src
 chmod o+rx /home/alarm
