@@ -63,7 +63,7 @@ func main() {
 	if err != nil {
 		log.Printf("Unable to initialise ds18b20: %v\n", err)
 	} else if !ds18b20.SensorOk() {
-		log.Printf("Initalised ds18b20 but sensor is not responding.")
+		log.Printf("Initalised ds18b20 but no sensors connected or sensor is not responding.")
 	}
 
 	dewcontrollerRunner, err := runners.NewDewControllerRunner(
@@ -152,7 +152,7 @@ func main() {
 
 	l, err := lsm9ds1.New(&bus)
 	if err != nil {
-		fmt.Printf("Error instantiating LSM9DS1 driver: %v", err)
+		fmt.Printf("Error instantiating LSM9DS1 driver: %v\n", err)
 	}
 
 	if context.Arch == "arm" && l != nil {
