@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { BrowserRouter } from "react-router-dom";
 import "fontsource-roboto";
 
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
@@ -40,6 +41,12 @@ class App extends Component {
   componentDidMount() {
     const qp = window.location.search;
     const logFile = qp.split("file=")[1];
+
+    if (logFile === undefined) {
+      this.setState({ hasData: false });
+      return;
+    }
+
     fetch(`/logs/${logFile}`)
       .then((r) => r.text())
       .then((v) => {
@@ -231,13 +238,15 @@ class App extends Component {
 
   render() {
     return (
-      <MuiPickersUtilsProvider utils={LuxonUtils}>
-        <div className="App">
-          {this.datePickers()}
-          {this.graph()}
-          {this.noData()}
-        </div>
-      </MuiPickersUtilsProvider>
+      <BrowserRouter basename={process.env.PUBLIC_URL}>
+        <MuiPickersUtilsProvider utils={LuxonUtils}>
+          <div className="App">
+            {this.datePickers()}
+            {this.graph()}
+            {this.noData()}
+          </div>
+        </MuiPickersUtilsProvider>
+      </BrowserRouter>
     );
   }
 }
