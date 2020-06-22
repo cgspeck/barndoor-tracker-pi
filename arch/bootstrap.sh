@@ -68,3 +68,16 @@ fi
 if [ ! -f /etc/dnsmasq.conf.bak ]; then
     cp /etc/dnsmasq.conf /etc/dnsmasq.conf.bak
 fi
+
+PWD=$(pwd)
+cd /src/alarm/src/barndoor-tracker-pi/backend
+go test ./...
+go build ./cmd/web
+chown alarm:alarm ./web
+chmod ugo+x ./web
+cd $PWD
+
+cp /home/alarm/src/barndoor-tracker-pi/arch/etc/systemd/system/barndoor-tracker.service /etc/systemd/system
+systemctl daemon-reload
+systemctl enable barndoor-tracker
+echo "If the kernal drivers are already loaded, run 'systemctl start barndoor-tracker' otherwise reboot now"

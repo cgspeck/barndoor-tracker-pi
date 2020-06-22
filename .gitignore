@@ -17,4 +17,5 @@ pocs/i2c/whichway
 arduino/bin
 arduino/.envrc
 backend/logs/pid*
+backend/web
 
