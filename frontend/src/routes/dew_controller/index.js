@@ -247,6 +247,7 @@ export default class DewController extends Component {
           <List.Item>
             <a
               href={`pid-log-viewer/index.html?file=${logFile.escapedFilename}`}
+              target="_blank"
             >
               {logFile.filename}
             </a>
@@ -274,7 +275,9 @@ export default class DewController extends Component {
             />
           </p>
           <p>{this.logListTags()}</p>
-          <a href="/logs/">View Folder</a>
+          <a href="/logs/" target="_blank">
+            View Folder
+          </a>
         </Dialog.Body>
         <Dialog.Footer>
           <Dialog.FooterButton accept={true}>Close</Dialog.FooterButton>

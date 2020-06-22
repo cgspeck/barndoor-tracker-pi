@@ -205,7 +205,6 @@ func main() {
 					context.Lock()
 					context.Time = &previousTime
 					context.Unlock()
-					log.Println(previousTime)
 				}
 
 				trackerRunner.Run(currentTime, context.TrackStatus)
