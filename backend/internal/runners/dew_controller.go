@@ -146,6 +146,7 @@ func (dcr *DewControllerRunner) Run(currentTime time.Time) {
 
 			dcr.lastSampleTime = currentTime
 			dcr.rawDutyCycle = hv
+			dcr.processValue = pv
 
 			if hv >= 0 {
 				if int(hv) >= samplePeriodSeconds {
