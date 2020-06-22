@@ -22,11 +22,25 @@ func New() (*WrappedDS18B20, error) {
 
 	sensorCount := len(sensors)
 	log.Printf("Found %v sensors\n", sensorCount)
+	wantedSensor := "28-02131a9dd1aa"
 
 	if sensorCount > 0 {
+		found := false
+		sensorAddress = "28-02131a9dd1aa"
 		log.Printf("All sensors: %v\n", sensors)
-		sensorAddress = sensors[0]
-		log.Printf("Selected sensor %q\n", sensorAddress)
+		for _, v := range sensors {
+			if v == wantedSensor {
+				found = true
+				break
+			}
+		}
+
+		if found {
+			log.Printf("Selected sensor %q\n", sensorAddress)
+			sensorOk = true
+		} else {
+			log.Printf("Could not find wanted sensor %q\n", wantedSensor)
+		}
 	}
 
 	return &WrappedDS18B20{
