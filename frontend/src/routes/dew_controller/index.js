@@ -140,7 +140,7 @@ export default class DewController extends Component {
     setTargetTemperature(targetTemperature)
       .then((r) =>
         this.setState({
-          info: 'Intervalometer Settings Updated',
+          info: 'Dew Controller Settings Updated',
           targetTemperature: r.targetTemperature,
         }),
       )

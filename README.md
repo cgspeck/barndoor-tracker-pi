@@ -45,6 +45,22 @@ Note:
 
 ## Optocoupler & Pi Resources
 
+| Rpi    | Optocoupler (-4) | (-1)       | Shutter Barrel Jack |
+| ------ | ---------------- | ---------- | ------------------- |
+| 3v3    | 1k - pin 1       | 1k - pin 1 |                     |
+| GPIO 5 | pin 2            | pin 2      |                     |
+| 3v3    | 1k - pin 3       |            |                     |
+| GPIO 6 | pin 4            |            |                     |
+|        | pin 16           | pin 4      | tip                 |
+|        | pin 15           | pin 3      | common / base       |
+|        | pin 14           |            | middle section      |
+|        | pin 13           |            | common / base       |
+
+Optocopulers:
+
+either 2x PS2501-1 (single channel)
+or 1x PS2501-4 (four channel)
+
 Wiring for each Cathode:
 
 | Logic Side                |
