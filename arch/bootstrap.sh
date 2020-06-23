@@ -72,6 +72,7 @@ fi
 PWD=$(pwd)
 cd /src/alarm/src/barndoor-tracker-pi/backend
 go test ./...
+go build ./...
 go build ./cmd/web
 chown alarm:alarm ./web
 chmod ugo+x ./web
