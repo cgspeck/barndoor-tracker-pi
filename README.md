@@ -88,8 +88,8 @@ FET needs a 100k pulldown on the Gate.
 |         |                |                   |          | P1-1        | 5V        |            |
 |         |                |                   |          | P1-2        |           | 12V        |
 |         | D              |                   |          | P2-Common   |           |            |
-|         |                | PIN4 (GND, black) |          | P1-1        |           |            |
-|         |                |                   | GND      | P1-2        |           |            |
+|         |                | PIN4 (GND, black) |          | P2-1        |           |            |
+|         |                |                   | GND      | P2-2        |           |            |
 
 ## Ardino / Stepper Driver / Button Wiring
 
@@ -106,6 +106,18 @@ FET needs a 100k pulldown on the Gate.
 | D7        |              |           | Pin 1          |              |
 | GND       |              |           | Pin 2          | Cathode      |
 | D8        |              |           |                | 220R - Anode |
+
+## Power
+
+| Arduino | Pi          | 100uf cap | 100uf cap | 5v5a transformer | 12v Jack |
+| ------- | ----------- | --------- | --------- | ---------------- | -------- |
+| GND     | GND         |           |           | GND              | GND      |
+| VIN     |             |           |           |                  | 12v      |
+|         | 5V0 (pin 2) |           |           | 5v               |          |
+|         |             | - cathode |           | GND              |          |
+|         |             | + anode   |           | 5v               |          |
+|         |             |           | - cathode |                  | GND      |
+|         |             |           | + anode   |                  | 12v      |
 
 ## Updating snapshots
 
