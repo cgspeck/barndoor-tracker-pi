@@ -31,17 +31,17 @@ Note:
 
 ## Pi / LSM9DS1 / Nano / Optocoupler Wiring / Transistor / DS18b20 wiring
 
-| Rpi                         | LSM9DS1 | Arduino Nano | Optocoupler                                | DS18B20        | Transistor |
-| --------------------------- | ------- | ------------ | ------------------------------------------ | -------------- | ---------- |
-| 3v3                         | VCC     |              | 1k resistor - Anode 1, 1k resistor Anode 2 | VCC (pin 3)    |            |
-| Ground                      | GND     | GND          | GND                                        | GND (pin 1)    | Collector  |
-| GPIO 2<br/>BCM2<br/>WiPi8   | SDA1    | A4 (SDA)     |                                            |                |            |
-| GPIO 3<br/>BCM3<br/>WiPi9   | SCL1    | A5 (SCL)     |                                            |                |            |
-| GPIO 4<br/>BCM4<br/>WiPi7   |         |              |                                            | DQ (pin 2)     |            |
-| GPIO 5                      |         |              | Cathode 1 (shutter)                        |                |            |
-| GPIO 6                      |         |              | Cathode 2 (focus)                          |                |            |
-| GPIO 25<br/>BCM25<br/>WiPi6 |         |              |                                            |                | Base       |
-|                             |         |              |                                            | DQ - 4k7 - VCC |            |
+| Rpi                         | LSM9DS1 | Arduino Nano | Optocoupler                                | DS18B20        | FET       |
+| --------------------------- | ------- | ------------ | ------------------------------------------ | -------------- | --------- |
+| 3v3                         | VCC     |              | 1k resistor - Anode 1, 1k resistor Anode 2 | VCC (pin 3)    |           |
+| Ground                      | GND     | GND          | GND                                        | GND (pin 1)    | Collector |
+| GPIO 2<br/>BCM2<br/>WiPi8   | SDA1    | A4 (SDA)     |                                            |                |           |
+| GPIO 3<br/>BCM3<br/>WiPi9   | SCL1    | A5 (SCL)     |                                            |                |           |
+| GPIO 4<br/>BCM4<br/>WiPi7   |         |              |                                            | DQ (pin 2)     |           |
+| GPIO 5                      |         |              | Cathode 1 (shutter)                        |                |           |
+| GPIO 6                      |         |              | Cathode 2 (focus)                          |                |           |
+| GPIO 25<br/>BCM25<br/>WiPi6 |         |              |                                            |                | G 1K PD   |
+|                             |         |              |                                            | DQ - 4k7 - VCC |           |
 
 ## Optocoupler & Pi Resources
 
@@ -73,6 +73,23 @@ https://www.sunfounder.com/learn/Super_Kit_V3_0_for_Raspberry_Pi/lesson-8-4n35-s
 https://raspberrypi.stackexchange.com/questions/74117/why-optocoupler-4n35-needs-resistor
 
 https://github.com/yryz/ds18b20
+
+## Pi / FET / Intervalometer Jack
+
+Selected FET: FQP30N06L as mentioned on the [eLinux](https://elinux.org/RPi_GPIO_Interface_Circuits#Using_a_FET) wiki.
+
+FET needs a 100k pulldown on the Gate.
+
+| Pi      | FET            | Usb Jack          | RCA Jack | DPDT Switch | 5v source | 12v source |
+| ------- | -------------- | ----------------- | -------- | ----------- | --------- | ---------- |
+| GND     | S              |                   |          |             | GND       | GND        |
+| GPIO 25 | G - 100K - GND |                   |          |             |           |            |
+|         |                | PIN1 (5v, red)    | PIN      | P1-Common   |           |            |
+|         |                |                   |          | P1-1        | 5V        |            |
+|         |                |                   |          | P1-2        |           | 12V        |
+|         | D              |                   |          | P2-Common   |           |            |
+|         |                | PIN4 (GND, black) |          | P1-1        |           |            |
+|         |                |                   | GND      | P1-2        |           |            |
 
 ## Ardino / Stepper Driver / Button Wiring
 
