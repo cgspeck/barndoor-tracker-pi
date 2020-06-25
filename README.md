@@ -91,33 +91,36 @@ FET needs a 100k pulldown on the Gate.
 |         |                | PIN4 (GND, black) |          | P2-1        |           |            |
 |         |                |                   | GND      | P2-2        |           |            |
 
-## Ardino / Stepper Driver / Button Wiring
+## Ardino / Stepper Driver / Button / Endstop Wiring
 
-| Arduino   | Rpi          | TMC2130   | Momentary SPST | Home LED     |
-| --------- | ------------ | --------- | -------------- | ------------ |
-| A4        | SDA1 (GPIO2) |           |                |              |
-| A5        | SCL1 (GPIO3) |           |                |              |
-| D2        |              | Step      |                |              |
-| D3        |              | Direction |                |              |
-| D5        |              | CS        |                |              |
-| SCK (13)  |              | SCK       |                |              |
-| MOSI (11) |              | SDI       |                |              |
-| MISO (12) |              | SDO       |                |              |
-| D7        |              |           | Pin 1          |              |
-| GND       |              |           | Pin 2          | Cathode      |
-| D8        |              |           |                | 220R - Anode |
+| Arduino   | Rpi          | A4988     | TMC2130   | Momentary SPST | Home LED     | Endstop |
+| --------- | ------------ | --------- | --------- | -------------- | ------------ | ------- |
+| A4        | SDA1 (GPIO2) |           |           |                |              |         |
+| A5        | SCL1 (GPIO3) |           |           |                |              |         |
+| D2        |              | Step      | Step      |                |              |         |
+| D3        |              | Direction | Direction |                |              |         |
+| SS (10)   |              | MS3       | CS        |                |              |         |
+| SCK (13)  |              | MS2       | SCK       |                |              |         |
+| MOSI (11) |              | MS1       | SDI       |                |              |         |
+| MISO (12) |              | RST       | SDO       |                |              |         |
+| D7        |              |           |           | Pin 1          |              |         |
+| GND       |              |           |           | Pin 2          | Cathode      | NO      |
+| D8        |              |           |           |                | 220R - Anode |         |
+| A3        |              |           |           |                |              | C       |
+| D5        |              | SLEEP     | NC        |                |              |         |
+| D9        |              | EN        | EN        |                |              |         |
 
 ## Power
 
-| Arduino | Pi          | 100uf cap | 100uf cap | 5v5a transformer | 12v Jack |
-| ------- | ----------- | --------- | --------- | ---------------- | -------- |
-| GND     | GND         |           |           | GND              | GND      |
-| VIN     |             |           |           |                  | 12v      |
-|         | 5V0 (pin 2) |           |           | 5v               |          |
-|         |             | - cathode |           | GND              |          |
-|         |             | + anode   |           | 5v               |          |
-|         |             |           | - cathode |                  | GND      |
-|         |             |           | + anode   |                  | 12v      |
+| Arduino | Pi          | 100uf cap | 100uf cap | 5v5a transformer | 12v Jack | Stepper |
+| ------- | ----------- | --------- | --------- | ---------------- | -------- | ------- |
+| GND     | GND         |           |           | GND              | GND      |         |
+| VIN     |             |           |           |                  | 12v      |         |
+|         | 5V0 (pin 2) |           |           | 5v               |          | VDD     |
+|         |             | - cathode |           | GND              |          |         |
+|         |             | + anode   |           | 5v               |          |         |
+|         |             |           | - cathode |                  | GND      | GND     |
+|         |             |           | + anode   |                  | 12v      | VMOT    |
 
 ## Updating snapshots
 

@@ -2,10 +2,8 @@
 #undef round
 #include <math.h>
 #include <Wire.h>
-#include <SPI.h>
 
 #include <AccelStepper.h>
-#include <Trinamic_TMC2130.h>
 #include "constants.h"
 #include "debounce.h"
 #include "lookupTable.h"
@@ -22,15 +20,20 @@ unsigned long previous_serial_report_millis = 0;
 #define I2C_SDA A4
 #define I2C_SCL A5
 
-// used by AccellStepper library - implied, but declared here so I can track them
-#define PIN_OUT_STEP 2      // Digital 2
-#define PIN_OUT_DIRECTION 3 // Digital 2
+// 1 for full steps, 2 for half steps, 4 for quarter steps etc
+#define MICROSTEP_FACTOR 4
 
-// used by Trinamic_TMC2130 library for setup of driver
-#define CS_PIN 5    // digital
-#define SPI_SCK 13  // digital
-#define SPI_MOSI 11 // digital
-#define SPI_MISO 12 // digital
+// used by AccellStepper library - implied, but declared here so I can track them
+#define PIN_OUT_STEPPER_STEP 2      // Digital 2
+#define PIN_OUT_STEPPER_DIRECTION 3 // Digital 2
+// on the A4988 these pins are used to configure the stepper driver
+// they match the SPI pins used to configure a TMC2130 in the future
+#define PIN_OUT_STEPPER_SLEEP 5
+#define PIN_OUT_STEPPER_RESET 12
+#define PIN_OUT_STEPPER_MS3 10
+#define PIN_OUT_STEPPER_MS2 13
+#define PIN_OUT_STEPPER_MS1 11
+#define PIN_OUT_STEPPER_ENABLE 9
 
 // used for basic hardware interface
 #define PIN_IN_HOME_RUN_STOP 7   // Digital
@@ -45,7 +48,6 @@ volatile byte previous_mode;
 volatile byte i2c_request = 0b00000000;
 
 AccelStepper stepper(AccelStepper::DRIVER);
-//Trinamic_TMC2130 stepperConfig(CS_PIN);
 
 void handleI2CRecieve(int _numBytes)
 {
@@ -58,17 +60,20 @@ void handleI2CRecieve(int _numBytes)
   switch (requested_mode)
   {
   case mode::STOP_REQUESTED:
-    if (previous_mode == mode::TRACKING) {
+    if (previous_mode == mode::TRACKING)
+    {
       i2c_request = requested_mode;
     }
     break;
   case mode::HOME_REQUESTED:
-    if (previous_mode == mode::IDLE) {
+    if (previous_mode == mode::IDLE)
+    {
       i2c_request = requested_mode;
     }
     break;
   case mode::TRACK_REQUESTED:
-    if (previous_mode == mode::HOMED) {
+    if (previous_mode == mode::HOMED)
+    {
       i2c_request = requested_mode;
     }
     break;
@@ -101,11 +106,47 @@ void turnOnHomeIndicator()
   digitalWrite(PIN_OUT_HOME_INDICATOR, HIGH);
 }
 
-// 1 for full steps, 2 for half steps, 4 for quarter steps etc
-#define MICROSTEP_FACTOR 4
+void setupStepper()
+{
+  pinMode(PIN_OUT_STEPPER_ENABLE, OUTPUT);
+  digitalWrite(PIN_OUT_STEPPER_ENABLE, LOW);
+  pinMode(PIN_OUT_STEPPER_RESET, OUTPUT);
+  digitalWrite(PIN_OUT_STEPPER_RESET, HIGH);
+  pinMode(PIN_OUT_STEPPER_SLEEP, OUTPUT);
+  digitalWrite(PIN_OUT_STEPPER_SLEEP, HIGH);
+  delay(5);
+  pinMode(PIN_OUT_STEPPER_MS1, OUTPUT);
+  pinMode(PIN_OUT_STEPPER_MS2, OUTPUT);
+  pinMode(PIN_OUT_STEPPER_MS3, OUTPUT);
+
+  switch (MICROSTEP_FACTOR)
+  {
+  case 1:
+    digitalWrite(PIN_OUT_STEPPER_MS1, LOW);
+    digitalWrite(PIN_OUT_STEPPER_MS2, LOW);
+    digitalWrite(PIN_OUT_STEPPER_MS3, LOW);
+    break;
+  case 2:
+    digitalWrite(PIN_OUT_STEPPER_MS1, HIGH);
+    digitalWrite(PIN_OUT_STEPPER_MS2, LOW);
+    digitalWrite(PIN_OUT_STEPPER_MS3, LOW);
+    break;
+  case 4:
+    digitalWrite(PIN_OUT_STEPPER_MS1, LOW);
+    digitalWrite(PIN_OUT_STEPPER_MS2, HIGH);
+    digitalWrite(PIN_OUT_STEPPER_MS3, LOW);
+    break;
+  default:
+    digitalWrite(PIN_OUT_STEPPER_MS1, LOW);
+    digitalWrite(PIN_OUT_STEPPER_MS2, LOW);
+    digitalWrite(PIN_OUT_STEPPER_MS3, LOW);
+    break;
+  }
+}
 
 void setup()
 {
+  setupStepper();
   pinMode(PIN_IN_HOME_RUN_STOP, INPUT_PULLUP);
   pinMode(PIN_IN_ENDSTOP, INPUT_PULLUP);
   pinMode(PIN_OUT_HOME_INDICATOR, OUTPUT);
@@ -194,7 +235,8 @@ bool setupTrackingState(int prev)
   return true;
 }
 
-bool isEndstopTriggered() {
+bool isEndstopTriggered()
+{
   return isButtonUp(&inputEndstopHistory);
 }
 
@@ -223,16 +265,19 @@ void loop()
     default:
       break;
     }
-  } else {
+  }
+  else
+  {
     noInterrupts();
     byte i2c_request_copy = i2c_request;
     interrupts();
-    if (i2c_request != 0b00000000) {
+    if (i2c_request != 0b00000000)
+    {
       current_mode = i2c_request;
       noInterrupts();
       i2c_request = 0b00000000;
       interrupts();
-      }
+    }
   }
 
   bool success;
@@ -248,7 +293,8 @@ void loop()
     success = setupHomingState(previous_mode);
     current_mode = success ? mode::HOMING : previous_mode;
 
-    if (current_mode == mode::HOMING) {
+    if (current_mode == mode::HOMING)
+    {
       turnOnHomeIndicator();
       homingBlinkOn = true;
       blinkLastChangedAtMillis = current_millis;
@@ -267,11 +313,15 @@ void loop()
     else
     {
       stepper.runSpeed();
-      if ((unsigned long)(current_millis - blinkLastChangedAtMillis) >= 330) {
-        if (homingBlinkOn) {
+      if ((unsigned long)(current_millis - blinkLastChangedAtMillis) >= 330)
+      {
+        if (homingBlinkOn)
+        {
           turnOffHomeIndicator();
           homingBlinkOn = false;
-        } else {
+        }
+        else
+        {
           turnOnHomeIndicator();
           homingBlinkOn = true;
         }
