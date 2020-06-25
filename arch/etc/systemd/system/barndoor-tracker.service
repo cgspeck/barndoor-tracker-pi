@@ -1,0 +1,10 @@
+[Unit]
+Description=Barndoor Tracker Backend
+
+[Service]
+WorkingDirectory=/home/alarm/src/barndoor-tracker-pi/backend/
+ExecStart=/home/alarm/src/barndoor-tracker-pi/backend/web
+
+[Install]
+WantedBy=default.target
+

@@ -32,7 +32,11 @@
     "WirelessProfiles": []
   },
   "os": "",
-  "arch": ""
+  "arch": "",
+  "trackStatus": null,
+  "intervalPeriods": null,
+  "DewControllerSettings": null,
+  "PIDLogFiles": null
 }),
   Flushed: (bool) false,
   result: (*http.Response)(<nil>),

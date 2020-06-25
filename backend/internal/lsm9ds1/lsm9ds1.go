@@ -3,9 +3,11 @@ package lsm9ds1
 import (
 	"fmt"
 	"log"
+
+	"github.com/cgspeck/barndoor-tracker-pi/internal/mutexi2cbus"
 )
 
-func New(i2c I2CBus) (*LSM9DS1, error) {
+func New(i2c mutexi2cbus.I2CBus) (*LSM9DS1, error) {
 	l := LSM9DS1{
 		agAddress: byte(0x6b),
 		mAddress:  byte(0x1e),
@@ -21,7 +23,7 @@ func New(i2c I2CBus) (*LSM9DS1, error) {
 
 	err := l.checkWhoAmI()
 	if err != nil {
-		return &l, err
+		return nil, err
 	}
 
 	// Gyro initialization stuff:

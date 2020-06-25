@@ -1,7 +1,5 @@
-build/
 node_modules/
 frontend/node_modules/
-frontend/build/
 .vscode/ipch
 .vscode/.browse.c_cpp.db
 backend/backend
@@ -16,3 +14,8 @@ pocs/i2c/accel
 pocs/i2c/basic
 pocs/i2c/mag
 pocs/i2c/whichway
+arduino/bin
+arduino/.envrc
+backend/logs/pid*
+backend/web
+

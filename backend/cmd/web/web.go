@@ -5,13 +5,19 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"time"
+
+	"github.com/cgspeck/barndoor-tracker-pi/internal/ds18b20_wrapper"
+
+	"github.com/cgspeck/barndoor-tracker-pi/internal/pidlogger"
+
+	"github.com/cgspeck/barndoor-tracker-pi/internal/runners"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/aligncalc"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/config"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/handlers"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/lsm9ds1"
+	"github.com/cgspeck/barndoor-tracker-pi/internal/mutexi2cbus"
 	"github.com/cgspeck/barndoor-tracker-pi/internal/wireless"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
@@ -37,50 +43,119 @@ func main() {
 		log.Fatalf("Unable to apply desired network settings: %v\n\n%+v\n", err, context.NetworkSettings)
 	}
 
-	http.Handle("/settings/network", handlers.AppHandler{AppContext: context, H: handlers.NetworkSettingsHandler})
-	http.Handle("/settings/network/ap", handlers.AppHandler{AppContext: context, H: handlers.APSettingsHandler})
-	// low prio: http.Handle("/settings/network/profiles", handlers.AppHandler{context, ...})
-	// low prio: http.Handle("/settings/network/avaliable", handlers.AppHandler{context, ...})
+	intervalometerRunner, err := runners.NewIntervalometerRunner(5, 6, context.IntervalPeriods)
 
-	http.Handle("/settings/location", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
-
-	http.Handle("/status/flags", handlers.AppHandler{AppContext: context, H: handlers.Flags})
-	http.Handle("/status/align", handlers.AppHandler{AppContext: context, H: handlers.AlignHandler})
-	// http.Handle("/status/track", handlers.AppHandler{context, ...})
-	http.Handle("/status/debug", handlers.AppHandler{AppContext: context, H: handlers.DebugHandler})
-
-	// location of the React/Preact Frontend
-	static := "../frontend/build"
-	if context.Arch == "arm" {
-		static = "html"
+	if err != nil {
+		log.Fatalf("Unable to create Intervalometer Runner: %v\n", err)
 	}
-	log.Printf("Serving static content from %v", static)
-	fs := http.FileServer(http.Dir(static))
-	http.Handle("/", fs)
 
-	http.HandleFunc("/config.json", func(w http.ResponseWriter, r *http.Request) {
+	pidLogger, err := pidlogger.NewPIDLogger()
+	defer pidLogger.Close()
+
+	context.PIDLogFiles, err = pidlogger.ScanForLogFiles()
+
+	if err != nil {
+		log.Fatalf("Unable to scan for log files: %v\n", err)
+	}
+
+	ds18b20, err := ds18b20_wrapper.New()
+
+	if err != nil {
+		log.Printf("Unable to initialise ds18b20: %v\n", err)
+	} else if !ds18b20.SensorOk() {
+		log.Printf("Initalised ds18b20 but no sensors connected or sensor is not responding.")
+	}
+
+	dewcontrollerRunner, err := runners.NewDewControllerRunner(
+		context.DewControllerSettings.P,
+		context.DewControllerSettings.I,
+		context.DewControllerSettings.D,
+		context.DewControllerSettings.TargetTemperature,
+		context.DewControllerSettings.Enabled,
+		25,
+		context.DewControllerSettings.LoggingEnabled,
+		pidLogger,
+		ds18b20,
+	)
+
+	if err != nil {
+		log.Fatalf("Unable to create Dew Controller Runner: %v\n", err)
+	}
+
+	http.Handle("/backend/log_list", handlers.AppHandler{AppContext: context, H: handlers.PIDLogHandler})
+
+	http.Handle("/backend/settings/network", handlers.AppHandler{AppContext: context, H: handlers.NetworkSettingsHandler})
+	http.Handle("/backend/settings/network/ap", handlers.AppHandler{AppContext: context, H: handlers.APSettingsHandler})
+	// low prio: http.Handle("/backend/settings/network/profiles", handlers.AppHandler{context, ...})
+	// low prio: http.Handle("/backend/settings/network/avaliable", handlers.AppHandler{context, ...})
+	http.Handle("/backend/settings/intervalometer", handlers.AppHandler{
+		AppContext:     context,
+		H:              handlers.IntervalometerSettingsHandler,
+		IntervalRunner: intervalometerRunner,
+	})
+
+	http.Handle("/backend/status/dew_controller", handlers.AppHandler{
+		AppContext:          context,
+		H:                   handlers.DewControllerHandler,
+		DewControllerRunner: dewcontrollerRunner,
+	})
+	http.Handle("/backend/settings/dew_controller", handlers.AppHandler{
+		AppContext:          context,
+		H:                   handlers.DewControllerHandler,
+		DewControllerRunner: dewcontrollerRunner,
+	})
+	http.Handle("/backend/settings/pid", handlers.AppHandler{
+		AppContext:          context,
+		H:                   handlers.DewControllerHandler,
+		DewControllerRunner: dewcontrollerRunner,
+	})
+	http.Handle("/backend/toggle/dewcontroller", handlers.AppHandler{
+		AppContext:          context,
+		H:                   handlers.DewControllerHandler,
+		DewControllerRunner: dewcontrollerRunner,
+	})
+	http.Handle("/backend/toggle/dewcontroller/logging", handlers.AppHandler{
+		AppContext:          context,
+		H:                   handlers.DewControllerHandler,
+		DewControllerRunner: dewcontrollerRunner,
+	})
+	http.Handle("/backend/settings/dew_controller/duty_cycle", handlers.AppHandler{
+		AppContext:          context,
+		H:                   handlers.DewControllerHandler,
+		DewControllerRunner: dewcontrollerRunner,
+	})
+
+	http.Handle("/backend/settings/location", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
+	http.Handle("/backend/toggle/ignoreAz", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
+	http.Handle("/backend/toggle/ignoreAlt", handlers.AppHandler{AppContext: context, H: handlers.LocationSettingsHandler})
+
+	http.Handle("/backend/status/flags", handlers.AppHandler{AppContext: context, H: handlers.Flags})
+	http.Handle("/backend/status/align", handlers.AppHandler{AppContext: context, H: handlers.AlignHandler})
+	http.Handle("/backend/status/track", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
+	http.Handle("/backend/status/debug", handlers.AppHandler{AppContext: context, H: handlers.DebugHandler})
+
+	http.Handle("/backend/toggle/intervalometer", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
+	http.Handle("/backend/track", handlers.AppHandler{AppContext: context, H: handlers.TrackHandler})
+
+	http.HandleFunc("/backend/config.json", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./config.json")
 	})
 
 	port := 5000
-	if context.Flags.RunningAsRoot {
-		port = 80
-	}
 	log.Printf("Starting server on port %v", port)
 
 	// set up periodic callbacks
 	ticker := time.NewTicker(500 * time.Millisecond)
 	done := make(chan bool)
-	bus := lsm9ds1.NewMutexI2cBus(1)
+	bus := mutexi2cbus.NewMutexI2cBus(1)
 	defer bus.Close()
 
 	l, err := lsm9ds1.New(&bus)
 	if err != nil {
-		fmt.Printf("Error instantiating driver: %v", err)
-		os.Exit(1)
+		fmt.Printf("Error instantiating LSM9DS1 driver: %v\n", err)
 	}
 
-	if context.Arch == "arm" {
+	if context.Arch == "arm" && l != nil {
 		log.Println("Begin calibration")
 		l.Calibrate(true)
 		log.Println("End calibration")
@@ -96,6 +171,8 @@ func main() {
 		context.LocationSettings.IgnoreAlt = true
 	}
 
+	trackerRunner := runners.NewTrackerRunner(&bus)
+
 	go func() {
 		for {
 			select {
@@ -105,7 +182,7 @@ func main() {
 				diff := currentTime.Sub(previousTime)
 
 				if diff.Milliseconds() >= 200.0 {
-					if l.AccelAvailable() || l.MagAvailable(lsm9ds1.ALL_AXIS) {
+					if l != nil && (l.AccelAvailable() || l.MagAvailable(lsm9ds1.ALL_AXIS)) {
 						l.ReadAccel()
 						l.ReadMag()
 						mx, my, mz := l.M.GetReading()
@@ -128,8 +205,11 @@ func main() {
 					context.Lock()
 					context.Time = &previousTime
 					context.Unlock()
-					log.Println(previousTime)
 				}
+
+				trackerRunner.Run(currentTime, context.TrackStatus)
+				intervalometerRunner.Run(currentTime, context.TrackStatus)
+				dewcontrollerRunner.Run(currentTime)
 			}
 		}
 	}()

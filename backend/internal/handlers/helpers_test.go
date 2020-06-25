@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/cgspeck/barndoor-tracker-pi/internal/models"
+	"github.com/cgspeck/barndoor-tracker-pi/internal/runners"
 )
 
 func getWirelessInterfaceRpi() (string, error) {
@@ -19,6 +20,7 @@ func newTestAppHandler() testAppHandler {
 
 	return testAppHandler{
 		AlignStatus:      nil,
+		TrackStatus:      nil,
 		APSettings:       nil,
 		NetworkSettings:  nil,
 		LocationSettings: nil,
@@ -34,6 +36,7 @@ func newTestAppHandler() testAppHandler {
 type testAppHandler struct {
 	APSettings               *models.APSettings
 	AlignStatus              *models.AlignStatus
+	TrackStatus              *models.TrackStatus
 	NetworkSettings          *models.NetworkSettings
 	LocationSettings         *models.LocationSettings
 	Flags                    *models.Flags
@@ -75,6 +78,10 @@ func (ah testAppHandler) GetAPSettings() *models.APSettings {
 	return ah.APSettings
 }
 
+func (ah testAppHandler) GetTrackStatus() *models.TrackStatus {
+	return ah.TrackStatus
+}
+
 func (ah *testAppHandler) SetAPSettings(input map[string]interface{}) error {
 	ah.SetAPSettingsCalls = append(ah.SetAPSettingsCalls, input)
 	return nil
@@ -91,6 +98,58 @@ func (ah testAppHandler) GetFlags() *models.Flags {
 
 func (ah testAppHandler) GetAlignStatus() *models.AlignStatus {
 	return ah.AlignStatus
+}
+
+func (ah testAppHandler) GetIntervalRunner() *runners.IntervalometerRunner {
+	return nil
+}
+
+func (ah testAppHandler) SaveIntervalPeriods(ip *models.IntervalPeriods) error {
+	return nil
+}
+
+func (ah testAppHandler) GetIntervalPeriods() *models.IntervalPeriods {
+	return nil
+}
+
+func (ah testAppHandler) SaveDewControllerSettings(_ *models.DewControllerSettings) error {
+	return nil
+}
+
+func (ah testAppHandler) GetDewControllerSettings() *models.DewControllerSettings {
+	return nil
+}
+
+func (ah testAppHandler) GetDewControllerStatus() *models.DewControllerStatus {
+	return nil
+}
+
+func (ah testAppHandler) SetPID(p float64, i float64, d float64) error {
+	return nil
+}
+
+func (ah testAppHandler) SetDewControllerEnabled(enabled bool) error {
+	return nil
+}
+
+func (ah testAppHandler) SetDewControllerLoggingEnabled(enabled bool) error {
+	return nil
+}
+
+func (ah testAppHandler) SetTargetTemperature(targetTemperature float64) error {
+	return nil
+}
+
+func (ah testAppHandler) SetDutyCycle(_ int) error {
+	return nil
+}
+
+func (ah testAppHandler) GetPIDLogFiles() *models.PIDLogFiles {
+	return nil
+}
+
+func (ah testAppHandler) SaveAppConfig() error {
+	return nil
 }
 
 func (ah *testAppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

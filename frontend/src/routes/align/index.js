@@ -1,46 +1,54 @@
-import { h, Component } from "preact";
-import style from "./style";
+import { h, Component } from 'preact';
+import style from './style';
 
-import TextField from "preact-material-components/TextField";
-import "preact-material-components/TextField/style.css";
+import TextField from 'preact-material-components/TextField';
+import 'preact-material-components/TextField/style.css';
+import Switch from 'preact-material-components/Switch';
+import 'preact-material-components/Switch/style.css';
 
-import { getAlignStatus, getLocationSettings } from "../../lib/settings";
-import { setInterval } from "timers";
+import { getAlignStatus, getLocationSettings } from '../../lib/settings';
+import { toggleIgnoreAz, toggleIgnoreAlt } from '../../lib/commands';
+
+import { setInterval } from 'timers';
 
 export default class Align extends Component {
   state = {
     locationSettings: {
-      latitude: null
+      latitude: null,
     },
+    ignoreAlt: false,
+    ignoreAz: false,
     alignStatus: {
       azAligned: null,
       altAligned: null,
       currentAz: null,
-      currentAlt: null
-    }
+      currentAlt: null,
+    },
   };
 
   async componentDidMount() {
     getLocationSettings()
-      .then(r => {
-        this.setState({ locationSettings: { ...r } });
-        console.log("Starting Interval");
+      .then((r) => {
+        this.setState({ locationSettings: { latitude: r.latitude } });
+        this.setState({ ignoreAlt: r.ignoreAlt });
+        this.setState({ ignoreAz: r.ignoreAz });
+        console.log('Starting Interval');
         this.timer = setInterval(this.refreshAlignmentStatus.bind(this), 500);
       })
-      .catch(e => this.handleError(e));
+      .catch((e) => this.handleError(e));
   }
 
-  handleError = e => {
-    console.error("problem", e);
+  handleError = (e) => {
+    console.error('problem', e);
     this.setState({ error: e });
   };
 
   async refreshAlignmentStatus() {
-    getAlignStatus().then(r => this.setState({ alignStatus: { ...r } }));
+    getAlignStatus().then((r) => this.setState({ alignStatus: { ...r } }));
   }
 
   componentWillUnmount() {
-    console.log("Clearing timer");
+    console.log('Clearing timer');
     clearInterval(this.timer._id);
   }
 
@@ -51,13 +59,13 @@ export default class Align extends Component {
     return <h2>Not Aligned</h2>;
   };
 
-  azTarget = azTarget => {
+  azTarget = (azTarget) => {
     if (azTarget !== null) {
       return `AZ target: ${azTarget}`;
     }
   };
 
-  calculateAzTarget = latitude => {
+  calculateAzTarget = (latitude) => {
     if (latitude === null) return null;
 
     if (latitude < 0) {
@@ -72,11 +80,11 @@ export default class Align extends Component {
       let indicator;
 
       if (azAligned) {
-        indicator = "✔";
+        indicator = '✔';
       } else if (azTarget == 180) {
-        indicator = currentAz < azTarget ? "✘ >>" : "✘ <<";
+        indicator = currentAz < azTarget ? '✘ >>' : '✘ <<';
       } else {
-        indicator = currentAz > 180 ? "✘ >>" : "✘ <<";
+        indicator = currentAz > 180 ? '✘ >>' : '✘ <<';
       }
 
       return `${currentAz.toFixed(2)} ${indicator}`;
@@ -89,16 +97,16 @@ export default class Align extends Component {
       let indicator;
 
       if (altAligned) {
-        indicator = "✔";
+        indicator = '✔';
       } else {
-        indicator = currentAlt > altTarget ? "✘ ▼▼" : "✘ ▲▲";
+        indicator = currentAlt > altTarget ? '✘ ▼▼' : '✘ ▲▲';
       }
 
       return `${currentAlt.toFixed(2)} ${indicator}`;
     }
   };
 
-  altTarget = latitude => {
+  altTarget = (latitude) => {
     if (latitude !== null) {
       const targetVal = Math.abs(latitude);
 
@@ -106,9 +114,27 @@ export default class Align extends Component {
     }
   };
 
-  render({}, { locationSettings, alignStatus }) {
+  onIgnoreAzToggled = (e) => {
+    const enabled = e.target.checked;
+    console.log(`IgnoreAz toggled to: ${enabled ? 'enabled' : 'disabled'}`);
+    this.setState({ ignoreAz: enabled });
+    toggleIgnoreAz(enabled)
+      .then((r) => this.setState({ ignoreAz: r }))
+      .catch((e) => this.handleError(e));
+  };
+
+  onIgnoreAltToggled = (e) => {
+    const enabled = e.target.checked;
+    console.log(`IgnoreAlt toggled to: ${enabled ? 'enabled' : 'disabled'}`);
+    this.setState({ ignoreAlt: enabled });
+    toggleIgnoreAlt(enabled)
+      .then((r) => this.setState({ ignoreAlt: r }))
+      .catch((e) => this.handleError(e));
+  };
+
+  render({}, { locationSettings, alignStatus, ignoreAz, ignoreAlt }) {
     const { azAligned, altAligned, currentAz, currentAlt } = alignStatus;
-    const { latitude, azError } = locationSettings;
+    const { latitude } = locationSettings;
 
     const azTarget = this.calculateAzTarget(latitude);
 
@@ -127,6 +153,13 @@ export default class Align extends Component {
             {this.azTarget(azTarget)}
           </p>
           <p>
+            Ignore Azimuth:{' '}
+            <Switch
+              onChange={this.onIgnoreAzToggled.bind(this)}
+              checked={ignoreAz === true}
+            />
+          </p>
+          <p>
             <TextField
               label="Altitude"
               value={this.altValue(latitude, currentAlt, altAligned)}
@@ -134,6 +167,13 @@ export default class Align extends Component {
             ></TextField>
             <br />
             {this.altTarget(latitude)}
+          </p>
+          <p>
+            Ignore Altitude:{' '}
+            <Switch
+              onChange={this.onIgnoreAltToggled.bind(this)}
+              checked={ignoreAlt === true}
+            />
           </p>
         </div>
       </div>

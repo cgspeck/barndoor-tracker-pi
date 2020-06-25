@@ -1,14 +1,14 @@
 - request:
-    url: /settings/debug
+    url: /backend/status/debug
     method: GET
   response:
     - status: 200
-      file: responses/settings_debug.json
+      file: responses/status_debug.json
       headers:
         Content-Type: application/json
 
 - request:
-    url: /settings/ap
+    url: /backend/settings/network/ap
     method: [GET, POST]
   response:
     - status: 200
@@ -17,7 +17,16 @@
         Content-Type: application/json
 
 - request:
-    url: /flags
+    url: /backend/settings/network
+    method: [POST]
+  response:
+    - status: 200
+      file: responses/settings_network.json
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: /backend/status/flags
     method: GET
   response:
     - status: 200
@@ -26,7 +35,7 @@
         Content-Type: application/json
 
 - request:
-    url: /settings/location
+    url: ^/backend/settings/location$
     method: [GET, POST]
   response:
     - status: 200
@@ -35,18 +44,303 @@
         Content-Type: application/json
 
 - request:
-    url: /status/align
+    url: /backend/status/align
     method: GET
   response:
     - status: 200
       file: responses/status_align.json
       headers:
         Content-Type: application/json
-# -  request:
-#       url: ^/settings/ap$
-#       method: OPTIONS
-#    response:
-#       status: 204
-#       headers:
-#          content-type: application/json
-#          Allow: OPTIONS, GET, POST
+
+- request:
+    url: ^/backend/track$
+    method: GET
+  response:
+    - status: 200
+      body: '{"state": "Homing Requested", "intervalometerEnabled": true, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Homed", "intervalometerEnabled": true, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking Requested", "intervalometerEnabled": true, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerEnabled": true, "dewControllerEnabled": true}'
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Shot 1", "elapsedMillis": 1000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Shot 1", "elapsedMillis": 2000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Shot 1", "elapsedMillis": 62000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Rest 1", "elapsedMillis": 63000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Rest 1", "elapsedMillis": 121000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Rest 1", "elapsedMillis": 122000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Shot 2", "elapsedMillis": 7560000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Shot 2", "elapsedMillis": 9000001, "intervalometerEnabled": true, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Tracking", "intervalometerState": "Shot 2", "elapsedMillis": 10800000, "intervalometerEnabled": true, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"state": "Finished", "intervalometerEnabled": true, "dewControllerEnabled": true}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/track$
+    method: POST
+    json: '{"command":"home"}'
+  response:
+    - status: 200
+      body: '{"state": "Homing"}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/track$
+    method: POST
+    json: '{"command":"track"}'
+  response:
+    - status: 200
+      body: '{"state": "Tracking"}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/track$
+    method: POST
+    json: '{"command":"stop"}'
+  response:
+    - status: 200
+      body: '{"state": "Idle"}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/toggle/intervalometer$
+    method: POST
+    json: '{"enabled":true}'
+  response:
+    - status: 200
+      body: '{"enabled":true}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/toggle/intervalometer$
+    method: POST
+    json: '{"enabled":false}'
+  response:
+    - status: 200
+      body: '{"enabled":false}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/toggle/dewcontroller$
+    method: POST
+    json: '{"enabled":true}'
+  response:
+    - status: 200
+      body: '{"enabled":true}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/toggle/dewcontroller$
+    method: POST
+    json: '{"enabled":false}'
+  response:
+    - status: 200
+      body: '{"enabled":false}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/settings/intervalometer$
+    method: [GET]
+  response:
+    - status: 200
+      body: '{"bulbInterval": 30, "restInterval": 31}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/settings/intervalometer$
+    method: [POST]
+  response:
+    - status: 200
+      body: '{"bulbInterval": 60, "restInterval": 61}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/toggle/ignoreAz$
+    method: POST
+    json: '{"enabled":true}'
+  response:
+    - status: 200
+      body: '{"enabled":true}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/toggle/ignoreAz$
+    method: POST
+    json: '{"enabled":false}'
+  response:
+    - status: 200
+      body: '{"enabled":false}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/toggle/ignoreAlt$
+    method: POST
+    json: '{"enabled":true}'
+  response:
+    - status: 200
+      body: '{"enabled":true}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/toggle/ignoreAlt$
+    method: POST
+    json: '{"enabled":false}'
+  response:
+    - status: 200
+      body: '{"enabled":false}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/status/dew_controller$
+    method: [GET]
+  response:
+    - status: 200
+      body: '{"currentTemperature": 8, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 1.23, "i": 4.56, "d": 7.89, "loggingEnabled": true, "dutyCycle": 8, "sensorOk": false}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 9, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 2.23, "i": 5.56, "d": 8.89, "loggingEnabled": false, "dutyCycle": 7, "sensorOk": false}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 11, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 3.23, "i": 6.56, "d": 9.89, "loggingEnabled": true, "dutyCycle": 6, "sensorOk": false}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 13, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true, "p": 4.23, "i": 7.56, "d": 10.89, "loggingEnabled": true, "dutyCycle": 5, "sensorOk": false}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 14, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true, "p": 5.23, "i": 8.56, "d": 11.89, "loggingEnabled": true, "dutyCycle": 4, "sensorOk": false}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 8, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 1.23, "i": 4.56, "d": 7.89, "loggingEnabled": true, "dutyCycle": 8, "sensorOk": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 9, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 2.23, "i": 5.56, "d": 8.89, "loggingEnabled": false, "dutyCycle": 7, "sensorOk": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 11, "currentlyHeating": true, "targetTemperature": 12, "dewControllerEnabled": true, "p": 3.23, "i": 6.56, "d": 9.89, "loggingEnabled": true, "dutyCycle": 6, "sensorOk": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 13, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true, "p": 4.23, "i": 7.56, "d": 10.89, "loggingEnabled": true, "dutyCycle": 5, "sensorOk": true}'
+      headers:
+        Content-Type: application/json
+    - status: 200
+      body: '{"currentTemperature": 14, "currentlyHeating": false, "targetTemperature": 12, "dewControllerEnabled": true, "p": 5.23, "i": 8.56, "d": 11.89, "loggingEnabled": true, "dutyCycle": 4, "sensorOk": true}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/settings/dew_controller$
+    method: [POST]
+  response:
+    - status: 200
+
+- request:
+    url: ^/backend/settings/dew_controller/duty_cycle$
+    method: [POST]
+  response:
+    - status: 200
+
+- request:
+    url: ^/backend/settings/pid$
+    method: [POST]
+  response:
+    - status: 200
+      body: '{
+        "p": 1.23,
+        "i": 4.56,
+        "d": 7.89,
+        }'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/toggle/dewcontroller/logging$
+    method: POST
+    json: '{"enabled":true}'
+  response:
+    - status: 200
+      body: '{"enabled":true}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/toggle/dewcontroller/logging$
+    method: POST
+    json: '{"enabled":false}'
+  response:
+    - status: 200
+      body: '{"enabled":false}'
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/backend/log_list$
+    method: GET
+  response:
+    - status: 200
+      file: responses/loglist.json
+      headers:
+        Content-Type: application/json
+
+- request:
+    url: ^/logs/pid.log$
+    method: GET
+  response:
+    - status: 200
+      file: responses/pid.log

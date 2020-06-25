@@ -1,6 +1,7 @@
 package lsm9ds1
 
 import (
+	"github.com/cgspeck/barndoor-tracker-pi/internal/mutexi2cbus"
 	"github.com/kidoman/embd"
 )
 
@@ -277,7 +278,7 @@ type LSM9DS1 struct {
 	// x_mAddress and gAddress store the I2C address or SPI chip select pin
 	// for each sensor.
 	mAddress, agAddress byte
-	i2c                 I2CBus
+	i2c                 mutexi2cbus.I2CBus
 
 	// gRes, aRes, and mRes store the current resolution for each sensor.
 	// Units of these values would be DPS (or g's or Gs's) per ADC tick.

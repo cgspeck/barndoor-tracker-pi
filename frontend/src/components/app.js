@@ -10,6 +10,8 @@ import Align from "../routes/align";
 import Track from "../routes/track";
 import APSettings from "../routes/ap_settings";
 import LocationSettings from "../routes/location_settings";
+import IntervalometerSettings from '../routes/intervalometer_settings';
+import DewController from '../routes/dew_controller';
 
 export default class App extends Component {
   state = {
@@ -73,8 +75,10 @@ export default class App extends Component {
           <Debug path="/debug" />
           <Align path="/align" />
           <Track path="/" />
+          <DewController path="/dew_controller" />
           <APSettings path="/ap_settings" />
           <LocationSettings path="/location_settings" />
+          <IntervalometerSettings path="/intervalometer_settings" />
         </Router>
       </div>
     );

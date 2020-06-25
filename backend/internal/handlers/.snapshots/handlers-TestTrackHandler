@@ -1,0 +1,24 @@
+(*httptest.ResponseRecorder)({
+  Code: (int) 200,
+  HeaderMap: (http.Header) (len=1) {
+    (string) (len=12) "Content-Type": ([]string) (len=1) {
+      (string) (len=16) "application/json"
+    }
+  },
+  Body: (*bytes.Buffer)({
+  "state": "foo",
+  "previousState": "",
+  "elapsedMillis": 123,
+  "intervalometerEnabled": false,
+  "intervalometerState": "bar",
+  "TrackStartedAt": "0001-01-01T00:00:00Z"
+}),
+  Flushed: (bool) false,
+  result: (*http.Response)(<nil>),
+  snapHeader: (http.Header) (len=1) {
+    (string) (len=12) "Content-Type": ([]string) (len=1) {
+      (string) (len=16) "application/json"
+    }
+  },
+  wroteHeader: (bool) true
+})

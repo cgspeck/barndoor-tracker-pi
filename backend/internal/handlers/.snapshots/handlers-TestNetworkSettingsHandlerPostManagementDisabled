@@ -8,7 +8,7 @@
       (string) (len=7) "nosniff"
     }
   },
-  Body: (*bytes.Buffer)(Bad Request
+  Body: (*bytes.Buffer)({"error":"Network management is disabled"}
 ),
   Flushed: (bool) false,
   result: (*http.Response)(<nil>),

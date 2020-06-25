@@ -35,12 +35,13 @@ func TestLocationSettingsHandler(t *testing.T) {
 }
 
 func doLocationSettingsPost(
+	path string,
 	body string,
 	testAppHandler *testAppHandler,
 	expectedStatus int,
 	t *testing.T) *httptest.ResponseRecorder {
 	t.Helper()
-	req, err := http.NewRequest("POST", "/", strings.NewReader(body))
+	req, err := http.NewRequest("POST", path, strings.NewReader(body))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,7 +60,8 @@ func doLocationSettingsPost(
 	return rr
 }
 func TestLocationSettingsHandlerPost(t *testing.T) {
-	body := `{
+	body := `
+{
 	"latitude": -37.4
 }
 `
@@ -67,17 +69,18 @@ func TestLocationSettingsHandlerPost(t *testing.T) {
 	handler := newTestAppHandler()
 	handler.H = LocationSettingsHandler
 	handler.LocationSettings = &models.LocationSettings{
-		AltError:        1,
-		AzError:         2,
-		Latitude:        3.4,
-		MagDeclination:  -5.6,
-		XOffset:         7,
-		YOffset:         8,
-		ZOffset:         9,
-		IgnoreAz: false,
+		AltError:       1,
+		AzError:        2,
+		Latitude:       3.4,
+		MagDeclination: -5.6,
+		XOffset:        7,
+		YOffset:        8,
+		ZOffset:        9,
+		IgnoreAz:       true,
+		IgnoreAlt:      true,
 	}
 
-	rr := doLocationSettingsPost(body, &handler, http.StatusOK, t)
+	rr := doLocationSettingsPost("/backend/settings/location", body, &handler, http.StatusOK, t)
 
 	if len(handler.SetLocationSettingsCalls) != 1 {
 		t.Errorf("Expected a call to SetLocationSetting")

@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/pid-log-viewer/static/css/main.5f361e03.chunk.css",
+    "main.js": "/pid-log-viewer/static/js/main.d9dbb465.chunk.js",
+    "main.js.map": "/pid-log-viewer/static/js/main.d9dbb465.chunk.js.map",
+    "runtime-main.js": "/pid-log-viewer/static/js/runtime-main.209da798.js",
+    "runtime-main.js.map": "/pid-log-viewer/static/js/runtime-main.209da798.js.map",
+    "static/css/2.87ecc592.chunk.css": "/pid-log-viewer/static/css/2.87ecc592.chunk.css",
+    "static/js/2.2ad2501f.chunk.js": "/pid-log-viewer/static/js/2.2ad2501f.chunk.js",
+    "static/js/2.2ad2501f.chunk.js.map": "/pid-log-viewer/static/js/2.2ad2501f.chunk.js.map",
+    "index.html": "/pid-log-viewer/index.html",
+    "precache-manifest.6746236eb2f97c0d2c34c400bfbdcdc6.js": "/pid-log-viewer/precache-manifest.6746236eb2f97c0d2c34c400bfbdcdc6.js",
+    "service-worker.js": "/pid-log-viewer/service-worker.js",
+    "static/css/2.87ecc592.chunk.css.map": "/pid-log-viewer/static/css/2.87ecc592.chunk.css.map",
+    "static/css/main.5f361e03.chunk.css.map": "/pid-log-viewer/static/css/main.5f361e03.chunk.css.map",
+    "static/js/2.2ad2501f.chunk.js.LICENSE.txt": "/pid-log-viewer/static/js/2.2ad2501f.chunk.js.LICENSE.txt",
+    "static/media/index.css": "/pid-log-viewer/static/media/roboto-latin-900-normal.bb1e4dc6.woff"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.209da798.js",
+    "static/css/2.87ecc592.chunk.css",
+    "static/js/2.2ad2501f.chunk.js",
+    "static/css/main.5f361e03.chunk.css",
+    "static/js/main.d9dbb465.chunk.js"
+  ]
+}

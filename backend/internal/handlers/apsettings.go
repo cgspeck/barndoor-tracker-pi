@@ -31,10 +31,7 @@ func APSettingsHandler(ah IAppHandler, w http.ResponseWriter, r *http.Request) (
 				return 500, err
 			}
 
-			apSettings := ah.GetAPSettings()
-			apSettings.Lock()
 			err = ah.SetAPSettings(input)
-			apSettings.Unlock()
 
 			if err != nil {
 				return 500, err

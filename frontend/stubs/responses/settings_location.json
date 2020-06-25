@@ -5,5 +5,7 @@
   "altError": 2.0,
   "xOffset": 0,
   "yOffset": 0,
-  "zOffset": 0
+  "zOffset": 0,
+  "ignoreAz": true,
+  "ignoreAlt": false
 }

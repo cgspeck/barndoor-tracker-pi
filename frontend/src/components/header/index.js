@@ -24,8 +24,11 @@ export default class Header extends Component {
   goAlign = this.linkTo("/align");
   goAPSettings = this.linkTo("/ap_settings");
   goLocationSettings = this.linkTo("/location_settings");
+  goIntervalometerSettings = this.linkTo("/intervalometer_settings");
   goDebug = this.linkTo("/debug");
   goTrack = this.linkTo("/");
+  goDewController = this.linkTo("/dew_controller");
+
 
   render({ selectedRoute }, {}) {
     return (
@@ -59,10 +62,17 @@ export default class Header extends Component {
             </Drawer.DrawerItem>
 
             <Drawer.DrawerItem
-              selected={selectedRoute == "/ap_settings"}
-              onClick={this.goAPSettings}
+              selected={selectedRoute == "/intervalometer_settings"}
+              onClick={this.goIntervalometerSettings}
             >
-              AP Settings
+              Intervalometer Settings
+            </Drawer.DrawerItem>
+
+            <Drawer.DrawerItem
+              selected={selectedRoute == "/dew_controller"}
+              onClick={this.goDewController}
+            >
+              Dew Controller
             </Drawer.DrawerItem>
 
             <Drawer.DrawerItem
@@ -71,6 +81,14 @@ export default class Header extends Component {
             >
               Location Settings
             </Drawer.DrawerItem>
+
+            <Drawer.DrawerItem
+              selected={selectedRoute == "/ap_settings"}
+              onClick={this.goAPSettings}
+            >
+              Access Point Settings
+            </Drawer.DrawerItem>
+
             <Drawer.DrawerItem
               selected={selectedRoute == "/debug"}
               onClick={this.goDebug}

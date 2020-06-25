@@ -1,14 +1,17 @@
-import { h, Component } from "preact";
-import style from "./style";
-import { getAllSettings } from "../../lib/settings";
+import { h, Component } from 'preact';
+import style from './style';
+import { getAllSettings } from '../../lib/settings';
 
 export default class Debug extends Component {
-  state = {
-    appContext: null
-  };
+  constructor() {
+    super();
+    this.state = {
+      appContext: null,
+    };
+  }
 
   async componentDidMount() {
-    getAllSettings().then(r => {
+    getAllSettings().then((r) => {
       this.setState({ appContext: r });
     });
   }
@@ -19,8 +22,8 @@ export default class Debug extends Component {
     }
     let jsonStr = JSON.stringify(this.state.appContext, null, 2);
 
-    jsonStr = jsonStr.replace(/\n/g, "<br/>");
-    jsonStr = jsonStr.replace(/ /g, "&nbsp");
+    jsonStr = jsonStr.replace(/\n/g, '<br/>');
+    jsonStr = jsonStr.replace(/ /g, '&nbsp');
 
     return <div dangerouslySetInnerHTML={{ __html: jsonStr }} />;
   }

@@ -38,6 +38,28 @@ if [ ! -f /etc/modules-load.d/raspberrypi.conf.bak ]; then
 fi
 cp etc/modules-load.d/raspberrypi.conf /etc/modules-load.d/raspberrypi.conf
 
+if [ ! -f /etc/lighttpd/lighttpd.conf.bak ]; then
+    cp /etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf.bak
+fi
+
+cp etc/lighttpd/lighttpd.conf /etc/lighttpd/lighttpd.conf
+
+mkdir -p /home/alarm/src/barndoor-tracker-pi/frontend/build
+chown alarm:alarm /home/alarm/src/barndoor-tracker-pi/frontend/build
+
+chmod o+rx /home/alarm/src/barndoor-tracker-pi/backend/logs
+chmod o+rx /home/alarm/src/barndoor-tracker-pi/backend
+chmod o+rx /home/alarm/src/barndoor-tracker-pi/frontend/build
+chmod o+rx /home/alarm/src/barndoor-tracker-pi/frontend
+chmod o+rx /home/alarm/src/barndoor-tracker-pi/pid-log-viewer/build
+chmod o+rx /home/alarm/src/barndoor-tracker-pi/pid-log-viewer
+chmod o+rx /home/alarm/src/barndoor-tracker-pi
+chmod o+rx /home/alarm/src
+chmod o+rx /home/alarm
+
+systemctl start lighttpd
+systemctl enable lighttpd
+
 # files that will be overwritten by the barndoor tracker itself
 if [ ! -f /etc/hostapd/hostapd.conf.bak ]; then
     cp /etc/hostapd/hostapd.conf /etc/hostapd/hostapd.conf.bak
@@ -46,3 +68,17 @@ fi
 if [ ! -f /etc/dnsmasq.conf.bak ]; then
     cp /etc/dnsmasq.conf /etc/dnsmasq.conf.bak
 fi
+
+PWD=$(pwd)
+cd /src/alarm/src/barndoor-tracker-pi/backend
+go test ./...
+go build ./...
+go build ./cmd/web
+chown alarm:alarm ./web
+chmod ugo+x ./web
+cd $PWD
+
+cp /home/alarm/src/barndoor-tracker-pi/arch/etc/systemd/system/barndoor-tracker.service /etc/systemd/system
+systemctl daemon-reload
+systemctl enable barndoor-tracker
+echo "If the kernal drivers are already loaded, run 'systemctl start barndoor-tracker' otherwise reboot now"

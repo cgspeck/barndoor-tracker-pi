@@ -3,7 +3,7 @@ package lsm9ds1
 type MagnetoWhoamiFailed struct{}
 
 func (_ MagnetoWhoamiFailed) Error() string {
-	return "Magentometere Whoami Failed"
+	return "Magentometer Whoami Failed"
 }
 
 type AGWhoamiFailed struct{}

@@ -2,9 +2,9 @@
 
 ## CLI Commands
 
-``` bash
+```bash
 # install dependencies
-npm install
+`./get-deps.sh`
 
 # serve with hot reload at localhost:8080
 npm run dev
@@ -25,5 +25,5 @@ Running the Stubby server:
 
 ```
 /src/barndoor-tracker/frontend
-$ npx stubby -d stubs/stubby.yaml
+$ npx stubby -d stubs/stubby.yaml -s 5000
 ```

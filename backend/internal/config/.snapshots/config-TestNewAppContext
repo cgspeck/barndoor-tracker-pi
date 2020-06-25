@@ -97,6 +97,57 @@
     }
   }),
   OS: (string) (len=5) "linux",
-  Arch: (string) (len=5) "amd64"
+  Arch: (string) (len=5) "amd64",
+  TrackStatus: (*models.TrackStatus)({
+    RWMutex: (sync.RWMutex) {
+      w: (sync.Mutex) {
+        state: (int32) 0,
+        sema: (uint32) 0
+      },
+      writerSem: (uint32) 0,
+      readerSem: (uint32) 0,
+      readerCount: (int32) 0,
+      readerWait: (int32) 0
+    },
+    State: (string) (len=4) "Idle",
+    PreviousState: (string) (len=4) "Idle",
+    ElapsedMillis: (int64) 0,
+    IntervalometerEnabled: (bool) true,
+    IntervalometerState: (string) "",
+    TrackStartedAt: (time.Time) 0001-01-01 00:00:00 +0000 UTC
+  }),
+  IntervalPeriods: (*models.IntervalPeriods)({
+    RWMutex: (sync.RWMutex) {
+      w: (sync.Mutex) {
+        state: (int32) 0,
+        sema: (uint32) 0
+      },
+      writerSem: (uint32) 0,
+      readerSem: (uint32) 0,
+      readerCount: (int32) 0,
+      readerWait: (int32) 0
+    },
+    BulbTimeSeconds: (int) 10,
+    RestTimeSeconds: (int) 20
+  }),
+  DewControllerSettings: (*models.DewControllerSettings)({
+    RWMutex: (sync.RWMutex) {
+      w: (sync.Mutex) {
+        state: (int32) 0,
+        sema: (uint32) 0
+      },
+      writerSem: (uint32) 0,
+      readerSem: (uint32) 0,
+      readerCount: (int32) 0,
+      readerWait: (int32) 0
+    },
+    TargetTemperature: (float64) 0,
+    Enabled: (bool) true,
+    P: (float64) 1,
+    I: (float64) 2,
+    D: (float64) 3,
+    LoggingEnabled: (bool) false
+  }),
+  PIDLogFiles: (*models.PIDLogFiles)(<nil>)
 })
 (interface {}) <nil>
