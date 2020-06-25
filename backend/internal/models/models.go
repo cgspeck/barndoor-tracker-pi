@@ -175,11 +175,9 @@ func (ts *TrackStatus) ProcessArduinoStateChange(arduinoReportedState string) (s
 			nextState = "Homed"
 		}
 	case "Tracking":
-		if currentState == "Homed" || currentState == "Tracking Requested" {
-			stateChanged = true
-			nextState = "Tracking"
-			ts.TrackStartedAt = time.Now()
-		}
+		stateChanged = true
+		nextState = "Tracking"
+		ts.TrackStartedAt = time.Now()
 	case "Idle":
 		if currentState == "Tracking" || currentState == "Stop Requested" {
 			stateChanged = true
