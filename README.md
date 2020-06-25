@@ -93,22 +93,22 @@ FET needs a 100k pulldown on the Gate.
 
 ## Ardino / Stepper Driver / Button / Endstop Wiring
 
-| Arduino   | Rpi          | A4988     | TMC2130   | Momentary SPST | Home LED     | Endstop |
-| --------- | ------------ | --------- | --------- | -------------- | ------------ | ------- |
-| A4        | SDA1 (GPIO2) |           |           |                |              |         |
-| A5        | SCL1 (GPIO3) |           |           |                |              |         |
-| D2        |              | Step      | Step      |                |              |         |
-| D3        |              | Direction | Direction |                |              |         |
-| SS (10)   |              | MS3       | CS        |                |              |         |
-| SCK (13)  |              | MS2       | SCK       |                |              |         |
-| MOSI (11) |              | MS1       | SDI       |                |              |         |
-| MISO (12) |              | RST       | SDO       |                |              |         |
-| D7        |              |           |           | Pin 1          |              |         |
-| GND       |              |           |           | Pin 2          | Cathode      | NO      |
-| D8        |              |           |           |                | 220R - Anode |         |
-| A3        |              |           |           |                |              | C       |
-| D5        |              | SLEEP     | NC        |                |              |         |
-| D9        |              | EN        | EN        |                |              |         |
+| Arduino   | Rpi          | A4988     | TMC2130   | Momentary SPST | Home LED            | Endstop |
+| --------- | ------------ | --------- | --------- | -------------- | ------------------- | ------- |
+| A4        | SDA1 (GPIO2) |           |           |                |                     |         |
+| A5        | SCL1 (GPIO3) |           |           |                |                     |         |
+| D2        |              | Step      | Step      |                |                     |         |
+| D3        |              | Direction | Direction |                |                     |         |
+| SS (10)   |              | MS3       | CS        |                |                     |         |
+| SCK (13)  |              | MS2       | SCK       |                |                     |         |
+| MOSI (11) |              | MS1       | SDI       |                |                     |         |
+| MISO (12) |              | RST       | SDO       |                |                     |         |
+| D7        |              |           |           | Pin 1          |                     |         |
+| GND       |              |           |           | Pin 2          | Cathode             | NO      |
+| D8        |              |           |           |                | SPST - 220R - Anode |         |
+| A3        |              |           |           |                |                     | C       |
+| D5        |              | SLEEP     | NC        |                |                     |         |
+| D9        |              | EN        | EN        |                |                     |         |
 
 ## Power
 
