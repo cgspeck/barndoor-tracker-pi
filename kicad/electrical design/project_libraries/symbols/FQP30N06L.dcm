@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP FQP30N06L
+D FQP30N06L N-Channel MOSFET, 32 A, 60 V QFET, 3-Pin TO-220 ON Semiconductor
+K
+F https://www.mouser.com/datasheet/2/308/FQP30N06L-1306227.pdf
+$ENDCMP
+#
+#End Doc Library

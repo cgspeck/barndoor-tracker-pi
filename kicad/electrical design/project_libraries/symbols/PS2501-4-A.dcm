@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP PS2501-4-A
+D Transistor Output Optocouplers Optocoupler 16-pin DIP
+K
+F https://static6.arrow.com/aropdfconversion/f7a3ab99120737b5601e335c604d7372a3bcd72c/1803056367660517pn10225ej05v0ds.pdf
+$ENDCMP
+#
+#End Doc Library

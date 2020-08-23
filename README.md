@@ -31,17 +31,17 @@ Note:
 
 ## Pi / LSM9DS1 / Nano / Optocoupler Wiring / Transistor / DS18b20 wiring
 
-| Rpi                         | LSM9DS1 | Arduino Nano | Optocoupler                                | DS18B20        | FET       |
-| --------------------------- | ------- | ------------ | ------------------------------------------ | -------------- | --------- |
-| 3v3                         | VCC     |              | 1k resistor - Anode 1, 1k resistor Anode 2 | VCC (pin 3)    |           |
-| Ground                      | GND     | GND          | GND                                        | GND (pin 1)    | Collector |
-| GPIO 2<br/>BCM2<br/>WiPi8   | SDA1    | A4 (SDA)     |                                            |                |           |
-| GPIO 3<br/>BCM3<br/>WiPi9   | SCL1    | A5 (SCL)     |                                            |                |           |
-| GPIO 4<br/>BCM4<br/>WiPi7   |         |              |                                            | DQ (pin 2)     |           |
-| GPIO 5                      |         |              | Cathode 1 (shutter)                        |                |           |
-| GPIO 6                      |         |              | Cathode 2 (focus)                          |                |           |
-| GPIO 25<br/>BCM25<br/>WiPi6 |         |              |                                            |                | G 1K PD   |
-|                             |         |              |                                            | DQ - 4k7 - VCC |           |
+| Rpi                         | LSM9DS1 | Arduino Nano | PS2501-4<br/> Photocoupler                 | DS18B20        |
+| --------------------------- | ------- | ------------ | ------------------------------------------ | -------------- |
+| 3v3                         | VCC     |              | 1k resistor - Anode 1, 1k resistor Anode 2 | VCC (pin 3)    |
+| Ground                      | GND     | GND          | GND                                        | GND (pin 1)    |
+| GPIO 2<br/>BCM2<br/>WiPi8   | SDA1    | A4 (SDA)     |                                            |                |
+| GPIO 3<br/>BCM3<br/>WiPi9   | SCL1    | A5 (SCL)     |                                            |                |
+| GPIO 4<br/>BCM4<br/>WiPi7   |         |              |                                            | DQ (pin 2)     |
+| GPIO 5                      |         |              | Cathode 1 (shutter)                        |                |
+| GPIO 6                      |         |              | Cathode 2 (focus)                          |                |
+| GPIO 25<br/>BCM25<br/>WiPi6 |         |              |                                            |                |
+|                             |         |              |                                            | DQ - 4k7 - VCC |
 
 ## Optocoupler & Pi Resources
 
@@ -80,16 +80,16 @@ Selected FET: FQP30N06L as mentioned on the [eLinux](https://elinux.org/RPi_GPIO
 
 FET needs a 100k pulldown on the Gate.
 
-| Pi      | FET            | Usb Jack          | RCA Jack | DPDT Switch | 5v source | 12v source |
-| ------- | -------------- | ----------------- | -------- | ----------- | --------- | ---------- |
-| GND     | S              |                   |          |             | GND       | GND        |
-| GPIO 25 | G - 100K - GND |                   |          |             |           |            |
-|         |                | PIN1 (5v, red)    | PIN      | P1-Common   |           |            |
-|         |                |                   |          | P1-1        | 5V        |            |
-|         |                |                   |          | P1-2        |           | 12V        |
-|         | D              |                   |          | P2-Common   |           |            |
-|         |                | PIN4 (GND, black) |          | P2-1        |           |            |
-|         |                |                   | GND      | P2-2        |           |            |
+| Pi      | FQP30N06L<br/>FET | Usb Jack          | RCA Jack | DPDT Switch | 5v source | 12v source |
+| ------- | ----------------- | ----------------- | -------- | ----------- | --------- | ---------- |
+| GND     | S                 |                   |          |             | GND       | GND        |
+| GPIO 25 | G - 100K - GND    |                   |          |             |           |            |
+|         |                   | PIN1 (5v, red)    | PIN      | P1-Common   |           |            |
+|         |                   |                   |          | P1-1        | 5V        |            |
+|         |                   |                   |          | P1-2        |           | 12V        |
+|         | D                 |                   |          | P2-Common   |           |            |
+|         |                   | PIN4 (GND, black) |          | P2-1        |           |            |
+|         |                   |                   | GND      | P2-2        |           |            |
 
 ## Ardino / Stepper Driver / Button / Endstop Wiring
 
@@ -128,3 +128,7 @@ FET needs a 100k pulldown on the Gate.
 cd backend
 UPDATE_SNAPSHOTS=true go test ./... -v
 ```
+
+## Tools
+
+Custom component symbols & footprints from [Component Search Engine](https://componentsearchengine.com/).

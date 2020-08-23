@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name PS2501-4-A)(type Legacy)(uri ${KIPRJMOD}/project_libraries/symbols/PS2501-4-A.lib)(options "")(descr ""))
+  (lib (name FQP30N06L)(type Legacy)(uri ${KIPRJMOD}/project_libraries/symbols/FQP30N06L.lib)(options "")(descr ""))
+)
